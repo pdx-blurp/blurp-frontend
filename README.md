@@ -1,2 +1,2 @@
-# Ecomapper-capstone-project
-The GitHub repository for the Ecomapper capstone project.
+# Ecomapper-capstone-project-Front-end
+The GitHub repository for the front end of Ecomapper capstone project.
