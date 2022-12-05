@@ -57,8 +57,8 @@
 }
 
 .background {
-  background-image: url('../assets/Happy woman chatting with friends online.png');
-  background-position-x: right -40%;
+  background-image: url('../assets/bg-home.png');
+  background-position: right -15% top 30%;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: 60%;
