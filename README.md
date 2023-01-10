@@ -1,7 +1,7 @@
-# Ecomapper-capstone-project-Front-end
+# Blurp Front End 
 
-# Ecomapper
-Ecomapper is a web application written in React + Express + MongoDB.
+# Blurp 
+Blurp is a web application written in React + Express + MongoDB.
 
 <img align="right" width="159px" src="">
 
@@ -11,14 +11,14 @@ To get developing, you'll want to clone this repository first. You'll also want 
 
 1. Go to your terminal and `cd` into a working folder you want to work in. 
 
-2. Now run `git clone https://github.com/ecomappah/Front-End-Ecomapper-Capstone-Project.git`.
+2. Now run `git clone https://github.com/pdx-blurp/blurp-frontend.git`.
 
 3. Next, make sure that you're linked to this remote repo by running these two commands:
 ```
-git remote add origin https://github.com/dan-trang/BoBoBa.git
+git remote add origin https://github.com/pdx-blurp/blurp-frontend.git
 ```
 ```
-git remote set-url origin https://github.com/dan-trang/BoBoBa.git
+git remote set-url origin https://github.com/pdx-blurp/blurp-frontend.git
 ```
 4. Add a new working branch in your local and change to it: `git checkout -b <first name><last initial>/<purpose of branch>`. Ex: `danielt/fixing-stuff`
 
