@@ -31,10 +31,9 @@ Now, you should be all set up to start developing!
 
 ## Running the Server
 
-We'll be using Docker Containers soon TM. For now, navigate to /ecomapper-app and do the following:
+We'll be using Docker Containers soon TM. For now, navigate to /blurp-app and do the following:
 
 ```
-> cd blurp-add
 > npm install
 > npm run dev
 ```
