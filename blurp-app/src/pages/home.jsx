@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import BrandName from '../assets/ecomap_transparent_name.png'
 import NavbarProp from '../components/navbar'
 
+
 const Home = () => {
   return (
     <>
@@ -19,7 +20,7 @@ const Home = () => {
           </div>
           <div class="my-5">
             <div class="flex flex-row flex-1 justify-end items-center gap-8">
-              <button class="btn-start px-8 ">Start (Local)</button>
+              <Link to="/blurpmap"><button class="btn-start px-8 ">Start (Local)</button></Link>
               <button class="btn-start px-8">Start (Log In)</button>
             </div>
             <div class="flex grid lg:grid-cols-2">
