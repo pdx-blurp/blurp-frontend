@@ -4,6 +4,7 @@ import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/test.splinecode';
 
+
 const Home = () => {
   return (
     <>
@@ -25,9 +26,11 @@ const Home = () => {
           </div>
           <div className="my-5">
             <div className="xl:flex xl:flex-row xl:flex-1 xl:justify-between items-center gap-8">
-              <button className="btn-start xl:w-1/2 w-4/5">
-                Start (Local)
-              </button>
+              <Link to="/blurpmap">
+                <button className="btn-start xl:w-1/2 w-4/5">
+                  Start (Local)
+                </button>
+              </Link>
               <button className="btn-start xl:w-1/2 w-4/5">
                 Start (Log In)
               </button>
