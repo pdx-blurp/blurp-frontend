@@ -7,7 +7,7 @@ const BlurpMap = () => {
         <>
             <div>
                 <SearchBar/>
-                <DataSidebar expanded="true"/>
+                <DataSidebar/>
                 <div>
                     <br/>
                     <br/>
