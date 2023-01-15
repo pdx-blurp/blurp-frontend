@@ -22,7 +22,7 @@ class DataSidebar extends React.Component {
         this.onclick = this.expand;
         this.setState({
             content: this.renderContent()
-        })
+        });
     }
 
     expand = () => {
@@ -38,13 +38,13 @@ class DataSidebar extends React.Component {
     renderContent() {
         return (
             <>
-                <div class={this.data_sidebar}>
-                    <div class="data-sidebar-tab" onClick={this.onclick}>
-                        <svg class="data-sidebar-tab-arrow" fill="currentColor">
+                <div className={this.data_sidebar}>
+                    <div className="data-sidebar-tab" onClick={this.onclick}>
+                        <svg className="data-sidebar-tab-arrow" fill="currentColor">
                             <polygon points={this.svg_coods}/>
                         </svg>
                     </div>
-                    <div class={this.data_sidebar_background}>
+                    <div className={this.data_sidebar_background}>
                         <p>
                             This is a data sidebar. The data of the selected
                             entity in the graph will appear here.
