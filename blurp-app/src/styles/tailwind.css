@@ -66,6 +66,10 @@
   .searchbar-btn {
     @apply inline-flex items-center py-2.5 px-3 ml-0 text-sm font-medium text-white bg-green-600 rounded-r-lg border border-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
   }
+
+  .landing-background {
+    @apply bg-indigo-900;
+  }
 }
 
 .background {

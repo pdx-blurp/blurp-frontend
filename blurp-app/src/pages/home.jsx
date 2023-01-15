@@ -2,15 +2,17 @@ import { Link } from 'react-router-dom';
 import BrandName from '../assets/ecomap_transparent_name.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
-import SplineModel from '../assets/test.splinecode';
-
+import SplineModel from '../assets/scene.splinecode';
 
 const Home = () => {
   return (
     <>
-      <div className="relative">
+      <div className="relative landing-background">
         <NavbarProp />
-        <Spline className="h-full w-full absolute" scene={SplineModel} />
+        <Spline
+          className="h-full w-full md:absolute sticky md:scale-100 scale-10"
+          scene={SplineModel}
+        />
         <div className="relative grid justify-center grid-cols-1 mx-24 px-6/12 py-10 lg:w-5/12 text-white">
           <div className="my-5">
             <div className="grid justify-center">
@@ -26,10 +28,8 @@ const Home = () => {
           </div>
           <div className="my-5">
             <div className="xl:flex xl:flex-row xl:flex-1 xl:justify-between items-center gap-8">
-              <Link to="/blurpmap">
-                <button className="btn-start xl:w-1/2 w-4/5">
-                  Start (Local)
-                </button>
+              <Link to="/blurpmap" className="xl:w-1/2 w-4/5">
+                <button className="btn-start">Start (Local)</button>
               </Link>
               <button className="btn-start xl:w-1/2 w-4/5">
                 Start (Log In)
