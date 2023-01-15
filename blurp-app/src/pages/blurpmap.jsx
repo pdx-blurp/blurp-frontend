@@ -1,11 +1,13 @@
 
-import SearchBar from "../components/searchbar.jsx"
+import SearchBar from "../components/searchbar.jsx";
+import DataSidebar from "../components/data_sidebar.jsx";
 
 const BlurpMap = () => {
     return (
         <>
             <div>
                 <SearchBar/>
+                <DataSidebar expanded="true"/>
                 <div>
                     <br/>
                     <br/>
