@@ -72,7 +72,7 @@
   }
 
   .data-sidebar-tab {
-    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-gray-400 rounded-l-md hover:cursor-pointer items-center;
+    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-green-600 rounded-l-md hover:cursor-pointer items-center;
   }
 
   .data-sidebar-tab-arrow {

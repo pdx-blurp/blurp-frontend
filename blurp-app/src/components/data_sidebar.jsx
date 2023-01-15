@@ -5,7 +5,7 @@ class DataSidebar extends React.Component {
         super(props);
 
         this.data_sidebar = "data-sidebar";
-        this.svg_coods = "5,20 5,40 14,30";
+        this.svg_coods = "4,20 4,40 13,30";
         this.data_sidebar_background = "data-sidebar-background";
         this.onclick = this.collapse;
         this.state = ({
@@ -27,7 +27,7 @@ class DataSidebar extends React.Component {
 
     expand = () => {
         this.data_sidebar = "data-sidebar";
-        this.svg_coods = "5,20 5,40 14,30";
+        this.svg_coods = "4,20 4,40 13,30";
         this.data_sidebar_background = "data-sidebar-background";
         this.onclick = this.collapse;
         this.setState({
