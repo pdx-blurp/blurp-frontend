@@ -6,14 +6,10 @@ import SplineModel from '../assets/scene.splinecode';
 
 const Home = () => {
   return (
-    <>
-      <div className="relative landing-background">
-        <NavbarProp />
-        <Spline
-          className="h-full w-full md:absolute sticky md:scale-100 scale-10"
-          scene={SplineModel}
-        />
-        <div className="relative grid justify-center grid-cols-1 mx-24 px-6/12 py-10 lg:w-5/12 text-white">
+    <div className="landing-background">
+      <NavbarProp />
+      <div className="grid lg:grid-cols-5 grid-cols-1">
+        <div className="relative grid justify-center grid-cols-1 mx-24 px-6/12 py-10 text-white lg:col-span-3 lg:w-4/6 order-last lg:order-first">
           <div className="my-5">
             <div className="grid justify-center">
               <img
@@ -91,9 +87,13 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <footer className="text-center">Made in 2022 by PDX Blurp</footer>
+        <Spline
+          className="h-full w-full scale-100 lg:col-span-2 order-first lg-order-last"
+          scene={SplineModel}
+        />
       </div>
-    </>
+      <footer className="text-center">Made in 2022 by PDX Blurp</footer>
+    </div>
   );
 };
 
