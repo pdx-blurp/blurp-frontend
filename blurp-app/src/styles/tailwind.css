@@ -32,7 +32,7 @@
   }
 
   .btn-start {
-    @apply w-64 h-20 m-5 bg-green-600 text-white text-3xl font-bold shadow-md rounded-xl;
+    @apply xl:w-64 w-96 h-20 my-4 bg-green-600 text-white text-3xl font-bold shadow-md rounded-xl inline-grid place-items-center;
   }
 
   .main-title {
@@ -70,14 +70,6 @@
   .landing-background {
     @apply bg-indigo-900;
   }
-}
-
-.background {
-  background-image: url('../assets/bg-home.png');
-  background-position: right -15% top 30%;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 60%;
 }
 
 .youtube-placeholder {

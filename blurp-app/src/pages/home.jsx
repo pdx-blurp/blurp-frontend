@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BrandName from '../assets/blurp_noslogan.png';
+import BrandName from '../assets/blurp_noslogan_dark.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
@@ -8,29 +8,24 @@ const Home = () => {
   return (
     <div className="landing-background">
       <NavbarProp />
-      <div className="grid lg:grid-cols-5 grid-cols-1">
-        <div className="relative grid justify-center grid-cols-1 mx-24 px-6/12 py-10 text-white lg:col-span-3 lg:w-4/6 order-last lg:order-first">
+      <div className="grid lg:grid-cols-2 grid-cols-1">
+        <div className="relative grid justify-center grid-cols-1 mx-20 px-6/12 py-10 text-white lg:w-5/6 order-last lg:order-first">
           <div className="my-5">
             <div className="grid justify-center">
-              <img
-                class="m-4 h-40 w-56"
-                src={BrandName}
-                alt="Ecomapper the Greatest"
-              />
-              {/* <h1 class="text-center main-title">Ecomapper</h1> */}
+              <img class="m-4" src={BrandName} alt="Blurp the Greatest" />
               <h2 className="text-center main-subtitle text-white">
                 A tool for you to map your relationships
               </h2>
             </div>
           </div>
           <div className="my-5">
-            <div className="xl:flex xl:flex-row xl:flex-1 xl:justify-between items-center gap-8">
-              <Link to="/blurpmap" className="xl:w-1/2 w-4/5">
-                <button className="btn-start">Start (Local)</button>
+            <div className="grid xl:grid-cols-2 grid-cols-1 gap-8 justify-items-center">
+              <Link to="/blurpmap" className="btn-start" role="button">
+                Start (Local)
               </Link>
-              <button className="btn-start xl:w-1/2 w-4/5">
+              <Link to="/blurpmap" className="btn-start" role="button">
                 Start (Log In)
-              </button>
+              </Link>
             </div>
             <div className="grid lg:grid-cols-2"></div>
             <div className="grid">
@@ -89,7 +84,7 @@ const Home = () => {
           </div>
         </div>
         <Spline
-          className="h-full w-full scale-100 lg:col-span-2 order-first lg-order-last"
+          className="md:scale-90 scale-50 order-first lg-order-last"
           scene={SplineModel}
         />
       </div>
