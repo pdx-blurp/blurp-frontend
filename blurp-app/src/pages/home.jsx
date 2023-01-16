@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BrandName from '../assets/ecomap_transparent_name.png';
+import BrandName from '../assets/blurp_noslogan.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
@@ -13,10 +13,11 @@ const Home = () => {
           <div className="my-5">
             <div className="grid justify-center">
               <img
-                className="m-4 h-40 w-96"
+                class="m-4 h-40 w-56"
                 src={BrandName}
                 alt="Ecomapper the Greatest"
               />
+              {/* <h1 class="text-center main-title">Ecomapper</h1> */}
               <h2 className="text-center main-subtitle text-white">
                 A tool for you to map your relationships
               </h2>
