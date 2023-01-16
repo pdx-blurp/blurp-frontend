@@ -32,7 +32,7 @@
   }
 
   .btn-start {
-    @apply xl:w-64 w-96 h-20 my-4 bg-green-600 text-white text-3xl font-bold shadow-md rounded-xl inline-grid place-items-center;
+    @apply xl:w-64 w-96 h-20 my-4 bg-fuchsia-750 text-white text-3xl font-bold shadow-md rounded-xl inline-grid place-items-center;
   }
 
   .main-title {
@@ -44,7 +44,7 @@
   }
 
   .section-title {
-    @apply text-green-600 text-6xl font-bold py-5;
+    @apply text-pink-550 text-6xl font-bold py-5;
   }
 
   .hero-card {

@@ -8,8 +8,8 @@ const Home = () => {
   return (
     <div className="landing-background">
       <NavbarProp />
-      <div className="grid lg:grid-cols-2 grid-cols-1">
-        <div className="relative grid justify-center grid-cols-1 mx-20 px-6/12 py-10 text-white lg:w-5/6 order-last lg:order-first">
+      <div className="grid xl:grid-cols-2 grid-cols-1 justify-items-center">
+        <div className="relative grid justify-center grid-cols-1 mx-20 px-6/12 py-10 text-neutral-75 lg:w-5/6 order-last xl:order-first">
           <div className="my-5">
             <div className="grid justify-center">
               <img class="m-4" src={BrandName} alt="Blurp the Greatest" />
@@ -84,7 +84,7 @@ const Home = () => {
           </div>
         </div>
         <Spline
-          className="md:scale-90 scale-50 order-first lg-order-last"
+          className="order-first xl:order-last lg:scale-100 scale-75"
           scene={SplineModel}
         />
       </div>
