@@ -1,4 +1,4 @@
-import logo_image from '../assets/ecomap_transparent_logo.png'
+import logo_image from '../assets/blurp_purplebrain.png'
 import profile_pic from '../assets/chubby_yellow_duck.png'
 import { Link } from 'react-router-dom'
 
@@ -9,7 +9,7 @@ function NavbarProp() {
                 <Link to="/">
                     <div class="cursor-pointer mx-2 flex items-center flex-shrink-0">
                         <img class="mr-4 h-8 w-8" src={logo_image} alt="Home Page" />
-                        <div class="font-mono text-xl font-semibold tracking-wider text-white">Ecomapper</div>
+                        <div class="font-mono text-xl font-semibold tracking-wider text-white">blurp</div>
                     </div>
                 </Link>
                 <ul class="hidden md:flex flex-row flex-1 justify-end items-center gap-8 uppercase text-xs">
