@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BrandName from '../assets/ecomap_transparent_name.png'
+import BrandName from '../assets/blurp_noslogan.png'
 import NavbarProp from '../components/navbar'
 
 
@@ -11,7 +11,7 @@ const Home = () => {
         <div class="flex justify-center grid grid-cols-1 mx-24 px-6/12 py-10 w-5/12">
           <div class="my-5">
             <div class="grid justify-center">
-              <img class="m-4 h-40 w-96" src={BrandName} alt="Ecomapper the Greatest" />
+              <img class="m-4 h-40 w-56" src={BrandName} alt="Ecomapper the Greatest" />
               {/* <h1 class="text-center main-title">Ecomapper</h1> */}
               <h2 class="text-center main-subtitle">
                 A tool for you to map your relationships
