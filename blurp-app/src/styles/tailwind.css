@@ -67,6 +67,22 @@
     @apply inline-flex items-center py-2.5 px-3 ml-0 text-sm font-medium text-white bg-green-600 rounded-r-lg border border-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
   }
 
+  .data-sidebar {
+    @apply absolute w-[260px] h-[60%] my-[100px] right-0 p-0;
+  }
+
+  .data-sidebar-tab {
+    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-green-600 rounded-l-md hover:cursor-pointer items-center;
+  }
+
+  .data-sidebar-tab-arrow {
+    @apply h-full w-full text-gray-200 dark:text-gray-200;
+  }
+
+  .data-sidebar-background {
+    @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 rounded-l-xl;
+  }
+
   .landing-background {
     @apply bg-indigo-900;
   }
