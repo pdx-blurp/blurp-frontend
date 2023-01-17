@@ -1,7 +1,5 @@
 # Blurp Front End
 
-# Blurp
-
 Blurp is a web application written in React + Express + MongoDB.
 
 <img align="right" width="159px" src="https://raw.githubusercontent.com/dan-trang/MyFiles/main/blurp_noslogan-removebg-preview.png">
