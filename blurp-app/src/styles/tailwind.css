@@ -32,7 +32,7 @@
   }
 
   .btn-start {
-    @apply w-64 h-20 m-5 bg-green-600 text-white text-3xl font-bold shadow-md rounded-xl;
+    @apply xl:w-64 w-96 h-20 my-4 bg-fuchsia-750 text-white text-3xl font-bold shadow-md rounded-xl inline-grid place-items-center;
   }
 
   .main-title {
@@ -44,7 +44,7 @@
   }
 
   .section-title {
-    @apply text-green-600 text-6xl font-bold py-5;
+    @apply text-pink-550 text-6xl font-bold py-5;
   }
 
   .hero-card {
@@ -66,14 +66,26 @@
   .searchbar-btn {
     @apply inline-flex items-center py-2.5 px-3 ml-0 text-sm font-medium text-white bg-green-600 rounded-r-lg border border-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
   }
-}
 
-.background {
-  background-image: url('../assets/bg-home.png');
-  background-position: right -15% top 30%;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: 60%;
+  .data-sidebar {
+    @apply absolute w-[260px] h-[60%] my-[100px] right-0 p-0;
+  }
+
+  .data-sidebar-tab {
+    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-green-600 rounded-l-md hover:cursor-pointer items-center;
+  }
+
+  .data-sidebar-tab-arrow {
+    @apply h-full w-full text-gray-200 dark:text-gray-200;
+  }
+
+  .data-sidebar-background {
+    @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 rounded-l-xl;
+  }
+
+  .landing-background {
+    @apply bg-indigo-900;
+  }
 }
 
 .youtube-placeholder {
