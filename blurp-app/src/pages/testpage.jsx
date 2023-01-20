@@ -22,7 +22,9 @@ export const LoadGraph = () => {
     //and reduce namespace collision
     graph.addNode("A", { x: 0, y: 0, label: "A", size: 15, color: "#FA4F40" });
     graph.addNode("B", { x: 1, y: 1, label: "B", size: 15, color: "#FA4F40" });
-    graph.addEdgeWithKey(uuidv4(), "A", "B", {label: "friends", size: 5, color: "black"});
+    graph.addNode("C", { x: -0.2, y: 2, label: "C", size: 15, color: "#FA4F40" });
+    graph.addEdgeWithKey(uuidv4(), "A", "B", {label: "friends"});
+    graph.addEdgeWithKey(uuidv4(), "B", "C", {label: "family"});
 
 
     //console.log reports of all Edges attributes on the map
@@ -45,6 +47,7 @@ const TestPage = () => {
       <SigmaContainer 
         id="blurp-map-container"
         graph={MultiUndirectedGraph}
+        settings={{ renderEdgeLabels: true}}
       >
         <LoadGraph />
       </SigmaContainer>
