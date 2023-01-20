@@ -6,8 +6,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const LoadGraph = () => {
   const loadGraph = useLoadGraph();
-  const node1 = uuidv4();
-  const node2 = uuidv4();
 
   useEffect(() => {
     //i'm leaving these settings "exposed" for future tweeks if necesssary
@@ -15,7 +13,9 @@ export const LoadGraph = () => {
     // const graph = new Graph({type: "mixed", allowSelfLoops: false, multi: true});
     const graph = new MultiUndirectedGraph();
 
-    //test add Node & Edges
+    //Node & Edges
+    //Use uuidv4() to random generate key IDs for edges to optimize performance
+    //and reduce namespace collision
     graph.addNode("A", { x: 0, y: 0, label: "A", size: 15, color: "#FA4F40" });
     graph.addNode("B", { x: 1, y: 1, label: "B", size: 15, color: "#FA4F40" });
     graph.addEdgeWithKey(uuidv4(), "A", "B", {label: "friends", size: 5, color: "black"});
