@@ -25,9 +25,11 @@ class DataSidebar extends React.Component {
         </p>
       </div>,
       <div className="data-sidebar-background grid justify-items-center">
+        <h1>Person</h1>
         <form>
           <input type="name" placeholder="Name" className="textbox-sidebar" />
           <input type="number" placeholder="Age" className="textbox-sidebar" />
+          <input type="text" placeholder="Misc." className="textbox-sidebar" />
           <input type="text" placeholder="Type" className="textbox-sidebar" />
           <textarea
             name="Notes"
@@ -37,6 +39,72 @@ class DataSidebar extends React.Component {
             maxLength={notes_size}
             placeholder="Notes"
           />
+        </form>
+        <button className="btn-sidebar">Save</button>
+      </div>,
+      <div className="data-sidebar-background grid justify-items-center">
+        <h1>Place</h1>
+        <form>
+          <input type="name" placeholder="Name" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
+          <textarea
+            name="Notes"
+            className="textbox-sidebar resize-none"
+            rows="10"
+            cols="25"
+            maxLength={notes_size}
+            placeholder="Notes"
+          />
+        </form>
+        <button className="btn-sidebar">Save</button>
+      </div>,
+      <div className="data-sidebar-background grid justify-items-center">
+        <h1>Idea</h1>
+        <form>
+          <input type="name" placeholder="Name" className="textbox-sidebar" />
+          <input type="number" placeholder="Age/History" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
+          <textarea
+            name="Notes"
+            className="textbox-sidebar resize-none"
+            rows="10"
+            cols="25"
+            maxLength={notes_size}
+            placeholder="Notes"
+          />
+        </form>
+        <button className="btn-sidebar">Save</button>
+      </div>,
+      <div className="data-sidebar-background grid justify-items-center">
+        <h1>Edges/Relationships</h1>
+        <form>
+          <div className="w-11/12 m-2">
+            <legend>Relationship Type:</legend>
+            <input type="radio" value="family" name="relation" />
+            <label for="family">Familial Relationship</label>
+            <br />
+            <input type="radio" value="friend" name="relation" />
+            <label for="friend">Friendships</label>
+            <br />
+            <input type="radio" value="acquaint" name="relation" />
+            <label for="acquaint">Acquaintances</label>
+            <br />
+            <input type="radio" value="romantic" name="relation" />
+            <label for="romantic">Romantic Relationships</label>
+            <br />
+            <input type="radio" value="work" name="relation" />
+            <label for="work">Work Relationships</label>
+            <br />
+            <input type="radio" value="undefined" name="relation" />
+            <label for="undefined">Situational/Undefined Relationships</label>
+            <br />
+          </div>
+          <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
+          <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
+          <input type="text" placeholder="Type" className="textbox-sidebar" />
         </form>
         <button className="btn-sidebar">Save</button>
       </div>,
@@ -89,10 +157,20 @@ class DataSidebar extends React.Component {
     }
   }
 
-  // Generates code for the div. Takes an argument: 0 if collapsed, 1 if expanded
-  renderContent(expanded, selection) {
-    console.log(expanded, selection);
+  /* Generates code for the div. Takes a few arguments:
+    expanded:  0 = collapsed, 
+               1 = expanded
+    selection: 0 = collapsed, 
+               1 = no selection, 
+               2 = person node selected, 
+               3 = place node selected,
+               4 = idea node selected,
+               5 = edge/relationship selected
 
+    would like to replace both of these with enums in the future,
+    but an initial glance at JS enums made them seem not great for this
+  */
+  renderContent(expanded, selection) {
     return (
       <>
         <div className={this.data_sidebar[expanded]}>
@@ -118,7 +196,16 @@ class DataSidebar extends React.Component {
           None
         </button>
         <button className="btn-primary m-10" onClick={() => this.changeView(2)}>
-          Node
+          Person Node
+        </button>
+        <button className="btn-primary m-10" onClick={() => this.changeView(3)}>
+          Place Node
+        </button>
+        <button className="btn-primary m-10" onClick={() => this.changeView(4)}>
+          Idea Node
+        </button>
+        <button className="btn-primary m-10" onClick={() => this.changeView(5)}>
+          Edge/Relationship
         </button>
       </>
     );
