@@ -9,11 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-sigma/core": "^3.1.0",
     "@splinetool/react-spline": "^2.2.5",
     "@splinetool/runtime": "^0.9.183",
+    "graphology": "^0.25.1",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.4"
+    "react-router-dom": "^6.4.4",
+    "sigma": "^2.4.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",
