@@ -72,7 +72,7 @@
   }
 
   .data-sidebar-tab {
-    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-green-600 rounded-l-md hover:cursor-pointer items-center;
+    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-fuchsia-750 rounded-l-md hover:cursor-pointer items-center;
   }
 
   .data-sidebar-tab-arrow {
@@ -81,6 +81,14 @@
 
   .data-sidebar-background {
     @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 rounded-l-xl;
+  }
+
+  .textbox-sidebar {
+    @apply m-2 w-11/12 rounded-md border-2 border-gray-50;
+  }
+
+  .btn-sidebar {
+    @apply xl:w-64 w-64 h-20 my-4 bg-fuchsia-750 text-white text-xl font-bold shadow-md rounded-xl inline-grid place-items-center;
   }
 
   .landing-background {
