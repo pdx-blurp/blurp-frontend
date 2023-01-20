@@ -115,8 +115,8 @@ class DataSidebar extends React.Component {
     this.name = '';
 
     this.state = {
-      content: this.renderContent(1, 2),
-      view: 2,
+      content: this.renderContent(0, 0),
+      view: 0,
     };
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
@@ -189,6 +189,7 @@ class DataSidebar extends React.Component {
     return (
       <>
         {this.state.content}
+        {/* Below are buttons used for testing each individual sidebar view
         <button className="btn-primary m-10" onClick={() => this.changeView(0)}>
           Closed
         </button>
@@ -206,7 +207,8 @@ class DataSidebar extends React.Component {
         </button>
         <button className="btn-primary m-10" onClick={() => this.changeView(5)}>
           Edge/Relationship
-        </button>
+        </button> 
+        */}
       </>
     );
   }
