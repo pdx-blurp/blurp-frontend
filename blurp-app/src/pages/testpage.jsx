@@ -4,6 +4,10 @@ import { SigmaContainer, useLoadGraph } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { v4 as uuidv4 } from 'uuid';
 
+import SearchBar from "../components/searchbar.jsx";
+import DataSidebar from "../components/data_sidebar.jsx";
+
+
 export const LoadGraph = () => {
   const loadGraph = useLoadGraph();
 
@@ -37,13 +41,19 @@ const TestPage = () => {
   return (
     //Sigma Graph Settings, reference graphology
     //Sigma inherits 100% of parent <div> width and height
-    <div className="w-screen h-screen">
+    <div className="static w-screen h-screen">
       <SigmaContainer 
         id="blurp-map-container"
         graph={MultiUndirectedGraph}
       >
         <LoadGraph />
       </SigmaContainer>
+      <div className="absolute top-0 inset-x-0">
+        <SearchBar/>
+      </div>
+      <div className="absolute inset-y-0 right-0">
+        <DataSidebar/>
+      </div>
     </div>
   );
 };
