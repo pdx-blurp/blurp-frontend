@@ -1,6 +1,7 @@
 # Blurp Front End
 
 Blurp is a web application written in React + Express + MongoDB.
+The Map tool data is handled by Graphology and rendered by SigmaJS.
 
 <img align="right" width="159px" src="https://raw.githubusercontent.com/dan-trang/MyFiles/main/blurp_noslogan-removebg-preview.png">
 
