@@ -12,7 +12,7 @@ const Home = () => {
         <div className="relative grid justify-center grid-cols-1 mx-20 px-6/12 py-10 text-neutral-75 lg:w-5/6 order-last xl:order-first">
           <div className="my-5">
             <div className="grid justify-center">
-              <img class="m-4" src={BrandName} alt="Blurp the Greatest" />
+              <img className="m-4" src={BrandName} alt="Blurp the Greatest" />
               <h2 className="text-center main-subtitle text-white">
                 A tool for you to map your relationships
               </h2>
@@ -43,35 +43,31 @@ const Home = () => {
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">What is an Ecomap?</h1>
             <p className="text-2xl">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor
-              veritatis, illum velit quasi, sed tenetur ipsa recusandae
-              assumenda distinctio asperiores, a non rerum repellat. Nulla quae
-              velit harum quisquam aspernatur. Lorem ipsum dolor, sit amet
-              consectetur adipisicing elit. Nostrum, labore quisquam aperiam
-              quibusdam expedita numquam quaerat omnis nihil ratione aliquid ex
-              quos veniam commodi. Soluta perferendis sit placeat iure minima.
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor veritatis, illum velit
+              quasi, sed tenetur ipsa recusandae assumenda distinctio asperiores, a non rerum
+              repellat. Nulla quae velit harum quisquam aspernatur. Lorem ipsum dolor, sit amet
+              consectetur adipisicing elit. Nostrum, labore quisquam aperiam quibusdam expedita
+              numquam quaerat omnis nihil ratione aliquid ex quos veniam commodi. Soluta perferendis
+              sit placeat iure minima.
             </p>
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">How it can help you</h1>
             <p className="text-2xl">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur
-              labore facilis assumenda, laborum quae rerum beatae non magni
-              ipsam quasi doloremque omnis facere ab quos officiis ipsum saepe
-              quo molestias. Lorem ipsum, dolor sit amet consectetur adipisicing
-              elit. Fuga natus iusto exercitationem explicabo incidunt molestias
-              accusantium doloremque! Fugiat amet, reiciendis exercitationem
-              sed, perspiciatis veniam recusandae nesciunt quasi hic ea
-              eligendi.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur labore facilis
+              assumenda, laborum quae rerum beatae non magni ipsam quasi doloremque omnis facere ab
+              quos officiis ipsum saepe quo molestias. Lorem ipsum, dolor sit amet consectetur
+              adipisicing elit. Fuga natus iusto exercitationem explicabo incidunt molestias
+              accusantium doloremque! Fugiat amet, reiciendis exercitationem sed, perspiciatis
+              veniam recusandae nesciunt quasi hic ea eligendi.
             </p>
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">How to make an ecomap</h1>
             <p className="text-2xl">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor,
-              rem eaque culpa reiciendis nostrum suscipit exercitationem magni
-              eum ratione, mollitia itaque voluptatibus vero consequatur
-              consectetur optio officiis harum facilis repellat?
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, rem eaque culpa
+              reiciendis nostrum suscipit exercitationem magni eum ratione, mollitia itaque
+              voluptatibus vero consequatur consectetur optio officiis harum facilis repellat?
             </p>
           </div>
           <div>
@@ -83,10 +79,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <Spline
-          className="order-first xl:order-last lg:scale-100 scale-75"
-          scene={SplineModel}
-        />
+        <Spline className="order-first xl:order-last lg:scale-100 scale-75" scene={SplineModel} />
       </div>
       <footer className="text-center">Made in 2022 by PDX Blurp</footer>
     </div>
