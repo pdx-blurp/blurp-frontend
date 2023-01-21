@@ -16,110 +16,138 @@ class DataSidebar extends React.Component {
     this.svg_coods = ['12,20 12,40 3,30', '4,20 4,40 13,30'];
     // Function to be called when the tab/button is clicked
     this.onclick = [this.expand, this.collapse];
-    // The content to appear inside the collapsable div
-    this.inside_content = [
-      <></>,
-      <div className="data-sidebar-background grid justify-items-center">
-        <p>
-          This is a data sidebar. The data of the selected entity in the graph will appear here.
-        </p>
-      </div>,
-      <div className="data-sidebar-background grid justify-items-center">
-        <h1>Person</h1>
-        <form>
-          <input type="name" placeholder="Name" className="textbox-sidebar" />
-          <input type="number" placeholder="Age" className="textbox-sidebar" />
-          <input type="text" placeholder="Misc." className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <textarea
-            name="Notes"
-            className="textbox-sidebar resize-none"
-            rows="10"
-            cols="25"
-            maxLength={notes_size}
-            placeholder="Notes"
-          />
-        </form>
-        <button className="btn-sidebar">Save</button>
-      </div>,
-      <div className="data-sidebar-background grid justify-items-center">
-        <h1>Place</h1>
-        <form>
-          <input type="name" placeholder="Name" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <textarea
-            name="Notes"
-            className="textbox-sidebar resize-none"
-            rows="10"
-            cols="25"
-            maxLength={notes_size}
-            placeholder="Notes"
-          />
-        </form>
-        <button className="btn-sidebar">Save</button>
-      </div>,
-      <div className="data-sidebar-background grid justify-items-center">
-        <h1>Idea</h1>
-        <form>
-          <input type="name" placeholder="Name" className="textbox-sidebar" />
-          <input type="number" placeholder="Age/History" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <textarea
-            name="Notes"
-            className="textbox-sidebar resize-none"
-            rows="10"
-            cols="25"
-            maxLength={notes_size}
-            placeholder="Notes"
-          />
-        </form>
-        <button className="btn-sidebar">Save</button>
-      </div>,
-      <div className="data-sidebar-background grid justify-items-center">
-        <h1>Edges/Relationships</h1>
-        <form>
-          <div className="w-11/12 m-2">
-            <legend>Relationship Type:</legend>
-            <input type="radio" value="family" name="relation" />
-            <label for="family">Familial Relationship</label>
-            <br />
-            <input type="radio" value="friend" name="relation" />
-            <label for="friend">Friendships</label>
-            <br />
-            <input type="radio" value="acquaint" name="relation" />
-            <label for="acquaint">Acquaintances</label>
-            <br />
-            <input type="radio" value="romantic" name="relation" />
-            <label for="romantic">Romantic Relationships</label>
-            <br />
-            <input type="radio" value="work" name="relation" />
-            <label for="work">Work Relationships</label>
-            <br />
-            <input type="radio" value="undefined" name="relation" />
-            <label for="undefined">Situational/Undefined Relationships</label>
-            <br />
-          </div>
-          <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
-          <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-          <input type="text" placeholder="Type" className="textbox-sidebar" />
-        </form>
-        <button className="btn-sidebar">Save</button>
-      </div>,
-    ];
-    /* Button is only in the sidebar temporarily, I'm intending to use it to 
-    check if its able to pull info from the form later */
-
-    this.name = '';
-
     this.state = {
       content: this.renderContent(0, 0),
       view: 0,
+      value: '',
     };
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  // The content to appear inside the collapsable div
+  /* Button is only in the sidebar temporarily, I'm intending to use it to 
+  check if its able to pull info from the form later */
+  getSidebar(selection) {
+    switch (selection) {
+      case 1:
+        return (
+          <div className="data-sidebar-background grid justify-items-center">
+            <p>
+              This is a data sidebar. The data of the selected entity in the graph will appear here.
+            </p>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="data-sidebar-background grid justify-items-center">
+            <h1>Person</h1>
+            <form>
+              <input
+                type="text"
+                name="person"
+                placeholder="Name"
+                value={this.state.value}
+                onChange={this.handleChange}
+                className="textbox-sidebar"
+              />
+              <input type="number" placeholder="Age" className="textbox-sidebar" />
+              <input type="text" placeholder="Misc." className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <textarea
+                name="Notes"
+                className="textbox-sidebar resize-none"
+                rows="10"
+                cols="25"
+                maxLength={notes_size}
+                placeholder="Notes"
+              />
+            </form>
+            <button className="btn-sidebar" onClick={this.handleSubmit}>
+              Save
+            </button>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="data-sidebar-background grid justify-items-center">
+            <h1>Place</h1>
+            <form>
+              <input type="name" placeholder="Name" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <textarea
+                name="Notes"
+                className="textbox-sidebar resize-none"
+                rows="10"
+                cols="25"
+                maxLength={notes_size}
+                placeholder="Notes"
+              />
+            </form>
+            <button className="btn-sidebar">Save</button>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="data-sidebar-background grid justify-items-center">
+            <h1>Idea</h1>
+            <form>
+              <input type="name" placeholder="Name" className="textbox-sidebar" />
+              <input type="number" placeholder="Age/History" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <textarea
+                name="Notes"
+                className="textbox-sidebar resize-none"
+                rows="10"
+                cols="25"
+                maxLength={notes_size}
+                placeholder="Notes"
+              />
+            </form>
+            <button className="btn-sidebar">Save</button>
+          </div>
+        );
+      case 5:
+        return (
+          <div className="data-sidebar-background grid justify-items-center">
+            <h1>Edges/Relationships</h1>
+            <form>
+              <div className="m-2 w-11/12">
+                <legend>Relationship Type:</legend>
+                <input type="radio" value="family" name="relation" />
+                <label htmlFor="family">Familial Relationship</label>
+                <br />
+                <input type="radio" value="friend" name="relation" />
+                <label htmlFor="friend">Friendships</label>
+                <br />
+                <input type="radio" value="acquaint" name="relation" />
+                <label htmlFor="acquaint">Acquaintances</label>
+                <br />
+                <input type="radio" value="romantic" name="relation" />
+                <label htmlFor="romantic">Romantic Relationships</label>
+                <br />
+                <input type="radio" value="work" name="relation" />
+                <label htmlFor="work">Work Relationships</label>
+                <br />
+                <input type="radio" value="undefined" name="relation" />
+                <label htmlFor="undefined">Situational/Undefined Relationships</label>
+                <br />
+              </div>
+              <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
+              <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+              <input type="text" placeholder="Type" className="textbox-sidebar" />
+            </form>
+            <button className="btn-sidebar">Save</button>
+          </div>
+        );
+      default:
+        return <></>;
+    }
   }
 
   collapse = () => {
@@ -179,10 +207,24 @@ class DataSidebar extends React.Component {
               <polygon points={this.svg_coods[expanded]} />
             </svg>
           </div>
-          {this.inside_content[selection]}
+          {this.getSidebar(selection)}
         </div>
       </>
     );
+  }
+
+  /* 
+    Using this to work on pulling info from the forms:
+    https://reactjs.org/docs/forms.html
+  */
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+    console.log(this.state.value);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    alert(this.state.value);
   }
 
   render() {
@@ -190,6 +232,7 @@ class DataSidebar extends React.Component {
       <>
         {this.state.content}
         {/* Below are buttons used for testing each individual sidebar view
+         */}
         <button className="btn-primary m-10" onClick={() => this.changeView(0)}>
           Closed
         </button>
@@ -207,8 +250,7 @@ class DataSidebar extends React.Component {
         </button>
         <button className="btn-primary m-10" onClick={() => this.changeView(5)}>
           Edge/Relationship
-        </button> 
-        */}
+        </button>
       </>
     );
   }
