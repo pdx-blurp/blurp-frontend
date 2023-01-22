@@ -21,6 +21,11 @@ class DataSidebar extends React.Component {
       view: 0,
       value: '',
     };
+    /* 
+      Used this to pull data from the form elements without it clearing 
+      the textbox:
+      https://stackoverflow.com/questions/69092720/cant-type-in-react-textfield-input 
+    */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -44,10 +49,10 @@ class DataSidebar extends React.Component {
         return (
           <div className="data-sidebar-background grid justify-items-center">
             <h1>Person</h1>
-            <form>
+            <form onSubmit={this.handleSubmit}>
               <input
                 type="text"
-                name="person"
+                name="person_name"
                 placeholder="Name"
                 value={this.state.value}
                 onChange={this.handleChange}
@@ -64,10 +69,10 @@ class DataSidebar extends React.Component {
                 maxLength={notes_size}
                 placeholder="Notes"
               />
+              <button type="submit" className="btn-sidebar">
+                Save
+              </button>
             </form>
-            <button className="btn-sidebar" onClick={this.handleSubmit}>
-              Save
-            </button>
           </div>
         );
       case 3:
@@ -219,12 +224,12 @@ class DataSidebar extends React.Component {
   */
   handleChange(event) {
     this.setState({ value: event.target.value });
-    console.log(this.state.value);
+    console.log(event.target.value);
   }
 
   handleSubmit(event) {
+    alert('A name was submitted: ' + this.state.value);
     event.preventDefault();
-    alert(this.state.value);
   }
 
   render() {
