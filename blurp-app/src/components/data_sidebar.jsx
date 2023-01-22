@@ -1,4 +1,5 @@
 import React from 'react';
+import SidebarForm from './sidebar_form.jsx';
 
 const notes_size = 255;
 
@@ -27,8 +28,6 @@ class DataSidebar extends React.Component {
     */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
   // The content to appear inside the collapsable div
@@ -48,32 +47,7 @@ class DataSidebar extends React.Component {
         return (
           <div className="data-sidebar-background grid justify-items-center">
             <h1>Person</h1>
-            <form onSubmit={this.handleSubmit}>
-              <input
-                type="text"
-                name="person_name"
-                placeholder="Name"
-                className="textbox-sidebar"
-                value={this.state.person_name}
-                onChange={(e) => {
-                  this.setState({ person_name: e.target.value });
-                }}
-              />
-              <input type="number" placeholder="Age" className="textbox-sidebar" />
-              <input type="text" placeholder="Misc." className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <textarea
-                name="Notes"
-                className="textbox-sidebar resize-none"
-                rows="10"
-                cols="25"
-                maxLength={notes_size}
-                placeholder="Notes"
-              />
-              <button type="submit" className="btn-sidebar">
-                Save
-              </button>
-            </form>
+            <SidebarForm />
           </div>
         );
       case 3:
@@ -223,20 +197,6 @@ class DataSidebar extends React.Component {
         </div>
       </>
     );
-  }
-
-  /* 
-    Using this to work on pulling info from the forms:
-    https://reactjs.org/docs/forms.html
-  */
-  handleChange(event) {
-    this.setState({ [event.target.name]: event.target.value });
-    console.log(this.state.person_name);
-  }
-
-  handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.person_name);
-    event.preventDefault();
   }
 
   render() {
