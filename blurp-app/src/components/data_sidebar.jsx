@@ -19,7 +19,6 @@ class DataSidebar extends React.Component {
     this.state = {
       content: this.renderContent(0, 0),
       view: 0,
-      value: '',
     };
     /* 
       Used this to pull data from the form elements without it clearing 
@@ -54,9 +53,11 @@ class DataSidebar extends React.Component {
                 type="text"
                 name="person_name"
                 placeholder="Name"
-                value={this.state.value}
-                onChange={this.handleChange}
                 className="textbox-sidebar"
+                value={this.state.person_name}
+                onChange={(e) => {
+                  this.setState({ person_name: e.target.value });
+                }}
               />
               <input type="number" placeholder="Age" className="textbox-sidebar" />
               <input type="text" placeholder="Misc." className="textbox-sidebar" />
@@ -80,7 +81,12 @@ class DataSidebar extends React.Component {
           <div className="data-sidebar-background grid justify-items-center">
             <h1>Place</h1>
             <form>
-              <input type="name" placeholder="Name" className="textbox-sidebar" />
+              <input
+                type="text"
+                placeholder="Name"
+                defaultValue={this.state.place_name}
+                className="textbox-sidebar"
+              />
               <input type="text" placeholder="Type" className="textbox-sidebar" />
               <input type="text" placeholder="Type" className="textbox-sidebar" />
               <textarea
@@ -181,6 +187,7 @@ class DataSidebar extends React.Component {
       this.setState({
         content: this.renderContent(1, new_view),
         view: new_view,
+        person_name: '',
       });
     } else {
       this.setState({
@@ -223,12 +230,12 @@ class DataSidebar extends React.Component {
     https://reactjs.org/docs/forms.html
   */
   handleChange(event) {
-    this.setState({ value: event.target.value });
-    console.log(event.target.value);
+    this.setState({ [event.target.name]: event.target.value });
+    console.log(this.state.person_name);
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
+    alert('A name was submitted: ' + this.state.person_name);
     event.preventDefault();
   }
 
