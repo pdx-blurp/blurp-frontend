@@ -1,4 +1,5 @@
 import React from 'react';
+import { sidebarView, Relationships, NodeType, NodeData, EdgeData } from '../pages/blurpmap.jsx';
 
 const notes_size = 255;
 
@@ -7,6 +8,8 @@ class SidebarForm extends React.Component {
     super(props);
     this.state = { value: 'test' };
     this.view = this.props.view;
+    this.NodeData = this.props.NodeData;
+    this.EdgeData = this.EdgeData;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -18,7 +21,6 @@ class SidebarForm extends React.Component {
   */
   handleChange(event) {
     this.setState({ value: event.target.value });
-    console.log(this.state.value);
   }
 
   handleSubmit(event) {
@@ -31,15 +33,14 @@ class SidebarForm extends React.Component {
   }
 
   selectView() {
-    console.log('view: ' + this.view);
     switch (this.view) {
-      case 1:
+      case sidebarView.none:
         return (
           <p>
             This is a data sidebar. The data of the selected entity in the graph will appear here.
           </p>
         );
-      case 2:
+      case sidebarView.person:
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Person</h1>
@@ -67,7 +68,7 @@ class SidebarForm extends React.Component {
             </button>
           </form>
         );
-      case 3:
+      case sidebarView.place:
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Place</h1>
@@ -92,7 +93,7 @@ class SidebarForm extends React.Component {
             </button>
           </form>
         );
-      case 4:
+      case sidebarView.idea:
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Idea</h1>
@@ -113,7 +114,7 @@ class SidebarForm extends React.Component {
             </button>
           </form>
         );
-      case 5:
+      case sidebarView.edge:
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Edges/Relationships</h1>
@@ -147,6 +148,9 @@ class SidebarForm extends React.Component {
             </button>
           </form>
         );
+      default:
+        // aligns with closed state, shouldn't happen but wanted to guard it
+        return <></>;
     }
   }
 
