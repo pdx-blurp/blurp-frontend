@@ -1,6 +1,6 @@
 import React from 'react';
 import SidebarForm from './sidebar_form.jsx';
-import { sidebarView } from '../pages/blurpmap.jsx';
+import { sidebarView, NodeData, EdgeData } from '../pages/blurpmap.jsx';
 
 const sidebarState = {
   closed: 'closed',
@@ -24,6 +24,11 @@ class DataSidebar extends React.Component {
       content: this.renderContent(sidebarState.closed, sidebarView.none),
       view: 0,
     };
+    // In the future this will be passed through from blurpmap, as the data
+    // will be coming from the map
+    this.NodeData = new NodeData();
+    this.EdgeData = new EdgeData();
+
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
     /* 
@@ -45,7 +50,12 @@ class DataSidebar extends React.Component {
     } else {
       return (
         <div className="data-sidebar-background grid justify-items-center">
-          <SidebarForm ref={this.child} view={view} />
+          <SidebarForm
+            ref={this.child}
+            view={view}
+            NodeData={this.NodeData}
+            EdgeData={this.EdgeData}
+          />
         </div>
       );
     }

@@ -6,10 +6,8 @@ const notes_size = 255;
 class SidebarForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: 'test' };
+    this.state = { value: '', NodeData: this.props.NodeData, EdgeData: this.props.EdgeData };
     this.view = this.props.view;
-    this.NodeData = this.props.NodeData;
-    this.EdgeData = this.EdgeData;
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -30,6 +28,7 @@ class SidebarForm extends React.Component {
 
   changeView(new_view) {
     this.view = new_view;
+    this.setState({ value: '' });
   }
 
   selectView() {
@@ -53,8 +52,6 @@ class SidebarForm extends React.Component {
               onChange={this.handleChange}
             />
             <input type="number" placeholder="Age" className="textbox-sidebar" />
-            <input type="text" placeholder="Misc." className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
             <textarea
               name="Notes"
               className="textbox-sidebar resize-none"
@@ -78,8 +75,6 @@ class SidebarForm extends React.Component {
               defaultValue={this.state.place_name}
               className="textbox-sidebar"
             />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
             <textarea
               name="Notes"
               className="textbox-sidebar resize-none"
@@ -99,8 +94,6 @@ class SidebarForm extends React.Component {
             <h1>Idea</h1>
             <input type="name" placeholder="Name" className="textbox-sidebar" />
             <input type="number" placeholder="Age/History" className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
             <textarea
               name="Notes"
               className="textbox-sidebar resize-none"
@@ -141,8 +134,6 @@ class SidebarForm extends React.Component {
             </div>
             <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
             <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
-            <input type="text" placeholder="Type" className="textbox-sidebar" />
             <button type="submit" className="btn-sidebar">
               Save
             </button>
