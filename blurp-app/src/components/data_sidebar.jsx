@@ -22,7 +22,7 @@ class DataSidebar extends React.Component {
     this.onclick = [this.expand, this.collapse];
     this.state = {
       content: this.renderContent(sidebarState.closed, sidebarView.none),
-      view: 0,
+      view: sidebarView.closed,
     };
     // In the future this will be passed through from blurpmap, as the data
     // will be coming from the map
@@ -83,8 +83,6 @@ class DataSidebar extends React.Component {
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
   changeView(new_view) {
-    console.log('new_view: ' + new_view);
-    console.log('sidebarView 1: ' + sidebarView.none);
     if (new_view != sidebarView.closed) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),

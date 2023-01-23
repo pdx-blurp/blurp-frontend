@@ -6,9 +6,20 @@ const notes_size = 255;
 class SidebarForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { value: '', NodeData: this.props.NodeData, EdgeData: this.props.EdgeData };
-    this.view = this.props.view;
+    this.NodeData = this.props.NodeData;
+    this.EdgeData = this.props.EdgeData;
 
+    this.state = {
+      value: '',
+      name: '',
+      years: '',
+      notes: '',
+      type: NodeType.person,
+      relation: Relationships.situational,
+      familiarity: '',
+      stressLevel: '',
+    };
+    this.view = this.props.view;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -16,13 +27,51 @@ class SidebarForm extends React.Component {
   /* 
     Using this to work on pulling info from the forms:
     https://reactjs.org/docs/forms.html
+
+    And using the link below for how to handle radio buttons:
+    https://www.pluralsight.com/guides/how-to-use-radio-buttons-in-reactjs
   */
   handleChange(event) {
-    this.setState({ value: event.target.value });
+    const target = event.target;
+    let value = target.value;
+    const name = target.name;
+
+    if (target.type == 'radio') {
+      switch (value) {
+        case 'family':
+          this.setState({ relation: Relationships.familial });
+          break;
+        case 'friend':
+          this.setState({ relation: Relationships.friendship });
+          break;
+        case 'acquaint':
+          this.setState({ relation: Relationships.acquaintance });
+          break;
+        case 'romantic':
+          this.setState({ relation: Relationships.romantic });
+          break;
+        case 'work':
+          this.setState({ relation: Relationships.work });
+          break;
+        case 'undefined':
+          this.setState({ relation: Relationships.situational });
+          break;
+      }
+    } else {
+      this.setState({ [name]: value });
+    }
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.value);
+    console.log('Submitted Data: ');
+    console.log('name: ' + this.state.name);
+    console.log('years: ' + this.state.years);
+    console.log('notes: ' + this.state.notes);
+    console.log('type: ' + this.state.type);
+    console.log('relation: ' + this.state.relation);
+    console.log('familiarity: ' + this.state.familiarity);
+    console.log('stressLevel: ' + this.state.stressLevel);
+
     event.preventDefault();
   }
 
@@ -40,24 +89,35 @@ class SidebarForm extends React.Component {
           </p>
         );
       case sidebarView.person:
+        this.type = NodeType.person;
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Person</h1>
             <input
               type="text"
-              name="person_name"
+              name="name"
               placeholder="Name"
               className="textbox-sidebar"
-              value={this.state.value}
+              value={this.state.name}
               onChange={this.handleChange}
             />
-            <input type="number" placeholder="Age" className="textbox-sidebar" />
+            <input
+              type="number"
+              name="years"
+              placeholder="Age"
+              value={this.state.years}
+              onChange={this.handleChange}
+              className="textbox-sidebar"
+            />
             <textarea
-              name="Notes"
+              type="text"
+              name="notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
               maxLength={notes_size}
+              value={this.state.notes}
+              onChange={this.handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -66,21 +126,27 @@ class SidebarForm extends React.Component {
           </form>
         );
       case sidebarView.place:
+        this.type = NodeType.place;
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Place</h1>
             <input
               type="text"
+              name="name"
               placeholder="Name"
-              defaultValue={this.state.place_name}
+              value={this.state.name}
+              onChange={this.handleChange}
               className="textbox-sidebar"
             />
             <textarea
-              name="Notes"
+              type="text"
+              name="notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
               maxLength={notes_size}
+              value={this.state.notes}
+              onChange={this.handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -89,17 +155,35 @@ class SidebarForm extends React.Component {
           </form>
         );
       case sidebarView.idea:
+        this.type = NodeType.idea;
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Idea</h1>
-            <input type="name" placeholder="Name" className="textbox-sidebar" />
-            <input type="number" placeholder="Age/History" className="textbox-sidebar" />
+            <input
+              type="name"
+              name="name"
+              placeholder="Name"
+              value={this.state.name}
+              onChange={this.handleChange}
+              className="textbox-sidebar"
+            />
+            <input
+              type="number"
+              name="years"
+              placeholder="Age/History"
+              value={this.state.years}
+              onChange={this.handleChange}
+              className="textbox-sidebar"
+            />
             <textarea
-              name="Notes"
+              type="text"
+              name="notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
               maxLength={notes_size}
+              value={this.state.notes}
+              onChange={this.handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -111,7 +195,7 @@ class SidebarForm extends React.Component {
         return (
           <form onSubmit={this.handleSubmit}>
             <h1>Edges/Relationships</h1>
-            <div className="m-2 w-11/12">
+            <div className="m-2 w-11/12" onChange={this.handleChange}>
               <legend>Relationship Type:</legend>
               <input type="radio" value="family" name="relation" />
               <label htmlFor="family">Familial Relationship</label>
@@ -132,8 +216,22 @@ class SidebarForm extends React.Component {
               <label htmlFor="undefined">Situational/Undefined Relationships</label>
               <br />
             </div>
-            <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
-            <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
+            <input
+              type="number"
+              name="familiarity"
+              placeholder="Familiarity"
+              value={this.state.familiarity}
+              onChange={this.handleChange}
+              className="textbox-sidebar"
+            />
+            <input
+              type="number"
+              name="stressLevel"
+              placeholder="Stress Level"
+              value={this.state.stressLevel}
+              onChange={this.handleChange}
+              className="textbox-sidebar"
+            />
             <button type="submit" className="btn-sidebar">
               Save
             </button>

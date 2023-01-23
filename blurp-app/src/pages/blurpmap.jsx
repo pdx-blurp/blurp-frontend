@@ -42,6 +42,17 @@ export class NodeData {
     this.notes = '';
     this.type = NodeType.person;
   }
+
+  setData(name, years, notes, type) {
+    this.name = name;
+    this.years = years;
+    this.notes = notes;
+    this.type = type;
+  }
+
+  getData() {
+    return [this.name, this.years, this.notes, this.type];
+  }
 }
 
 export class EdgeData {
