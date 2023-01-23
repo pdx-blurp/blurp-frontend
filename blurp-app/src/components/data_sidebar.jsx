@@ -21,6 +21,8 @@ class DataSidebar extends React.Component {
       content: this.renderContent(0, 0),
       view: 0,
     };
+    // https://chafikgharbi.com/react-call-child-method/
+    this.child = React.createRef();
     /* 
       Used this to pull data from the form elements without it clearing 
       the textbox:
@@ -30,108 +32,19 @@ class DataSidebar extends React.Component {
     this.collapse = this.collapse.bind(this);
   }
 
-  // The content to appear inside the collapsable div
-  /* Button is only in the sidebar temporarily, I'm intending to use it to 
-  check if its able to pull info from the form later */
+  /* 
+    probably isn't needed anymore, just have it like this for now while
+    working on the form 
+  */
   getSidebar(selection) {
-    switch (selection) {
-      case 1:
-        return (
-          <div className="data-sidebar-background grid justify-items-center">
-            <p>
-              This is a data sidebar. The data of the selected entity in the graph will appear here.
-            </p>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="data-sidebar-background grid justify-items-center">
-            <h1>Person</h1>
-            <SidebarForm />
-          </div>
-        );
-      case 3:
-        return (
-          <div className="data-sidebar-background grid justify-items-center">
-            <h1>Place</h1>
-            <form>
-              <input
-                type="text"
-                placeholder="Name"
-                defaultValue={this.state.place_name}
-                className="textbox-sidebar"
-              />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <textarea
-                name="Notes"
-                className="textbox-sidebar resize-none"
-                rows="10"
-                cols="25"
-                maxLength={notes_size}
-                placeholder="Notes"
-              />
-            </form>
-            <button className="btn-sidebar">Save</button>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="data-sidebar-background grid justify-items-center">
-            <h1>Idea</h1>
-            <form>
-              <input type="name" placeholder="Name" className="textbox-sidebar" />
-              <input type="number" placeholder="Age/History" className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <textarea
-                name="Notes"
-                className="textbox-sidebar resize-none"
-                rows="10"
-                cols="25"
-                maxLength={notes_size}
-                placeholder="Notes"
-              />
-            </form>
-            <button className="btn-sidebar">Save</button>
-          </div>
-        );
-      case 5:
-        return (
-          <div className="data-sidebar-background grid justify-items-center">
-            <h1>Edges/Relationships</h1>
-            <form>
-              <div className="m-2 w-11/12">
-                <legend>Relationship Type:</legend>
-                <input type="radio" value="family" name="relation" />
-                <label htmlFor="family">Familial Relationship</label>
-                <br />
-                <input type="radio" value="friend" name="relation" />
-                <label htmlFor="friend">Friendships</label>
-                <br />
-                <input type="radio" value="acquaint" name="relation" />
-                <label htmlFor="acquaint">Acquaintances</label>
-                <br />
-                <input type="radio" value="romantic" name="relation" />
-                <label htmlFor="romantic">Romantic Relationships</label>
-                <br />
-                <input type="radio" value="work" name="relation" />
-                <label htmlFor="work">Work Relationships</label>
-                <br />
-                <input type="radio" value="undefined" name="relation" />
-                <label htmlFor="undefined">Situational/Undefined Relationships</label>
-                <br />
-              </div>
-              <input type="number" placeholder="Familiarity" className="textbox-sidebar" />
-              <input type="number" placeholder="Stress Level" className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-              <input type="text" placeholder="Type" className="textbox-sidebar" />
-            </form>
-            <button className="btn-sidebar">Save</button>
-          </div>
-        );
-      default:
-        return <></>;
+    if (selection == 0) {
+      return <></>;
+    } else {
+      return (
+        <div className="data-sidebar-background grid justify-items-center">
+          <SidebarForm ref={this.child} view={selection} />
+        </div>
+      );
     }
   }
 
@@ -161,8 +74,10 @@ class DataSidebar extends React.Component {
       this.setState({
         content: this.renderContent(1, new_view),
         view: new_view,
-        person_name: '',
       });
+      if (this.child.current) {
+        this.child.current.changeView(new_view);
+      }
     } else {
       this.setState({
         content: this.renderContent(0, 0),
@@ -203,11 +118,9 @@ class DataSidebar extends React.Component {
     return (
       <>
         {this.state.content}
+
         {/* Below are buttons used for testing each individual sidebar view
          */}
-        <button className="btn-primary m-10" onClick={() => this.changeView(0)}>
-          Closed
-        </button>
         <button className="btn-primary m-10" onClick={() => this.changeView(1)}>
           None
         </button>
