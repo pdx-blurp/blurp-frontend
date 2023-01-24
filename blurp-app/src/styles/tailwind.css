@@ -94,6 +94,14 @@
   .landing-background {
     @apply bg-indigo-900;
   }
+
+  .system-toolbar {
+    @apply transition ease-in-out transition-all absolute bg-gray-300 h-[100%] w-[150px];
+  }
+
+  .system-toolbar-button {
+    @apply flex justify-center h-[40px] my-[15px];
+  }
 }
 
 .youtube-placeholder {
