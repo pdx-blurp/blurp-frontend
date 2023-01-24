@@ -6,7 +6,8 @@
   },
   "dependencies": {
     "@splinetool/react-spline": "^2.2.5",
-    "@splinetool/runtime": "^0.9.183"
+    "@splinetool/runtime": "^0.9.183",
+    "prettier-plugin-tailwindcss": "^0.2.1"
   },
   "devDependencies": {
     "eslint": "^8.32.0",
