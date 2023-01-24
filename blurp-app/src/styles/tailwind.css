@@ -80,7 +80,7 @@
   }
 
   .data-sidebar-background {
-    @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 rounded-l-xl;
+    @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 border-r-0 rounded-l-xl;
   }
 
   .textbox-sidebar {
