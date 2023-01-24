@@ -1,80 +1,22 @@
 import { useEffect, useState } from "react";
-import { MultiUndirectedGraph, MultiGraph } from "graphology";
- 
-import { SigmaContainer, useLoadGraph, useRegisterEvents, ControlsContainer, SearchControl } from "@react-sigma/core";
+import { MultiGraph } from "graphology";
+import { SigmaContainer, useRegisterEvents, ControlsContainer, SearchControl, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
 import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE } from "../constants/constants.ts";
-
-import SearchBar from "../components/searchbar.jsx";
 import DataSidebar from "../components/data_sidebar.jsx";
-// import MyModal from "../components/modal.jsx" 
-
-
-// export const LoadGraph = () => {
-//   const loadGraph = useLoadGraph();
-
-//   useEffect(() => {
-//     //i'm leaving these settings "exposed" for future tweeks if necesssary
-//     //we can also use pre-defined graph types: MultiGraph, MultiUndirectedGraph, etc.
-//     // const graph = new Graph({type: "mixed", allowSelfLoops: false, multi: true});
-//     const graph = new MultiUndirectedGraph();
-
-//     //Node & Edges
-//     //Use uuidv4() to random generate key IDs for edges to optimize performance
-//     //and reduce namespace collision
-//     graph.addNode("A", { x: 0, y: 0, label: "A", size: 15, color: "#FA4F40" });
-//     graph.addNode("B", { x: 1, y: 1, label: "B", size: 15, color: "#FA4F40" });
-//     graph.addNode("C", { x: -0.2, y: 2, label: "C", size: 15, color: "#FA4F40" });
-//     graph.addEdgeWithKey(uuidv4(), "A", "B", {label: "friends"});
-//     graph.addEdgeWithKey(uuidv4(), "B", "C", {label: "family"});
-
-
-//     //console.log reports of all Edges attributes on the map
-//     for (const {edge, attributes} of graph.edgeEntries()) {
-//       console.log(edge, attributes);
-//     }
-
-//     //LoadGraph Hook
-//     loadGraph(graph);
-//   }, [loadGraph]);
-
-//   return null;
-// };
-// const [graph, setGraph] = useState(new MultiUndirectedGraph());
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
   const [nodeType, setNodeType] = useState("PERSON");
   const [color, setColor] = useState("#FF0000");
   const [name, setName] = useState("");
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
   function handleSubmit() {
-    const id = uuidv4()
-    const newNode = { id: id, label: name, size: size, color: color, x: event.x, y:event.y };
-    const newGraph = new MultiGraph();
-    setNodes(nodes => [...nodes, newNode]);
-
-    nodes.forEach(node => {
-      newGraph.addNode(node.id, { x: node.x, y: node.y, label: node.label, color: node.color, size: node.size});
-    })
-    edges.forEach(edge => {
-      newGraph.addEdge(edge.nodeOne, edge.nodeTwo, {label: edge.label});
-    })
-    //this will add the most recent node, because the component (nodes.forEach & edges.forEach) is yet not render for the newly created node in nodes and edges
-    //if this is the first node, you can use console.log to check the nodes.length and it will say zero since the most recent node is not rendered
-    //if this is the second node, you will see that the lenght is 1 and so on and so forth
-    // Might not be the best convention. Maybe cut a ticket
-    newGraph.addNode(id, { x: event.x, y: event.y, label: name, color: color, size: size})
-    console.log("The length of nodes is " + nodes.length)
-
-
-    setGraph(newGraph)
+    const id = uuidv4();
+    graph.addNode(id, {x: event.x, y: event.y, color: color, size: size, label: name, entity: nodeType});
     setIsModalOpen(false); 
   }
   const GraphEvents = () => {
@@ -114,19 +56,24 @@ const TestPage = () => {
                 <div className="relative p-6 flex-auto">
                 <div>
                   <div>
-                    <input placeholder="Node Name" type="text" value={name} onChange={e => setName(e.target.value)} />
+                    <input placeholder="Name" type="text" onChange={e => setName(e.target.value)} />
                   </div>
                   <br/>
                   <div>
-                    <input placeholder="Color" type="text" value={color} onChange={e => setColor(e.target.value)} />
+                    <select type="text" value={color} onChange={e => setColor(e.target.value)} >
+                      {Object.entries(COLORS).map(([color, value]) => <option key={color} value={value}>{color}</option>)} 
+                    </select> 
+                    
                   </div>
                   <br/>
                   <div>
-                    <input placeholder="Size" type="text" value={size} onChange={e => setSize(e.target.value)} />
+                    <input placeholder="Size" type="text"  onChange={e => setSize(e.target.value)} />
                   </div>
                   <br/>
                   <div>
-                    <input placeholder="Type"type="text" value={nodeType} onChange={e => setNodeType(e.target.value)} />
+                    <select type="text" value={nodeType} onChange={e => setNodeType(e.target.value)} >
+                      {Object.entries(NODE_TYPE).map(([key, value]) => <option key={key} value={value}>{key}</option>)}
+                    </select>
                   </div>
               </div>
                 </div>
@@ -161,7 +108,6 @@ const TestPage = () => {
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
-
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
         <DataSidebar/>
