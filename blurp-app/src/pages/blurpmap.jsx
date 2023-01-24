@@ -2,9 +2,80 @@ import { useEffect, useState } from "react";
 import { MultiGraph } from "graphology";
 import { SigmaContainer, useRegisterEvents, ControlsContainer, SearchControl, useSigma } from "@react-sigma/core";
 import "@react-sigma/core/lib/react-sigma.min.css";
+
 import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE } from "../constants/constants.ts";
 import DataSidebar from "../components/data_sidebar.jsx";
+import System_Toolbar from "../components/system_toolbar.jsx";
+
+export const sidebarView = {
+  closed: 'closed',
+  none: 'none',
+  person: 'person',
+  place: 'place',
+  idea: 'idea',
+  edge: 'edge',
+};
+
+/* 
+  graphData and Relationships were both made according 
+  to the data objects/map architecture docs
+*/
+export const Relationships = {
+  familial: 'familial',
+  friendship: 'friendship',
+  acquaintance: 'acquaintance',
+  romantic: 'romantic',
+  work: 'work',
+  situational: 'situational',
+};
+
+export const NodeType = {
+  person: 'person',
+  place: 'place',
+  idea: 'idea',
+};
+
+export class NodeData {
+  constructor() {
+    this.name = '';
+    this.years = 0;
+    this.notes = '';
+    this.type = NodeType.person;
+  }
+
+  setData(name, years, notes, type) {
+    this.name = name;
+    this.years = years;
+    this.notes = notes;
+    this.type = type;
+  }
+
+  getData() {
+    return [this.name, this.years, this.notes, this.type];
+  }
+}
+
+export class EdgeData {
+  constructor() {
+    this.category = Relationships.situational;
+    this.familiarity = 0;
+    this.stressCode = 0;
+    this.node1ID = 0;
+    this.node2ID = 0;
+  }
+  setData(category, familiarity, stressCode, node1ID, node2ID) {
+    this.category = category;
+    this.familiarity = familiarity;
+    this.stressCode = stressCode;
+    this.node1ID = node1ID;
+    this.node2ID = node2ID;
+  }
+
+  getData() {
+    return [this.category, this.familiarity, this.stressCode, this.node1ID, this.node2ID];
+  }
+}
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -14,6 +85,8 @@ const TestPage = () => {
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
+
   function handleSubmit() {
     const id = uuidv4();
     graph.addNode(id, {x: event.x, y: event.y, color: color, size: size, label: name, entity: nodeType});
@@ -21,7 +94,6 @@ const TestPage = () => {
   }
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
-
     useEffect(() => {
       // Register the events
       registerEvents({
@@ -110,7 +182,10 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar/>
+        <DataSidebar />
+      </div>
+      <div className="absolute inset-y-0 left-0">
+        <System_Toolbar/>
       </div>
     </div>
   );
