@@ -68,7 +68,7 @@
   }
 
   .data-sidebar {
-    @apply absolute w-[260px] h-[60%] my-[100px] right-0 p-0;
+    @apply absolute w-[260px] h-[400px] my-[100px] right-[40px] p-0;
   }
 
   .data-sidebar-tab {

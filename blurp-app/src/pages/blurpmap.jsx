@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import SearchBar from "../components/searchbar.jsx";
 import DataSidebar from "../components/data_sidebar.jsx";
+import GraphToolbar from "../components/graph_toolbar.jsx";
 
 
 export const LoadGraph = () => {
@@ -56,6 +57,9 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 right-0">
         <DataSidebar/>
+      </div>
+      <div className="absolute top-0 inset-y-0 right-0">
+        <GraphToolbar/>
       </div>
     </div>
   );
