@@ -6,9 +6,6 @@ const notes_size = 255;
 class SidebarForm extends React.Component {
   constructor(props) {
     super(props);
-    this.NodeData = this.props.NodeData;
-    this.EdgeData = this.props.EdgeData;
-
     this.state = {
       value: '',
       name: '',
@@ -18,7 +15,10 @@ class SidebarForm extends React.Component {
       relation: Relationships.situational,
       familiarity: '',
       stressLevel: '',
+      node1ID: 'node1',
+      node2ID: 'node2',
     };
+    this.setData();
     this.view = this.props.view;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -63,6 +63,7 @@ class SidebarForm extends React.Component {
   }
 
   handleSubmit(event) {
+    /* Will be replaced with code that will send the data back to the node */
     console.log('Submitted Data: ');
     console.log('name: ' + this.state.name);
     console.log('years: ' + this.state.years);
@@ -75,6 +76,29 @@ class SidebarForm extends React.Component {
     event.preventDefault();
   }
 
+  setData() {
+    if (this.props.NodeData) {
+      let node_name, node_years, node_notes, node_type;
+      [node_name, node_years, node_notes, node_type] = this.props.NodeData.getData();
+      this.setState({
+        name: node_name,
+        years: node_years,
+        notes: node_notes,
+        type: node_type,
+      });
+    } else if (this.props.EdgeData) {
+      let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
+      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = this.props.EdgeData.getData();
+      this.setState({
+        category: edge_cat,
+        familiarity: edge_fam,
+        stressLevel: edge_stress,
+        node1ID: edge_1ID,
+        node2ID: edge_2ID,
+      });
+    }
+  }
+
   changeView(new_view) {
     this.view = new_view;
     this.setState({ value: '' });
@@ -84,7 +108,7 @@ class SidebarForm extends React.Component {
     switch (this.view) {
       case sidebarView.none:
         return (
-          <p>
+          <p className="m-4">
             This is a data sidebar. The data of the selected entity in the graph will appear here.
           </p>
         );
@@ -92,7 +116,7 @@ class SidebarForm extends React.Component {
         this.type = NodeType.person;
         return (
           <form onSubmit={this.handleSubmit}>
-            <h1>Person</h1>
+            <h1 className="m-2 text-center text-xl">Person</h1>
             <input
               type="text"
               name="name"
@@ -129,7 +153,7 @@ class SidebarForm extends React.Component {
         this.type = NodeType.place;
         return (
           <form onSubmit={this.handleSubmit}>
-            <h1>Place</h1>
+            <h1 className="m-2 text-center text-xl">Place</h1>
             <input
               type="text"
               name="name"
@@ -158,7 +182,7 @@ class SidebarForm extends React.Component {
         this.type = NodeType.idea;
         return (
           <form onSubmit={this.handleSubmit}>
-            <h1>Idea</h1>
+            <h1 className="m-2 text-center text-xl">Idea</h1>
             <input
               type="name"
               name="name"
@@ -194,7 +218,7 @@ class SidebarForm extends React.Component {
       case sidebarView.edge:
         return (
           <form onSubmit={this.handleSubmit}>
-            <h1>Edges/Relationships</h1>
+            <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
             <div className="m-2 w-11/12" onChange={this.handleChange}>
               <legend>Relationship Type:</legend>
               <input type="radio" value="family" name="relation" />
@@ -232,6 +256,9 @@ class SidebarForm extends React.Component {
               onChange={this.handleChange}
               className="textbox-sidebar"
             />
+            <div className="m-4 w-11/12 text-lg">
+              <u>{this.state.node1ID}</u> is related to <u>{this.state.node2ID}</u>
+            </div>
             <button type="submit" className="btn-sidebar">
               Save
             </button>

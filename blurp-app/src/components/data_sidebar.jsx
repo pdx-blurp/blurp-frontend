@@ -1,6 +1,6 @@
 import React from 'react';
 import SidebarForm from './sidebar_form.jsx';
-import { sidebarView, NodeData, EdgeData } from '../pages/blurpmap.jsx';
+import { sidebarView, NodeData, NodeType, EdgeData } from '../pages/blurpmap.jsx';
 
 const sidebarState = {
   closed: 'closed',
@@ -27,7 +27,8 @@ class DataSidebar extends React.Component {
     // In the future this will be passed through from blurpmap, as the data
     // will be coming from the map
     this.NodeData = new NodeData();
-    this.EdgeData = new EdgeData();
+    this.NodeData.setData('bingus', 17, 'this is a test', NodeType.person);
+    this.EdgeData = null;
 
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
@@ -126,7 +127,6 @@ class DataSidebar extends React.Component {
         {this.state.content}
 
         {/* Below are buttons used for testing each individual sidebar view
-         */}
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.none)}>
           None
         </button>
@@ -142,6 +142,7 @@ class DataSidebar extends React.Component {
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.edge)}>
           Edge/Relationship
         </button>
+         */}
       </>
     );
   }

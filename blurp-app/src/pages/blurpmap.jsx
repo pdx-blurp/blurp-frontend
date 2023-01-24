@@ -63,6 +63,17 @@ export class EdgeData {
     this.node1ID = 0;
     this.node2ID = 0;
   }
+  setData(category, familiarity, stressCode, node1ID, node2ID) {
+    this.category = category;
+    this.familiarity = familiarity;
+    this.stressCode = stressCode;
+    this.node1ID = node1ID;
+    this.node2ID = node2ID;
+  }
+
+  getData() {
+    return [this.category, this.familiarity, this.stressCode, this.node1ID, this.node2ID];
+  }
 }
 
 export const LoadGraph = () => {
