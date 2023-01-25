@@ -26,8 +26,7 @@ class DataSidebar extends React.Component {
     };
     // In the future this will be passed through from blurpmap, as the data
     // will be coming from the map
-    this.NodeData = new NodeData();
-    this.NodeData.setData('bingus', 17, 'this is a test', NodeType.person);
+    this.NodeData = this.props.NodeData;
     this.EdgeData = null;
 
     // https://chafikgharbi.com/react-call-child-method/
@@ -127,6 +126,7 @@ class DataSidebar extends React.Component {
         {this.state.content}
 
         {/* Below are buttons used for testing each individual sidebar view
+         */}
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.none)}>
           None
         </button>
@@ -142,7 +142,6 @@ class DataSidebar extends React.Component {
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.edge)}>
           Edge/Relationship
         </button>
-         */}
       </>
     );
   }
