@@ -92,7 +92,7 @@
   }
 
   .landing-background {
-    @apply bg-indigo-900;
+    @apply bg-gray-800;
   }
 
   .system-toolbar {
