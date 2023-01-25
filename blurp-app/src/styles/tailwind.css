@@ -32,7 +32,7 @@
   }
 
   .btn-start {
-    @apply bg-fuchsia-750 my-4 inline-grid h-20 w-96 place-items-center rounded-xl text-3xl font-bold text-white shadow-md xl:w-64;
+    @apply bg-red-400 my-4 inline-grid h-20 w-96 place-items-center rounded-xl text-3xl font-bold text-white shadow-md xl:w-64;
   }
 
   .main-title {
