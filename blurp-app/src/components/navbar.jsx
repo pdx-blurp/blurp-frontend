@@ -15,8 +15,12 @@ function NavbarProp() {
           </div>
         </Link>
         <ul className="hidden md:flex flex-row flex-1 justify-end items-center gap-8 uppercase text-xs">
-          <li className="btn-navbar">About Us</li>
-          <li className="btn-navbar">Contact</li>
+          <Link to="/about">
+            <li className="btn-navbar">About Us</li>
+          </Link>
+          <Link to="/contact">
+            <li className="btn-navbar">Contact</li>
+          </Link>
           <li className="cursor-pointer">
             <img className="w-9 h-9 rounded-full" src={profile_pic} />
           </li>
