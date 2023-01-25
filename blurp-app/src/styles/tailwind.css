@@ -12,59 +12,59 @@
 /* reuse styles wrapped conviently under one class name */
 @layer components {
   .btn-primary {
-    @apply py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
+    @apply rounded-lg bg-blue-500 py-2 px-4 font-semibold text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75;
   }
 
   .btn-navbar {
-    @apply cursor-pointer text-white text-sm hover:bg-blue-300/25 border-2 border-transparent hover:border-2 hover:border-blue-300/10 rounded py-2 px-6;
+    @apply cursor-pointer rounded border-2 border-transparent py-2 px-6 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
   }
 
   .btn-leave {
-    @apply py-2 px-4 w-32 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75;
+    @apply w-32 rounded-lg bg-red-500 py-2 px-4 font-semibold text-white shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75;
   }
 
   .btn-callback {
-    @apply py-2 px-4 w-32 bg-green-500/80 text-white font-semibold rounded-lg shadow-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75;
+    @apply w-32 rounded-lg bg-green-500/80 py-2 px-4 font-semibold text-white shadow-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75;
   }
 
   .btn-skip {
-    @apply py-2 px-4 w-32 bg-gray-500/80 text-white font-semibold rounded-lg shadow-md hover:bg-gray-500/90 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75;
+    @apply w-32 rounded-lg bg-gray-500/80 py-2 px-4 font-semibold text-white shadow-md hover:bg-gray-500/90 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75;
   }
 
   .btn-start {
-    @apply xl:w-64 w-96 h-20 my-4 bg-fuchsia-750 text-white text-3xl font-bold shadow-md rounded-xl inline-grid place-items-center;
+    @apply bg-fuchsia-750 my-4 inline-grid h-20 w-96 place-items-center rounded-xl text-3xl font-bold text-white shadow-md xl:w-64;
   }
 
   .main-title {
-    @apply text-green-600 text-8xl font-bold py-5;
+    @apply py-5 text-8xl font-bold text-green-600;
   }
 
   .main-subtitle {
-    @apply text-gray-600 text-2xl py-5;
+    @apply py-5 text-2xl text-gray-600;
   }
 
   .section-title {
-    @apply text-pink-550 text-6xl font-bold py-5;
+    @apply text-pink-550 py-5 text-6xl font-bold;
   }
 
   .hero-card {
-    @apply fixed p-8 my-6 top-1/3 bg-slate-200 rounded-lg border-4 border-dashed border-black opacity-80;
+    @apply fixed top-1/3 my-6 rounded-lg border-4 border-dashed border-black bg-slate-200 p-8 opacity-80;
   }
 
   .my-style {
-    @apply w-8 h-1 bg-slate-100 rounded-sm;
+    @apply h-1 w-8 rounded-sm bg-slate-100;
   }
 
   .searchbar-icon {
-    @apply absolute inset-y-0 left-[10px] flex items-center pointer-events-none;
+    @apply pointer-events-none absolute inset-y-0 left-[10px] flex items-center;
   }
 
   .searchbar-input {
-    @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white;
+    @apply block w-full rounded-l-lg border border-gray-300 bg-gray-50 p-2.5 pl-10 text-sm text-gray-900  dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400;
   }
 
   .searchbar-btn {
-    @apply inline-flex items-center py-2.5 px-3 ml-0 text-sm font-medium text-white bg-green-600 rounded-r-lg border border-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
+    @apply ml-0 inline-flex items-center rounded-r-lg border border-green-600 bg-green-600 py-2.5 px-3 text-sm font-medium text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800;
   }
 
   .data-sidebar {
@@ -72,7 +72,7 @@
   }
 
   .data-sidebar-tab {
-    @apply absolute flex w-[15px] h-[60px] mt-[50px] bg-fuchsia-750 rounded-l-md hover:cursor-pointer items-center;
+    @apply bg-fuchsia-750 absolute mt-[50px] flex h-[60px] w-[15px] items-center rounded-l-md hover:cursor-pointer;
   }
 
   .data-sidebar-tab-arrow {
@@ -88,11 +88,19 @@
   }
 
   .btn-sidebar {
-    @apply xl:w-64 w-64 h-20 my-4 bg-fuchsia-750 text-white text-xl font-bold shadow-md rounded-xl inline-grid place-items-center;
+    @apply bg-fuchsia-750 m-2 inline-grid h-20 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
   }
 
   .landing-background {
     @apply bg-indigo-900;
+  }
+
+  .system-toolbar {
+    @apply transition ease-in-out transition-all absolute bg-gray-300 h-[100%] w-[150px];
+  }
+
+  .system-toolbar-button {
+    @apply flex justify-center h-[40px] my-[15px];
   }
 }
 

@@ -20,10 +20,10 @@ const Home = () => {
           </div>
           <div className="my-5">
             <div className="grid xl:grid-cols-2 grid-cols-1 gap-8 justify-items-center">
-              <Link to="/blurpmap" className="btn-start" role="button">
+              <Link to="/blurp-map" className="btn-start" role="button">
                 Start (Local)
               </Link>
-              <Link to="/blurpmap" className="btn-start" role="button">
+              <Link to="/blurp-map" className="btn-start" role="button">
                 Start (Log In)
               </Link>
             </div>
