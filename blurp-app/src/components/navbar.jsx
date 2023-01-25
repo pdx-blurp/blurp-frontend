@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function NavbarProp() {
   return (
     <>
-      <nav className="flex items-center sticky top-0 z-50 px-4 py-2 bg-slate-500/75 shadow-2xl">
+      <nav className="flex items-center sticky top-0 z-50 px-4 py-2 bg-gray-900/75 shadow-2xl">
         <Link to="/">
           <div className="cursor-pointer mx-2 flex items-center flex-shrink-0">
             <img className="mr-4 h-8 w-8" src={logo_image} alt="Home Page" />
@@ -15,7 +15,6 @@ function NavbarProp() {
           </div>
         </Link>
         <ul className="hidden md:flex flex-row flex-1 justify-end items-center gap-8 uppercase text-xs">
-          <li className="btn-navbar">Shop</li>
           <li className="btn-navbar">About Us</li>
           <li className="btn-navbar">Contact</li>
           <li className="cursor-pointer">
