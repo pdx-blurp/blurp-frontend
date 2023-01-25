@@ -68,7 +68,7 @@
   }
 
   .data-sidebar {
-    @apply absolute right-0 my-[100px] h-[60%] w-[260px] p-0;
+    @apply absolute w-[260px] h-[400px] my-[100px] right-[40px] p-0;
   }
 
   .data-sidebar-tab {
@@ -80,7 +80,7 @@
   }
 
   .data-sidebar-background {
-    @apply absolute mr-0 ml-[15px] flex h-full w-[245px] rounded-l-xl border-2 border-gray-400 bg-gray-200 p-0;
+    @apply absolute flex w-[245px] p-0 mr-0 ml-[15px] bg-gray-200 h-full border-2 border-gray-400 border-r-0 rounded-l-xl;
   }
 
   .textbox-sidebar {
@@ -92,7 +92,7 @@
   }
 
   .landing-background {
-    @apply bg-indigo-900;
+    @apply bg-gray-800;
   }
 
   .system-toolbar {
