@@ -174,10 +174,11 @@ const TestPage = () => {
       </div>
       <SigmaContainer 
         id="blurp-map-container"
+        className="w-full flex justify-center"
         graph={graph}
         settings={{ renderEdgeLabels: true}}
       >
-        <ControlsContainer>
+        <ControlsContainer className="w-[400px] absolute top-5" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
