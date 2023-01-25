@@ -6,6 +6,7 @@ import "@react-sigma/core/lib/react-sigma.min.css";
 import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE } from "../constants/constants.ts";
 import DataSidebar from "../components/data_sidebar.jsx";
+import GraphToolbar from "../components/graph_toolbar.jsx";
 import System_Toolbar from "../components/system_toolbar.jsx";
 
 export const sidebarView = {
@@ -173,10 +174,11 @@ const TestPage = () => {
       </div>
       <SigmaContainer 
         id="blurp-map-container"
+        className="w-full flex justify-center"
         graph={graph}
         settings={{ renderEdgeLabels: true}}
       >
-        <ControlsContainer>
+        <ControlsContainer className="w-[400px] absolute top-5" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
@@ -186,6 +188,9 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar/>
+      </div>
+      <div className="absolute top-0 inset-y-0 right-0">
+        <GraphToolbar/>
       </div>
     </div>
   );
