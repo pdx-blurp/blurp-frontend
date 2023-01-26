@@ -56,6 +56,7 @@ export class NodeData {
     this.years = years;
     this.notes = notes;
     this.type = type;
+    this.display = this.display.bind(this);
   }
 
   setData(name, years, notes, type) {

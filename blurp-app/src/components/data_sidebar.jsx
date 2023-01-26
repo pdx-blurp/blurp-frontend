@@ -26,7 +26,7 @@ class DataSidebar extends React.Component {
     };
     // In the future this will be passed through from blurpmap, as the data
     // will be coming from the map
-    this.node = new NodeData('bingus', 21, 'testing', NodeType.person);
+    this.node = new NodeData('wow, a test!', 21, 'testing', NodeType.person);
     this.edge = null;
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
