@@ -44,11 +44,18 @@ export const NodeType = {
 };
 
 export class NodeData {
-  constructor() {
+  /* constructor() {
     this.name = '';
     this.years = 0;
     this.notes = '';
     this.type = NodeType.person;
+  } */
+
+  constructor(name, years, notes, type) {
+    this.name = name;
+    this.years = years;
+    this.notes = notes;
+    this.type = type;
   }
 
   setData(name, years, notes, type) {
@@ -56,6 +63,14 @@ export class NodeData {
     this.years = years;
     this.notes = notes;
     this.type = type;
+  }
+
+  display() {
+    console.log('data: ');
+    console.log('name: ' + this.name);
+    console.log('years: ' + this.years);
+    console.log('notes: ' + this.notes);
+    console.log('type: ' + this.type);
   }
 
   setName(name) {
@@ -136,7 +151,7 @@ const TestPage = () => {
   };
 
   let testdata = new NodeData();
-  testdata.setData('bingus', 17, 'this is a test', NodeType.person);
+  testdata.setData('testing', 17, 'this is a test', NodeType.person);
 
   return (
     //Sigma Graph Settings, reference graphology

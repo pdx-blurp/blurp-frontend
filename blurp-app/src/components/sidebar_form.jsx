@@ -1,18 +1,34 @@
-import React from 'react';
+import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { sidebarView, Relationships, NodeType, NodeData, EdgeData } from '../pages/blurpmap.jsx';
 
 const notes_size = 255;
 
-const SidebarForm = ({ view }) => {
-  let name = '';
-  let years = '';
-  let notes = '';
-  let type = NodeType.person;
-  let relation = Relationships.situational;
-  let familiarity = '';
-  let stressLevel = '';
-  let node1ID = '';
-  let node2ID = '';
+const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
+  /* 
+    used this stackoverflow answer to help with getting the form to update 
+    when the data its being fed is changed
+    https://stackoverflow.com/a/68642185 
+
+    and used this one for figuring out how to allow for a child function
+    to be called from a parent component:
+    https://stackoverflow.com/a/68642839
+  */
+  useEffect(() => setData(), [parent_node]);
+  const [value, setValue] = useState('');
+  const [node, setNode] = useState({
+    name: '',
+    years: '',
+    notes: '',
+    type: NodeType.person,
+  });
+
+  const [edge, setEdge] = useState({
+    relation: Relationships.situational,
+    familiarity: '',
+    stressLevel: '',
+    node1ID: '',
+    node2ID: '',
+  });
 
   /* let view =  props.view;
     handleChange =  handleChange.bind(this);
@@ -26,104 +42,115 @@ const SidebarForm = ({ view }) => {
   */
   const handleChange = (e) => {
     const target = e.target;
-    let value = target.value;
-    const name = target.name;
+    const value = target.value;
+    const e_name = target.name;
+
+    console.log(target + ' ' + value + ' ' + e_name);
 
     if (target.type == 'radio') {
       switch (value) {
         case 'family':
-          setState({ relation: Relationships.familial });
+          setEdge({
+            ...edge,
+            relation: Relationships.familial,
+          });
           break;
         case 'friend':
-          setState({ relation: Relationships.friendship });
+          setEdge({
+            ...edge,
+            relation: Relationships.friendship,
+          });
           break;
         case 'acquaint':
-          setState({ relation: Relationships.acquaintance });
+          setEdge({
+            ...edge,
+            relation: Relationships.acquaintance,
+          });
           break;
         case 'romantic':
-          setState({ relation: Relationships.romantic });
+          setEdge({
+            ...edge,
+            relation: Relationships.romantic,
+          });
           break;
         case 'work':
-          setState({ relation: Relationships.work });
+          setEdge({
+            ...edge,
+            relation: Relationships.work,
+          });
           break;
         case 'undefined':
-          setState({ relation: Relationships.situational });
+          setEdge({
+            ...edge,
+            relation: Relationships.situational,
+          });
           break;
       }
     } else {
-      setState({ [name]: value });
-      switch (name) {
-        case 'name':
-          name = value;
-          break;
-        case 'years':
-          years = value;
-          break;
-        case 'notes':
-          notes = value;
-          break;
-        case 'type':
-          type = value;
-          break;
-        case 'relation':
-          relation = value;
-          break;
-        case 'familiarity':
-          familiarity = value;
-          break;
-        case 'stressLevel':
-          stressLevel = value;
-          break;
-        case 'node1ID':
-          node1ID = value;
-          break;
-        case 'node2ID':
-          node2ID = value;
-          break;
-      }
+      console.log('e_name: ' + e_name + '\nvalue :' + value);
+      setNode({
+        ...node,
+        [e_name]: value,
+      });
+      console.log('state: ' + node.name);
     }
   };
 
   const handleSubmit = (e) => {
     // Will be replaced with code that will send the data back to the node
     console.log('Submitted Data: ');
-    console.log('name: ' + name);
-    console.log('years: ' + years);
-    console.log('notes: ' + notes);
-    console.log('type: ' + type);
-    console.log('relation: ' + relation);
-    console.log('familiarity: ' + familiarity);
-    console.log('stressLevel: ' + stressLevel);
+    console.log('name: ' + node.name);
+    console.log('years: ' + node.years);
+    console.log('notes: ' + node.notes);
+    console.log('type: ' + node.type);
+    console.log('relation: ' + edge.relation);
+    console.log('familiarity: ' + edge.familiarity);
+    console.log('stressLevel: ' + edge.stressLevel);
+
+    parent_node.setData(node.name, node.years, node.notes, node.type);
 
     e.preventDefault();
   };
 
-  const setData = () => {
-    if (props.NodeData) {
-      let node_name, node_years, node_notes, node_type;
-      [node_name, node_years, node_notes, node_type] = props.NodeData.getData();
-      setState({
-        name: node_name,
-        years: node_years,
-        notes: node_notes,
-        type: node_type,
-      });
-    } else if (props.EdgeData) {
-      let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
-      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = props.EdgeData.getData();
-      setState({
-        category: edge_cat,
-        familiarity: edge_fam,
-        stressLevel: edge_stress,
-        node1ID: edge_1ID,
-        node2ID: edge_2ID,
-      });
-    }
+  const clearState = () => {
+    setNode({
+      name: '',
+      years: '',
+      notes: '',
+      type: NodeType.person,
+    });
+
+    setEdge({
+      relation: Relationships.situational,
+      familiarity: '',
+      stressLevel: '',
+      node1ID: '',
+      node2ID: '',
+    });
   };
 
-  const changeView = (new_view) => {
-    view = new_view;
-    setState({ value: '' });
+  useImperativeHandle(ref, () => ({
+    clearState,
+  }));
+
+  const setData = () => {
+    console.log('testing');
+    if (parent_node) {
+      let node_name, node_years, node_notes, node_type;
+      [node_name, node_years, node_notes, node_type] = parent_node.getData();
+      node.name = node_name;
+      node.years = node_years;
+      node.notes = node_notes;
+      node.type = node_type;
+    } else if (parent_edge) {
+      let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
+      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = parent_edge.getData();
+      edge.category = edge_cat;
+      edge.familiarity = edge_fam;
+      edge.stressLevel = edge_stress;
+      edge.node1ID = edge_1ID;
+      edge.node2ID = edge_2ID;
+    }
   };
 
   const selectView = () => {
@@ -135,7 +162,7 @@ const SidebarForm = ({ view }) => {
           </p>
         );
       case sidebarView.person:
-        type = NodeType.person;
+        node.type = NodeType.person;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Person</h1>
@@ -144,14 +171,20 @@ const SidebarForm = ({ view }) => {
               name="name"
               placeholder="Name"
               className="textbox-sidebar"
-              value={name}
-              onChange={handleChange}
+              value={node.name}
+              onChange={(e) => {
+                setNode({
+                  ...node,
+                  name: e.target.value,
+                });
+                console.log(node.name);
+              }}
             />
             <input
               type="number"
               name="years"
               placeholder="Age"
-              value={years}
+              value={node.years}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -162,7 +195,7 @@ const SidebarForm = ({ view }) => {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={notes}
+              value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
             />
@@ -172,7 +205,7 @@ const SidebarForm = ({ view }) => {
           </form>
         );
       case sidebarView.place:
-        type = NodeType.place;
+        node.type = NodeType.place;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Place</h1>
@@ -180,7 +213,7 @@ const SidebarForm = ({ view }) => {
               type="text"
               name="name"
               placeholder="Name"
-              value={name}
+              value={node.name}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -191,7 +224,7 @@ const SidebarForm = ({ view }) => {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={notes}
+              value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
             />
@@ -201,7 +234,7 @@ const SidebarForm = ({ view }) => {
           </form>
         );
       case sidebarView.idea:
-        type = NodeType.idea;
+        node.type = NodeType.idea;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Idea</h1>
@@ -209,7 +242,7 @@ const SidebarForm = ({ view }) => {
               type="name"
               name="name"
               placeholder="Name"
-              value={name}
+              value={node.name}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -217,7 +250,7 @@ const SidebarForm = ({ view }) => {
               type="number"
               name="years"
               placeholder="Age/History"
-              value={years}
+              value={node.years}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -228,7 +261,7 @@ const SidebarForm = ({ view }) => {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={notes}
+              value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
             />
@@ -266,7 +299,7 @@ const SidebarForm = ({ view }) => {
               type="number"
               name="familiarity"
               placeholder="Familiarity"
-              value={familiarity}
+              value={node.familiarity}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -274,12 +307,12 @@ const SidebarForm = ({ view }) => {
               type="number"
               name="stressLevel"
               placeholder="Stress Level"
-              value={stressLevel}
+              value={node.stressLevel}
               onChange={handleChange}
               className="textbox-sidebar"
             />
             <div className="m-4 w-11/12 text-lg">
-              <u>{node1ID}</u> is related to <u>{node2ID}</u>
+              <u>{node.node1ID}</u> is related to <u>{node.node2ID}</u>
             </div>
             <button type="submit" className="btn-sidebar">
               Save
@@ -293,6 +326,6 @@ const SidebarForm = ({ view }) => {
   };
 
   return <>{selectView()}</>;
-};
+});
 
 export default SidebarForm;

@@ -26,9 +26,8 @@ class DataSidebar extends React.Component {
     };
     // In the future this will be passed through from blurpmap, as the data
     // will be coming from the map
-    this.NodeData = this.props.NodeData;
-    this.EdgeData = null;
-
+    this.node = new NodeData('bingus', 21, 'testing', NodeType.person);
+    this.edge = null;
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
     /* 
@@ -39,6 +38,10 @@ class DataSidebar extends React.Component {
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
   }
+
+  onClickFunction = () => {
+    this.child.current?.clearState();
+  };
 
   /* 
     probably isn't needed anymore, just have it like this for now while
@@ -53,8 +56,8 @@ class DataSidebar extends React.Component {
           <SidebarForm
             ref={this.child}
             view={view}
-            NodeData={this.NodeData}
-            EdgeData={this.EdgeData}
+            parent_node={this.node}
+            parent_edge={this.edge}
           />
         </div>
       );
@@ -88,15 +91,15 @@ class DataSidebar extends React.Component {
         content: this.renderContent(sidebarState.open, new_view),
         view: new_view,
       });
-      if (this.child.current) {
-        this.child.current.changeView(new_view);
-      }
     } else {
       this.setState({
         content: this.renderContent(sidebarState.closed, sidebarView.closed),
         view: new_view,
       });
     }
+    /* Works, but will clear data after the new data has been loaded in, so
+       probably need to play around with it and see what works best */
+    // this.onClickFunction();
   }
 
   renderContent(status, view) {
@@ -127,6 +130,12 @@ class DataSidebar extends React.Component {
 
         {/* Below are buttons used for testing each individual sidebar view
          */}
+        <button className="btn-primary m-10" onClick={this.node.display}>
+          display
+        </button>
+        <button className="btn-primary m-10" onClick={this.testFunction}>
+          testing
+        </button>
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.none)}>
           None
         </button>
