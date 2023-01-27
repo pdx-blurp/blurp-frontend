@@ -100,7 +100,7 @@ const TestPage = () => {
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const node = new NodeData('', '25', '', NodeType.person);
+  const [node, setNode] = useState({ selected: new NodeData('', '25', '', NodeType.person) });
   const child = useRef();
 
   function handleSubmit() {
@@ -143,8 +143,9 @@ const TestPage = () => {
               selected_view = sidebarView.idea;
               break;
           }
-
-          node.setData(retrieved.label, node.years, node.notes, selected_type);
+          setNode({
+            selected: new NodeData(retrieved.label, node.years, node.notes, selected_type),
+          });
           child.current.changeView(selected_view);
           console.log('clickNode', event.node, graph.getNodeAttributes(event.node));
           console.log(node);
@@ -243,7 +244,7 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node} test={'testing'} />
+        <DataSidebar ref={child} node={node.selected} test={'testing'} />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />

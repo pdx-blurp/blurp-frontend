@@ -3,7 +3,7 @@ import { sidebarView, Relationships, NodeType, NodeData, EdgeData } from '../pag
 
 const notes_size = 255;
 
-const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
+const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_edge }, ref) {
   /* 
     used this stackoverflow answer to help with getting the form to update 
     when the data its being fed is changed
@@ -14,7 +14,6 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
     https://stackoverflow.com/a/68642839
   */
   useEffect(() => setData(), [parent_node]);
-  const [value, setValue] = useState('');
   const [node, setNode] = useState({
     name: '',
     years: '',
@@ -29,10 +28,6 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
     node1ID: '',
     node2ID: '',
   });
-
-  /* let view =  props.view;
-    handleChange =  handleChange.bind(this);
-    handleSubmit =  handleSubmit.bind(this); */
   /* 
     Using this to work on pulling info from the forms:
     https://reactjs.org/docs/forms.html
@@ -96,9 +91,7 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
     }
   };
 
-  const handleSubmit = (e) => {
-    // Will be replaced with code that will send the data back to the node
-    console.log('Submitted Data: ');
+  const display = () => {
     console.log('name: ' + node.name);
     console.log('years: ' + node.years);
     console.log('notes: ' + node.notes);
@@ -106,7 +99,10 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
     console.log('relation: ' + edge.relation);
     console.log('familiarity: ' + edge.familiarity);
     console.log('stressLevel: ' + edge.stressLevel);
+  };
 
+  const handleSubmit = (e) => {
+    // Will be replaced with code that will send the data back to the node
     parent_node.setData(node.name, node.years, node.notes, node.type);
 
     e.preventDefault();
@@ -129,11 +125,16 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
     });
   };
 
-  useImperativeHandle(ref, () => ({
-    clearState,
-  }));
+  useImperativeHandle(
+    ref,
+    () => ({
+      clearState: clearState,
+    }),
+    []
+  );
 
   const setData = () => {
+    console.log('ran!');
     if (parent_node) {
       let node_name, node_years, node_notes, node_type;
       [node_name, node_years, node_notes, node_type] = parent_node.getData();
@@ -153,6 +154,7 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
   };
 
   const selectView = () => {
+    display();
     console.log(parent_node);
     switch (view) {
       case sidebarView.none:

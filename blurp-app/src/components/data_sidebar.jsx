@@ -33,7 +33,12 @@ class DataSidebar extends React.Component {
     */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
+    this.clearState = this.clearState.bind(this);
   }
+
+  clearState = () => {
+    this.child.current.clearState();
+  };
 
   /* 
     probably isn't needed anymore, just have it like this for now while
@@ -78,7 +83,6 @@ class DataSidebar extends React.Component {
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
   changeView(new_view) {
-    console.log(new_view);
     if (new_view != sidebarView.closed) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),
