@@ -9,7 +9,6 @@ const sidebarState = {
 class DataSidebar extends React.Component {
   constructor(props) {
     super(props);
-
     // Each of the four specifications below is an array: [collapsed, expanded].
     // The first element is what the specification is when the data-sidebar is collapsed,
     // and the second element is when it's expanded.
@@ -21,13 +20,10 @@ class DataSidebar extends React.Component {
     // Function to be called when the tab/button is clicked
     this.onclick = [this.expand, this.collapse];
     this.state = {
-      content: this.renderContent(sidebarState.closed, sidebarView.none),
-      view: sidebarView.closed,
+      content: this.renderContent(sidebarState.expanded, sidebarView.person),
+      view: sidebarView.person,
     };
-    // In the future this will be passed through from blurpmap, as the data
-    // will be coming from the map
-    this.node = new NodeData('wow, a test!', 21, 'testing', NodeType.person);
-    this.edge = null;
+
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
     /* 
@@ -38,10 +34,6 @@ class DataSidebar extends React.Component {
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
   }
-
-  onClickFunction = () => {
-    this.child.current?.clearState();
-  };
 
   /* 
     probably isn't needed anymore, just have it like this for now while
@@ -56,7 +48,7 @@ class DataSidebar extends React.Component {
           <SidebarForm
             ref={this.child}
             view={view}
-            parent_node={this.node}
+            parent_node={this.props.node}
             parent_edge={this.edge}
           />
         </div>
@@ -86,6 +78,7 @@ class DataSidebar extends React.Component {
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
   changeView(new_view) {
+    console.log(new_view);
     if (new_view != sidebarView.closed) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),
@@ -129,7 +122,6 @@ class DataSidebar extends React.Component {
         {this.state.content}
 
         {/* Below are buttons used for testing each individual sidebar view
-         */}
         <button className="btn-primary m-10" onClick={this.node.display}>
           display
         </button>
@@ -151,6 +143,7 @@ class DataSidebar extends React.Component {
         <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.edge)}>
           Edge/Relationship
         </button>
+         */}
       </>
     );
   }

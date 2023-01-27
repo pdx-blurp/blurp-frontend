@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MultiGraph } from 'graphology';
 import {
   SigmaContainer,
@@ -44,13 +44,6 @@ export const NodeType = {
 };
 
 export class NodeData {
-  /* constructor() {
-    this.name = '';
-    this.years = 0;
-    this.notes = '';
-    this.type = NodeType.person;
-  } */
-
   constructor(name, years, notes, type) {
     this.name = name;
     this.years = years;
@@ -72,22 +65,6 @@ export class NodeData {
     console.log('years: ' + this.years);
     console.log('notes: ' + this.notes);
     console.log('type: ' + this.type);
-  }
-
-  setName(name) {
-    this.name = name;
-  }
-
-  setYears(years) {
-    this.years = years;
-  }
-
-  setNotes(notes) {
-    this.notes = notes;
-  }
-
-  setType(type) {
-    this.type = type;
   }
 
   getData() {
@@ -123,6 +100,8 @@ const TestPage = () => {
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const node = new NodeData('', '25', '', NodeType.person);
+  const child = useRef();
 
   function handleSubmit() {
     const id = uuidv4();
@@ -142,17 +121,40 @@ const TestPage = () => {
       // Register the events
       registerEvents({
         // default mouse events
-        click: (event) => {
+        doubleClick: (event) => {
           setIsModalOpen(true);
+        }, // node events
+        clickNode: (event) => {
+          let retrieved = graph.getNodeAttributes(event.node);
+          let type = NodeType.person;
+          let view = sidebarView.closed;
+          switch (retrieved.entity) {
+            case 'PERSON':
+              type = NodeType.person;
+              view = sidebarView.person;
+              break;
+            case 'PLACE':
+              type = NodeType.place;
+              view = sidebarView.place;
+              break;
+            case 'IDEA':
+              type = NodeType.idea;
+              view = sidebarView.idea;
+              break;
+          }
+
+          node.setData(retrieved.label, node.years, node.notes, type);
+          if (child.current) {
+            child.current.changeView(view);
+          }
+          console.log('clickNode', event.node, graph.getNodeAttributes(event.node));
+          console.log(node);
         },
       });
     }, [registerEvents]);
 
     return null;
   };
-
-  let testdata = new NodeData();
-  testdata.setData('testing', 17, 'this is a test', NodeType.person);
 
   return (
     //Sigma Graph Settings, reference graphology
@@ -242,10 +244,10 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar />
+        <DataSidebar node={node} test={'testing'} />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar NodeData={testdata} />
+        <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <GraphToolbar />

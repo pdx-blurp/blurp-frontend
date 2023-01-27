@@ -134,7 +134,6 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
   }));
 
   const setData = () => {
-    console.log('testing');
     if (parent_node) {
       let node_name, node_years, node_notes, node_type;
       [node_name, node_years, node_notes, node_type] = parent_node.getData();
@@ -154,6 +153,7 @@ const SidebarForm = forwardRef(({ view, parent_node, parent_edge }, ref) => {
   };
 
   const selectView = () => {
+    console.log(parent_node);
     switch (view) {
       case sidebarView.none:
         return (
