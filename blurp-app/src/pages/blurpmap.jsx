@@ -115,6 +115,7 @@ const TestPage = () => {
     });
     setIsModalOpen(false);
   }
+
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
     useEffect(() => {
@@ -125,28 +126,26 @@ const TestPage = () => {
           setIsModalOpen(true);
         }, // node events
         clickNode: (event) => {
+          let selected_view = sidebarView.closed;
+          let selected_type = NodeType.person;
           let retrieved = graph.getNodeAttributes(event.node);
-          let type = NodeType.person;
-          let view = sidebarView.closed;
           switch (retrieved.entity) {
             case 'PERSON':
-              type = NodeType.person;
-              view = sidebarView.person;
+              selected_type = NodeType.person;
+              selected_view = sidebarView.person;
               break;
             case 'PLACE':
-              type = NodeType.place;
-              view = sidebarView.place;
+              selected_type = NodeType.place;
+              selected_view = sidebarView.place;
               break;
             case 'IDEA':
-              type = NodeType.idea;
-              view = sidebarView.idea;
+              selected_type = NodeType.idea;
+              selected_view = sidebarView.idea;
               break;
           }
 
-          node.setData(retrieved.label, node.years, node.notes, type);
-          if (child.current) {
-            child.current.changeView(view);
-          }
+          node.setData(retrieved.label, node.years, node.notes, selected_type);
+          child.current.changeView(selected_view);
           console.log('clickNode', event.node, graph.getNodeAttributes(event.node));
           console.log(node);
         },
@@ -244,7 +243,7 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar node={node} test={'testing'} />
+        <DataSidebar ref={child} node={node} test={'testing'} />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />
