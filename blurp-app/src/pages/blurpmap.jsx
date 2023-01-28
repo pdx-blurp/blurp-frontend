@@ -10,88 +10,11 @@ import {
 import '@react-sigma/core/lib/react-sigma.min.css';
 
 import { v4 as uuidv4 } from 'uuid';
-import { COLORS, NODE_TYPE } from '../constants/constants.ts';
+import { COLORS, NODE_TYPE, sidebarView } from '../constants/constants.ts';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import GraphToolbar from '../components/graph_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
-
-export const sidebarView = {
-  closed: 'closed',
-  none: 'none',
-  person: 'person',
-  place: 'place',
-  idea: 'idea',
-  edge: 'edge',
-};
-
-/* 
-  graphData and Relationships were both made according 
-  to the data objects/map architecture docs
-*/
-export const Relationships = {
-  familial: 'familial',
-  friendship: 'friendship',
-  acquaintance: 'acquaintance',
-  romantic: 'romantic',
-  work: 'work',
-  situational: 'situational',
-};
-
-export const NodeType = {
-  person: 'person',
-  place: 'place',
-  idea: 'idea',
-};
-
-export class NodeData {
-  constructor(name, years, notes, type) {
-    this.name = name;
-    this.years = years;
-    this.notes = notes;
-    this.type = type;
-    this.display = this.display.bind(this);
-  }
-
-  setData(name, years, notes, type) {
-    this.name = name;
-    this.years = years;
-    this.notes = notes;
-    this.type = type;
-  }
-
-  display() {
-    console.log('data: ');
-    console.log('name: ' + this.name);
-    console.log('years: ' + this.years);
-    console.log('notes: ' + this.notes);
-    console.log('type: ' + this.type);
-  }
-
-  getData() {
-    return [this.name, this.years, this.notes, this.type];
-  }
-}
-
-export class EdgeData {
-  constructor() {
-    this.category = Relationships.situational;
-    this.familiarity = 0;
-    this.stressCode = 0;
-    this.node1ID = 0;
-    this.node2ID = 0;
-  }
-  setData(category, familiarity, stressCode, node1ID, node2ID) {
-    this.category = category;
-    this.familiarity = familiarity;
-    this.stressCode = stressCode;
-    this.node1ID = node1ID;
-    this.node2ID = node2ID;
-  }
-
-  getData() {
-    return [this.category, this.familiarity, this.stressCode, this.node1ID, this.node2ID];
-  }
-}
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -100,7 +23,7 @@ const TestPage = () => {
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [node, setNode] = useState({ selected: new NodeData('', '25', '', NodeType.person) });
+  const [node, setNode] = useState({ selected: new NodeData('', '', '', '') });
   const child = useRef();
 
   function handleSubmit() {
@@ -127,24 +50,27 @@ const TestPage = () => {
         }, // node events
         clickNode: (event) => {
           let selected_view = sidebarView.closed;
-          let selected_type = NodeType.person;
+          let selected_type = NODE_TYPE.PERSON;
           let retrieved = graph.getNodeAttributes(event.node);
           switch (retrieved.entity) {
             case 'PERSON':
-              selected_type = NodeType.person;
               selected_view = sidebarView.person;
               break;
             case 'PLACE':
-              selected_type = NodeType.place;
               selected_view = sidebarView.place;
               break;
             case 'IDEA':
-              selected_type = NodeType.idea;
               selected_view = sidebarView.idea;
               break;
           }
+          console.log(retrieved.label);
           setNode({
-            selected: new NodeData(retrieved.label, node.years, node.notes, selected_type),
+            selected: new NodeData(
+              retrieved.label,
+              node.selected.years,
+              node.selected.notes,
+              selected_type
+            ),
           });
           child.current.changeView(selected_view);
           console.log('clickNode', event.node, graph.getNodeAttributes(event.node));
@@ -244,7 +170,7 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node.selected} test={'testing'} />
+        <DataSidebar ref={child} node={node.selected} />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />

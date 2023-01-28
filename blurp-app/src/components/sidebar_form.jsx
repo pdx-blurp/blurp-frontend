@@ -1,9 +1,11 @@
+import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
-import { sidebarView, Relationships, NodeType, NodeData, EdgeData } from '../pages/blurpmap.jsx';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
+import { NODE_TYPE, sidebarView, Relationships } from '../constants/constants.ts';
 
 const notes_size = 255;
 
-const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_edge }, ref) {
+const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, changeView }, ref) {
   /* 
     used this stackoverflow answer to help with getting the form to update 
     when the data its being fed is changed
@@ -13,12 +15,15 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
     to be called from a parent component:
     https://stackoverflow.com/a/68642839
   */
-  useEffect(() => setData(), [parent_node]);
+  useEffect(() => {
+    setData();
+  }, [parent_node]);
+  const [view, setView] = useState(sidebarView.closed);
   const [node, setNode] = useState({
     name: '',
     years: '',
     notes: '',
-    type: NodeType.person,
+    type: NODE_TYPE.PERSON,
   });
 
   const [edge, setEdge] = useState({
@@ -113,7 +118,7 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
       name: '',
       years: '',
       notes: '',
-      type: NodeType.person,
+      type: NODE_TYPE.PERSON,
     });
 
     setEdge({
@@ -136,26 +141,37 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
   const setData = () => {
     console.log('ran!');
     if (parent_node) {
-      let node_name, node_years, node_notes, node_type;
+      let node_name, node_years, node_notes, node_type, view;
       [node_name, node_years, node_notes, node_type] = parent_node.getData();
-      node.name = node_name;
-      node.years = node_years;
-      node.notes = node_notes;
-      node.type = node_type;
+      setNode({
+        name: node_name,
+        years: node_years,
+        notes: node_notes,
+        type: node_type,
+      });
+      if (node_type != '') {
+        console.log('view has been set!');
+        if (node_type == 'PERSON') view = sidebarView.person;
+        else if (node_type == 'PLACE') view = sidebarView.place;
+        else if (node_type == 'IDEA') view = sidebarView.idea;
+
+        setView(view);
+        changeView(view);
+      }
     } else if (parent_edge) {
       let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
       [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = parent_edge.getData();
-      edge.category = edge_cat;
-      edge.familiarity = edge_fam;
-      edge.stressLevel = edge_stress;
-      edge.node1ID = edge_1ID;
-      edge.node2ID = edge_2ID;
+      setEdge({
+        category: edge_cat,
+        familiarity: edge_fam,
+        stressLevel: edge_stress,
+        node1ID: edge_1ID,
+        node2ID: edge_2ID,
+      });
     }
   };
 
   const selectView = () => {
-    display();
-    console.log(parent_node);
     switch (view) {
       case sidebarView.none:
         return (
@@ -164,7 +180,7 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
           </p>
         );
       case sidebarView.person:
-        node.type = NodeType.person;
+        node.type = NODE_TYPE.PERSON;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Person</h1>
@@ -207,7 +223,7 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
           </form>
         );
       case sidebarView.place:
-        node.type = NodeType.place;
+        node.type = NODE_TYPE.PLACE;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Place</h1>
@@ -236,7 +252,7 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
           </form>
         );
       case sidebarView.idea:
-        node.type = NodeType.idea;
+        node.type = NODE_TYPE.IDEA;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Idea</h1>
@@ -322,7 +338,6 @@ const SidebarForm = forwardRef(function SidebarForm({ view, parent_node, parent_
           </form>
         );
       default:
-        // aligns with closed state, shouldn't happen but wanted to guard it
         return <></>;
     }
   };

@@ -1,11 +1,8 @@
 import React from 'react';
 import SidebarForm from './sidebar_form.jsx';
-import { sidebarView, NodeData, NodeType, EdgeData } from '../pages/blurpmap.jsx';
+import { NODE_TYPE, sidebarState, sidebarView } from '../constants/constants.ts';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
 
-const sidebarState = {
-  closed: 'closed',
-  expanded: 'expanded',
-};
 class DataSidebar extends React.Component {
   constructor(props) {
     super(props);
@@ -34,32 +31,12 @@ class DataSidebar extends React.Component {
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
     this.clearState = this.clearState.bind(this);
+    this.changeView = this.changeView.bind(this);
   }
 
   clearState = () => {
     this.child.current.clearState();
   };
-
-  /* 
-    probably isn't needed anymore, just have it like this for now while
-    working on the form 
-  */
-  getSidebar(view) {
-    if (view == sidebarView.closed) {
-      return <></>;
-    } else {
-      return (
-        <div className="data-sidebar-background grid justify-items-center">
-          <SidebarForm
-            ref={this.child}
-            view={view}
-            parent_node={this.props.node}
-            parent_edge={this.edge}
-          />
-        </div>
-      );
-    }
-  }
 
   collapse = () => {
     this.setState({
@@ -82,7 +59,7 @@ class DataSidebar extends React.Component {
 
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
-  changeView(new_view) {
+  changeView = (new_view) => {
     if (new_view != sidebarView.closed) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),
@@ -94,10 +71,7 @@ class DataSidebar extends React.Component {
         view: new_view,
       });
     }
-    /* Works, but will clear data after the new data has been loaded in, so
-       probably need to play around with it and see what works best */
-    // this.onClickFunction();
-  }
+  };
 
   renderContent(status, view) {
     /* Fancy way to do an if/else statement, doing it since I was having issues
@@ -114,7 +88,14 @@ class DataSidebar extends React.Component {
               <polygon points={this.svg_coods[barState]} />
             </svg>
           </div>
-          {this.getSidebar(view)}
+          <div className="data-sidebar-background grid justify-items-center">
+            <SidebarForm
+              ref={this.child}
+              parent_node={this.props.node}
+              parent_edge={this.edge}
+              changeView={this.changeView}
+            />
+          </div>
         </div>
       </>
     );
