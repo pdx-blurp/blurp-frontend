@@ -31,7 +31,6 @@ class DataSidebar extends React.Component {
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
     this.clearState = this.clearState.bind(this);
-    this.changeView = this.changeView.bind(this);
   }
 
   clearState = () => {
@@ -60,7 +59,8 @@ class DataSidebar extends React.Component {
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
   changeView = (new_view) => {
-    if (new_view != sidebarView.closed) {
+    console.log('changing view...');
+    if (new_view != sidebarView.closed && new_view != sidebarView.none) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),
         view: new_view,
@@ -71,9 +71,10 @@ class DataSidebar extends React.Component {
         view: new_view,
       });
     }
+    return 1;
   };
 
-  renderContent(status, view) {
+  renderContent(status) {
     /* Fancy way to do an if/else statement, doing it since I was having issues
       getting variables to stay changed outside an if statement
       https://stackoverflow.com/questions/31971801/setting-a-javascript-variable-with-an-if-statement-should-the-var-x-be-in
@@ -102,35 +103,7 @@ class DataSidebar extends React.Component {
   }
 
   render() {
-    return (
-      <>
-        {this.state.content}
-
-        {/* Below are buttons used for testing each individual sidebar view
-        <button className="btn-primary m-10" onClick={this.node.display}>
-          display
-        </button>
-        <button className="btn-primary m-10" onClick={this.testFunction}>
-          testing
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.none)}>
-          None
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.person)}>
-          Person Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.place)}>
-          Place Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.idea)}>
-          Idea Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.edge)}>
-          Edge/Relationship
-        </button>
-         */}
-      </>
-    );
+    return <>{this.state.content}</>;
   }
 }
 

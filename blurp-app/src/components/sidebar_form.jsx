@@ -5,7 +5,7 @@ import { NODE_TYPE, sidebarView, Relationships } from '../constants/constants.ts
 
 const notes_size = 255;
 
-const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, changeView }, ref) {
+const SidebarForm = forwardRef((props, ref) => {
   /* 
     used this stackoverflow answer to help with getting the form to update 
     when the data its being fed is changed
@@ -15,9 +15,10 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
     to be called from a parent component:
     https://stackoverflow.com/a/68642839
   */
+
   useEffect(() => {
     setData();
-  }, [parent_node]);
+  }, [props.parent_node]);
   const [view, setView] = useState(sidebarView.closed);
   const [node, setNode] = useState({
     name: '',
@@ -108,7 +109,7 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
 
   const handleSubmit = (e) => {
     // Will be replaced with code that will send the data back to the node
-    parent_node.setData(node.name, node.years, node.notes, node.type);
+    props.parent_node.setData(node.name, node.years, node.notes, node.type);
 
     e.preventDefault();
   };
@@ -139,10 +140,9 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
   );
 
   const setData = () => {
-    console.log('ran!');
-    if (parent_node) {
+    if (props.parent_node.name != '') {
       let node_name, node_years, node_notes, node_type, view;
-      [node_name, node_years, node_notes, node_type] = parent_node.getData();
+      [node_name, node_years, node_notes, node_type] = props.parent_node.getData();
       setNode({
         name: node_name,
         years: node_years,
@@ -154,13 +154,12 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
         if (node_type == 'PERSON') view = sidebarView.person;
         else if (node_type == 'PLACE') view = sidebarView.place;
         else if (node_type == 'IDEA') view = sidebarView.idea;
-
         setView(view);
-        changeView(view);
+        props.changeView(view);
       }
-    } else if (parent_edge) {
+    } else if (props.parent_edge) {
       let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
-      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = parent_edge.getData();
+      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = props.parent_edge.getData();
       setEdge({
         category: edge_cat,
         familiarity: edge_fam,
@@ -171,8 +170,8 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
     }
   };
 
-  const selectView = () => {
-    switch (view) {
+  const selectView = (sel_view) => {
+    switch (sel_view) {
       case sidebarView.none:
         return (
           <p className="m-4">
@@ -342,7 +341,7 @@ const SidebarForm = forwardRef(function SidebarForm({ parent_node, parent_edge, 
     }
   };
 
-  return <>{selectView()}</>;
+  return <>{selectView(view)}</>;
 });
 
 export default SidebarForm;

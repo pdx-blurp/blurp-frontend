@@ -103,20 +103,3 @@
     @apply my-[15px] flex h-[40px] justify-center;
   }
 }
-
-.youtube-placeholder {
-  background-color: #0f0f0f;
-  border-radius: 9px;
-  width: 625px;
-  height: 352px;
-  color: #ffffff;
-  font-size: 1.6em;
-  font-style: bold;
-  margin: 20px 0;
-}
-
-.youtube-triangle {
-  border-top: 20px solid transparent;
-  border-bottom: 20px solid transparent;
-  border-left: 40px solid white;
-}
