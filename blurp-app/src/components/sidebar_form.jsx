@@ -19,12 +19,13 @@ const SidebarForm = forwardRef((props, ref) => {
   useEffect(() => {
     setData();
   }, [props.parent_node]);
-  const [view, setView] = useState(sidebarView.closed);
+  const [view, setView] = useState(sidebarView.person);
   const [node, setNode] = useState({
     name: '',
     years: '',
     notes: '',
     type: NODE_TYPE.PERSON,
+    id: '',
   });
 
   const [edge, setEdge] = useState({
@@ -93,7 +94,7 @@ const SidebarForm = forwardRef((props, ref) => {
         ...node,
         [e_name]: value,
       });
-      console.log('state: ' + node.name);
+      console.log(node);
     }
   };
 
@@ -108,9 +109,7 @@ const SidebarForm = forwardRef((props, ref) => {
   };
 
   const handleSubmit = (e) => {
-    // Will be replaced with code that will send the data back to the node
-    props.parent_node.setData(node.name, node.years, node.notes, node.type);
-
+    props.changeNodeData(node.name, node.years, node.notes, node.id);
     e.preventDefault();
   };
 
@@ -120,6 +119,7 @@ const SidebarForm = forwardRef((props, ref) => {
       years: '',
       notes: '',
       type: NODE_TYPE.PERSON,
+      id: '',
     });
 
     setEdge({
@@ -131,46 +131,37 @@ const SidebarForm = forwardRef((props, ref) => {
     });
   };
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      clearState: clearState,
-    }),
-    []
-  );
-
   const setData = () => {
-    if (props.parent_node.name != '') {
-      let node_name, node_years, node_notes, node_type, view;
-      [node_name, node_years, node_notes, node_type] = props.parent_node.getData();
+    const selected_node = props.parent_node.selected;
+    const selected_edge = props.parent_edge;
+    clearState();
+    if (selected_node) {
       setNode({
-        name: node_name,
-        years: node_years,
-        notes: node_notes,
-        type: node_type,
+        name: selected_node.name,
+        years: selected_node.years,
+        notes: selected_node.notes,
+        type: selected_node.type,
+        id: selected_node.id,
       });
-      if (node_type != '') {
+      if (selected_node.type != '') {
         console.log('view has been set!');
-        if (node_type == 'PERSON') view = sidebarView.person;
-        else if (node_type == 'PLACE') view = sidebarView.place;
-        else if (node_type == 'IDEA') view = sidebarView.idea;
-        setView(view);
-        props.changeView(view);
+        if (selected_node.type == 'PERSON') setView(sidebarView.person);
+        else if (selected_node.type == 'PLACE') setView(sidebarView.place);
+        else if (selected_node.type == 'IDEA') setView(sidebarView.idea);
       }
-    } else if (props.parent_edge) {
-      let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
-      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = props.parent_edge.getData();
+    } else if (selected_edge) {
       setEdge({
-        category: edge_cat,
-        familiarity: edge_fam,
-        stressLevel: edge_stress,
-        node1ID: edge_1ID,
-        node2ID: edge_2ID,
+        category: selected_edge.category,
+        familiarity: selected_edge.familiarity,
+        stressLevel: selected_edge.stressLevel,
+        node1ID: selected_edge.node1ID,
+        node2ID: selected_edge.node2ID,
       });
     }
   };
 
   const selectView = (sel_view) => {
+    console.log(sel_view);
     switch (sel_view) {
       case sidebarView.none:
         return (
@@ -179,7 +170,6 @@ const SidebarForm = forwardRef((props, ref) => {
           </p>
         );
       case sidebarView.person:
-        node.type = NODE_TYPE.PERSON;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Person</h1>
@@ -189,13 +179,7 @@ const SidebarForm = forwardRef((props, ref) => {
               placeholder="Name"
               className="textbox-sidebar"
               value={node.name}
-              onChange={(e) => {
-                setNode({
-                  ...node,
-                  name: e.target.value,
-                });
-                console.log(node.name);
-              }}
+              onChange={handleChange}
             />
             <input
               type="number"
@@ -222,7 +206,6 @@ const SidebarForm = forwardRef((props, ref) => {
           </form>
         );
       case sidebarView.place:
-        node.type = NODE_TYPE.PLACE;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Place</h1>
@@ -251,7 +234,6 @@ const SidebarForm = forwardRef((props, ref) => {
           </form>
         );
       case sidebarView.idea:
-        node.type = NODE_TYPE.IDEA;
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Idea</h1>

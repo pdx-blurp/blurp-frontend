@@ -30,12 +30,7 @@ class DataSidebar extends React.Component {
     */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
-    this.clearState = this.clearState.bind(this);
   }
-
-  clearState = () => {
-    this.child.current.clearState();
-  };
 
   collapse = () => {
     this.setState({
@@ -94,7 +89,7 @@ class DataSidebar extends React.Component {
               ref={this.child}
               parent_node={this.props.node}
               parent_edge={this.edge}
-              changeView={this.changeView}
+              changeNodeData={this.props.changeNodeData}
             />
           </div>
         </div>

@@ -1,29 +1,29 @@
 export class NodeData {
-  constructor(name, years, notes, type) {
+  constructor(name, years, notes, type, id) {
     this.name = name;
     this.years = years;
     this.notes = notes;
     this.type = type;
+    this.id = id;
+
     this.display = this.display.bind(this);
   }
 
-  setData(name, years, notes, type) {
+  setData(name, years, notes, type, id) {
     this.name = name;
     this.years = years;
     this.notes = notes;
     this.type = type;
+    this.id = id;
   }
 
   display() {
     console.log('data: ');
+    console.log('id: ' + this.id);
     console.log('name: ' + this.name);
     console.log('years: ' + this.years);
     console.log('notes: ' + this.notes);
     console.log('type: ' + this.type);
-  }
-
-  getData() {
-    return [this.name, this.years, this.notes, this.type];
   }
 }
 
@@ -41,9 +41,5 @@ export class EdgeData {
     this.stressCode = stressCode;
     this.node1ID = node1ID;
     this.node2ID = node2ID;
-  }
-
-  getData() {
-    return [this.category, this.familiarity, this.stressCode, this.node1ID, this.node2ID];
   }
 }

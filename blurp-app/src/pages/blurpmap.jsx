@@ -23,8 +23,19 @@ const TestPage = () => {
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [node, setNode] = useState({ selected: new NodeData('', '', '', '') });
+  const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
   const child = useRef();
+
+  function changeNodeData(name, years, notes, id) {
+    try {
+      graph.setNodeAttribute(id, 'label', name);
+      graph.setNodeAttribute(id, 'years', years);
+      graph.setNodeAttribute(id, 'notes', notes);
+    } catch {
+      console.log('ERROR: failed to retrieve node with that ID');
+      console.log('ID used: ' + id);
+    }
+  }
 
   function handleSubmit() {
     const id = uuidv4();
@@ -34,6 +45,8 @@ const TestPage = () => {
       color: color,
       size: size,
       label: name,
+      years: '',
+      notes: '',
       entity: nodeType,
     });
     setIsModalOpen(false);
@@ -49,32 +62,26 @@ const TestPage = () => {
           setIsModalOpen(true);
         }, // node events
         clickNode: (event) => {
-          let selected_view = sidebarView.closed;
-          let selected_type = NODE_TYPE.PERSON;
+          let selected_type = '';
           let retrieved = graph.getNodeAttributes(event.node);
-          switch (retrieved.entity) {
-            case 'PERSON':
-              selected_view = sidebarView.person;
-              break;
-            case 'PLACE':
-              selected_view = sidebarView.place;
-              break;
-            case 'IDEA':
-              selected_view = sidebarView.idea;
-              break;
+          if (retrieved.entity === NODE_TYPE.PERSON) {
+            child.current.changeView(sidebarView.person);
+          } else if (retrieved.entity === NODE_TYPE.PLACE) {
+            child.current.changeView(sidebarView.place);
+          } else if (retrieved.entity === NODE_TYPE.IDEA) {
+            child.current.changeView(sidebarView.idea);
           }
-          console.log(retrieved.label);
+          console.log(event.node);
+          console.log(retrieved);
           setNode({
             selected: new NodeData(
               retrieved.label,
               node.selected.years,
               node.selected.notes,
-              selected_type
+              selected_type,
+              event.node
             ),
           });
-          child.current.changeView(selected_view);
-          console.log('clickNode', event.node, graph.getNodeAttributes(event.node));
-          console.log(node);
         },
       });
     }, [registerEvents]);
@@ -170,7 +177,7 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node.selected} />
+        <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />
