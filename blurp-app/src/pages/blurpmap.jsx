@@ -76,9 +76,9 @@ const TestPage = () => {
           setNode({
             selected: new NodeData(
               retrieved.label,
-              node.selected.years,
-              node.selected.notes,
-              selected_type,
+              retrieved.years,
+              retrieved.notes,
+              retrieved.entity,
               event.node
             ),
           });

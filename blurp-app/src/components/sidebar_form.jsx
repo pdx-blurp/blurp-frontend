@@ -144,7 +144,6 @@ const SidebarForm = forwardRef((props, ref) => {
         id: selected_node.id,
       });
       if (selected_node.type != '') {
-        console.log('view has been set!');
         if (selected_node.type == 'PERSON') setView(sidebarView.person);
         else if (selected_node.type == 'PLACE') setView(sidebarView.place);
         else if (selected_node.type == 'IDEA') setView(sidebarView.idea);
@@ -161,7 +160,6 @@ const SidebarForm = forwardRef((props, ref) => {
   };
 
   const selectView = (sel_view) => {
-    console.log(sel_view);
     switch (sel_view) {
       case sidebarView.none:
         return (

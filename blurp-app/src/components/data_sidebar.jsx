@@ -30,6 +30,7 @@ class DataSidebar extends React.Component {
     */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
+    this.changeView = this.changeView.bind(this);
   }
 
   collapse = () => {
