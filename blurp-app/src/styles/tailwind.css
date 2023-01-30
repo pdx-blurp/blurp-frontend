@@ -72,7 +72,7 @@
   }
 
   .data-sidebar-frame {
-    @apply absolute right-[40px] w-[260px] h-[400px] my-[100px] overflow-hidden pointer-events-none;
+    @apply absolute right-[40px] w-[260px] h-[470px] my-[100px] overflow-hidden pointer-events-none;
   }
 
   .textbox-sidebar {
