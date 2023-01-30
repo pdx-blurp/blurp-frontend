@@ -1,105 +1,73 @@
 import React from 'react';
 import SidebarForm from './sidebar_form.jsx';
-import { NODE_TYPE, sidebarState, sidebarView } from '../constants/constants.ts';
-import { NodeData, EdgeData } from '../constants/classes.jsx';
+import { sidebarView } from '../constants/constants.ts';
 
 class DataSidebar extends React.Component {
   constructor(props) {
     super(props);
-    // Each of the four specifications below is an array: [collapsed, expanded].
-    // The first element is what the specification is when the data-sidebar is collapsed,
-    // and the second element is when it's expanded.
-    //
-    // className for the main sidebar div
-    this.data_sidebar = ['data-sidebar w-[15px]', 'data-sidebar'];
-    // svg coordinates for the collapse/expand arrow on the tab/button
-    this.svg_coods = ['12,20 12,40 3,30', '4,20 4,40 13,30'];
-    // Function to be called when the tab/button is clicked
-    this.onclick = [this.expand, this.collapse];
+
+    // State consists of a changing data-sidebar classname. These
+    // changes cause the sidebar to expand/collapse.
+    this.collapsed_classname = 'data-sidebar right-[-260px]';
+    this.expanded_classname = 'data-sidebar right-[0px]';
+
     this.state = {
-      content: this.renderContent(sidebarState.expanded, sidebarView.person),
       view: sidebarView.person,
+      sidebar_classname: this.collapsed_classname,
     };
 
-    // https://chafikgharbi.com/react-call-child-method/
-    this.child = React.createRef();
-    /* 
-      Used this to pull data from the form elements without it clearing 
-      the textbox:
-      https://stackoverflow.com/questions/69092720/cant-type-in-react-textfield-input 
-    */
-    this.expand = this.expand.bind();
+    this.expand = this.expand.bind(this);
     this.collapse = this.collapse.bind(this);
     this.changeView = this.changeView.bind(this);
+
+    this.child = React.createRef(); // ref to sidebar-form
+    this.sidebar_ref = React.createRef(); // ref to the sidebar div
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   collapse = () => {
-    this.setState({
-      content: this.renderContent(sidebarState.closed, this.state.view),
-    });
+    this.setState({sidebar_classname: this.collapsed_classname});
   };
-
   expand = () => {
-    if (this.state.view == sidebarView.closed) {
-      this.setState({
-        view: sidebarView.none,
-        content: this.renderContent(sidebarState.open, sidebarView.none),
-      });
-    } else {
-      this.setState({
-        content: this.renderContent(sidebarState.open, this.state.view),
-      });
-    }
+    this.setState({sidebar_classname: this.expanded_classname});
   };
 
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
   changeView = (new_view) => {
-    console.log('changing view...');
-    if (new_view != sidebarView.closed && new_view != sidebarView.none) {
-      this.setState({
-        content: this.renderContent(sidebarState.open, new_view),
-        view: new_view,
-      });
-    } else {
-      this.setState({
-        content: this.renderContent(sidebarState.closed, sidebarView.closed),
-        view: new_view,
-      });
-    }
-    return 1;
+    this.setState({view: new_view});
+    this.expand();
   };
 
-  renderContent(status) {
-    /* Fancy way to do an if/else statement, doing it since I was having issues
-      getting variables to stay changed outside an if statement
-      https://stackoverflow.com/questions/31971801/setting-a-javascript-variable-with-an-if-statement-should-the-var-x-be-in
-    */
-    let barState = status === sidebarState.open ? 1 : 0;
+  // When clicked outside of sidebar, collapse it
+  handleClickOutside(event) {
+    if(this.sidebar_ref && !this.sidebar_ref.current.contains(event.target)) {
+      this.collapse();
+    }
+  }
 
-    return (
-      <>
-        <div className={this.data_sidebar[barState]}>
-          <div className="data-sidebar-tab" onClick={this.onclick[barState]}>
-            <svg className="data-sidebar-tab-arrow" fill="currentColor">
-              <polygon points={this.svg_coods[barState]} />
-            </svg>
-          </div>
-          <div className="data-sidebar-background grid justify-items-center">
-            <SidebarForm
-              ref={this.child}
-              parent_node={this.props.node}
-              parent_edge={this.edge}
-              changeNodeData={this.props.changeNodeData}
-            />
-          </div>
-        </div>
-      </>
-    );
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
 
   render() {
-    return <>{this.state.content}</>;
+      return (
+        <>
+          <div className="data-sidebar-frame">
+            <div className={this.state.sidebar_classname} ref={this.sidebar_ref}>
+              <SidebarForm
+                ref={this.child}
+                parent_node={this.props.node}
+                parent_edge={this.edge}
+                changeNodeData={this.props.changeNodeData}
+              />
+            </div>
+          </div>
+        </>
+      );
   }
 }
 
