@@ -68,19 +68,11 @@
   }
 
   .data-sidebar {
-    @apply absolute right-[40px] my-[100px] h-[400px] w-[260px] p-0;
+    @apply absolute w-full h-full bg-gray-200 border-2 border-gray-400 border-r-0 rounded-l-xl pointer-events-auto grid justify-items-center duration-100;
   }
 
-  .data-sidebar-tab {
-    @apply bg-fuchsia-750 absolute mt-[50px] flex h-[60px] w-[15px] items-center rounded-l-md hover:cursor-pointer;
-  }
-
-  .data-sidebar-tab-arrow {
-    @apply h-full w-full text-gray-200 dark:text-gray-200;
-  }
-
-  .data-sidebar-background {
-    @apply absolute mr-0 ml-[15px] flex h-full w-[245px] rounded-l-xl border-2 border-r-0 border-gray-400 bg-gray-200 p-0;
+  .data-sidebar-frame {
+    @apply absolute right-[40px] w-[260px] h-[400px] my-[100px] overflow-hidden pointer-events-none;
   }
 
   .textbox-sidebar {
