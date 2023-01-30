@@ -1,29 +1,40 @@
-import React from 'react';
-import { sidebarView, Relationships, NodeType, NodeData, EdgeData } from '../pages/blurpmap.jsx';
+import { useReducer } from 'react';
+import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
+import { NODE_TYPE, sidebarView, Relationships } from '../constants/constants.ts';
 
 const notes_size = 255;
 
-class SidebarForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: '',
-      name: '',
-      years: '',
-      notes: '',
-      type: NodeType.person,
-      relation: Relationships.situational,
-      familiarity: '',
-      stressLevel: '',
-      node1ID: 'node1',
-      node2ID: 'node2',
-    };
-    this.setData();
-    this.view = this.props.view;
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+const SidebarForm = forwardRef((props, ref) => {
+  /* 
+    used this stackoverflow answer to help with getting the form to update 
+    when the data its being fed is changed
+    https://stackoverflow.com/a/68642185 
 
+    and used this one for figuring out how to allow for a child function
+    to be called from a parent component:
+    https://stackoverflow.com/a/68642839
+  */
+
+  useEffect(() => {
+    setData();
+  }, [props.parent_node]);
+  const [view, setView] = useState(sidebarView.person);
+  const [node, setNode] = useState({
+    name: '',
+    years: '',
+    notes: '',
+    type: NODE_TYPE.PERSON,
+    id: '',
+  });
+
+  const [edge, setEdge] = useState({
+    relation: Relationships.situational,
+    familiarity: '',
+    stressLevel: '',
+    node1ID: '',
+    node2ID: '',
+  });
   /* 
     Using this to work on pulling info from the forms:
     https://reactjs.org/docs/forms.html
@@ -31,81 +42,125 @@ class SidebarForm extends React.Component {
     And using the link below for how to handle radio buttons:
     https://www.pluralsight.com/guides/how-to-use-radio-buttons-in-reactjs
   */
-  handleChange(event) {
-    const target = event.target;
-    let value = target.value;
-    const name = target.name;
+  const handleChange = (e) => {
+    const target = e.target;
+    const value = target.value;
+    const e_name = target.name;
+
+    console.log(target + ' ' + value + ' ' + e_name);
 
     if (target.type == 'radio') {
       switch (value) {
         case 'family':
-          this.setState({ relation: Relationships.familial });
+          setEdge({
+            ...edge,
+            relation: Relationships.familial,
+          });
           break;
         case 'friend':
-          this.setState({ relation: Relationships.friendship });
+          setEdge({
+            ...edge,
+            relation: Relationships.friendship,
+          });
           break;
         case 'acquaint':
-          this.setState({ relation: Relationships.acquaintance });
+          setEdge({
+            ...edge,
+            relation: Relationships.acquaintance,
+          });
           break;
         case 'romantic':
-          this.setState({ relation: Relationships.romantic });
+          setEdge({
+            ...edge,
+            relation: Relationships.romantic,
+          });
           break;
         case 'work':
-          this.setState({ relation: Relationships.work });
+          setEdge({
+            ...edge,
+            relation: Relationships.work,
+          });
           break;
         case 'undefined':
-          this.setState({ relation: Relationships.situational });
+          setEdge({
+            ...edge,
+            relation: Relationships.situational,
+          });
           break;
       }
     } else {
-      this.setState({ [name]: value });
-    }
-  }
-
-  handleSubmit(event) {
-    /* Will be replaced with code that will send the data back to the node */
-    console.log('Submitted Data: ');
-    console.log('name: ' + this.state.name);
-    console.log('years: ' + this.state.years);
-    console.log('notes: ' + this.state.notes);
-    console.log('type: ' + this.state.type);
-    console.log('relation: ' + this.state.relation);
-    console.log('familiarity: ' + this.state.familiarity);
-    console.log('stressLevel: ' + this.state.stressLevel);
-
-    event.preventDefault();
-  }
-
-  setData() {
-    if (this.props.NodeData) {
-      let node_name, node_years, node_notes, node_type;
-      [node_name, node_years, node_notes, node_type] = this.props.NodeData.getData();
-      this.setState({
-        name: node_name,
-        years: node_years,
-        notes: node_notes,
-        type: node_type,
+      console.log('e_name: ' + e_name + '\nvalue :' + value);
+      setNode({
+        ...node,
+        [e_name]: value,
       });
-    } else if (this.props.EdgeData) {
-      let edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID;
-      [edge_cat, edge_fam, edge_stress, edge_1ID, edge_2ID] = this.props.EdgeData.getData();
-      this.setState({
-        category: edge_cat,
-        familiarity: edge_fam,
-        stressLevel: edge_stress,
-        node1ID: edge_1ID,
-        node2ID: edge_2ID,
+      console.log(node);
+    }
+  };
+
+  const display = () => {
+    console.log('name: ' + node.name);
+    console.log('years: ' + node.years);
+    console.log('notes: ' + node.notes);
+    console.log('type: ' + node.type);
+    console.log('relation: ' + edge.relation);
+    console.log('familiarity: ' + edge.familiarity);
+    console.log('stressLevel: ' + edge.stressLevel);
+  };
+
+  const handleSubmit = (e) => {
+    props.changeNodeData(node.name, node.years, node.notes, node.id);
+    e.preventDefault();
+  };
+
+  const clearState = () => {
+    setNode({
+      name: '',
+      years: '',
+      notes: '',
+      type: NODE_TYPE.PERSON,
+      id: '',
+    });
+
+    setEdge({
+      relation: Relationships.situational,
+      familiarity: '',
+      stressLevel: '',
+      node1ID: '',
+      node2ID: '',
+    });
+  };
+
+  const setData = () => {
+    const selected_node = props.parent_node.selected;
+    const selected_edge = props.parent_edge;
+    clearState();
+    if (selected_node) {
+      setNode({
+        name: selected_node.name,
+        years: selected_node.years,
+        notes: selected_node.notes,
+        type: selected_node.type,
+        id: selected_node.id,
+      });
+      if (selected_node.type != '') {
+        if (selected_node.type == 'PERSON') setView(sidebarView.person);
+        else if (selected_node.type == 'PLACE') setView(sidebarView.place);
+        else if (selected_node.type == 'IDEA') setView(sidebarView.idea);
+      }
+    } else if (selected_edge) {
+      setEdge({
+        category: selected_edge.category,
+        familiarity: selected_edge.familiarity,
+        stressLevel: selected_edge.stressLevel,
+        node1ID: selected_edge.node1ID,
+        node2ID: selected_edge.node2ID,
       });
     }
-  }
+  };
 
-  changeView(new_view) {
-    this.view = new_view;
-    this.setState({ value: '' });
-  }
-
-  selectView() {
-    switch (this.view) {
+  const selectView = (sel_view) => {
+    switch (sel_view) {
       case sidebarView.none:
         return (
           <p className="m-4">
@@ -113,24 +168,23 @@ class SidebarForm extends React.Component {
           </p>
         );
       case sidebarView.person:
-        this.type = NodeType.person;
         return (
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Person</h1>
             <input
               type="text"
               name="name"
               placeholder="Name"
               className="textbox-sidebar"
-              value={this.state.name}
-              onChange={this.handleChange}
+              value={node.name}
+              onChange={handleChange}
             />
             <input
               type="number"
               name="years"
               placeholder="Age"
-              value={this.state.years}
-              onChange={this.handleChange}
+              value={node.years}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <textarea
@@ -140,8 +194,8 @@ class SidebarForm extends React.Component {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={this.state.notes}
-              onChange={this.handleChange}
+              value={node.notes}
+              onChange={handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -150,16 +204,15 @@ class SidebarForm extends React.Component {
           </form>
         );
       case sidebarView.place:
-        this.type = NodeType.place;
         return (
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Place</h1>
             <input
               type="text"
               name="name"
               placeholder="Name"
-              value={this.state.name}
-              onChange={this.handleChange}
+              value={node.name}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <textarea
@@ -169,8 +222,8 @@ class SidebarForm extends React.Component {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={this.state.notes}
-              onChange={this.handleChange}
+              value={node.notes}
+              onChange={handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -179,24 +232,23 @@ class SidebarForm extends React.Component {
           </form>
         );
       case sidebarView.idea:
-        this.type = NodeType.idea;
         return (
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Idea</h1>
             <input
               type="name"
               name="name"
               placeholder="Name"
-              value={this.state.name}
-              onChange={this.handleChange}
+              value={node.name}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <input
               type="number"
               name="years"
               placeholder="Age/History"
-              value={this.state.years}
-              onChange={this.handleChange}
+              value={node.years}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <textarea
@@ -206,8 +258,8 @@ class SidebarForm extends React.Component {
               rows="10"
               cols="25"
               maxLength={notes_size}
-              value={this.state.notes}
-              onChange={this.handleChange}
+              value={node.notes}
+              onChange={handleChange}
               placeholder="Notes"
             />
             <button type="submit" className="btn-sidebar">
@@ -217,9 +269,9 @@ class SidebarForm extends React.Component {
         );
       case sidebarView.edge:
         return (
-          <form onSubmit={this.handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
-            <div className="m-2 w-11/12" onChange={this.handleChange}>
+            <div className="m-2 w-11/12" onChange={handleChange}>
               <legend>Relationship Type:</legend>
               <input type="radio" value="family" name="relation" />
               <label htmlFor="family">Familial Relationship</label>
@@ -244,20 +296,20 @@ class SidebarForm extends React.Component {
               type="number"
               name="familiarity"
               placeholder="Familiarity"
-              value={this.state.familiarity}
-              onChange={this.handleChange}
+              value={node.familiarity}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <input
               type="number"
               name="stressLevel"
               placeholder="Stress Level"
-              value={this.state.stressLevel}
-              onChange={this.handleChange}
+              value={node.stressLevel}
+              onChange={handleChange}
               className="textbox-sidebar"
             />
             <div className="m-4 w-11/12 text-lg">
-              <u>{this.state.node1ID}</u> is related to <u>{this.state.node2ID}</u>
+              <u>{node.node1ID}</u> is related to <u>{node.node2ID}</u>
             </div>
             <button type="submit" className="btn-sidebar">
               Save
@@ -265,14 +317,11 @@ class SidebarForm extends React.Component {
           </form>
         );
       default:
-        // aligns with closed state, shouldn't happen but wanted to guard it
         return <></>;
     }
-  }
+  };
 
-  render() {
-    return <>{this.selectView()}</>;
-  }
-}
+  return <>{selectView(view)}</>;
+});
 
 export default SidebarForm;

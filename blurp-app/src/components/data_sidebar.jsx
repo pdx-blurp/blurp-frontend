@@ -1,15 +1,11 @@
 import React from 'react';
 import SidebarForm from './sidebar_form.jsx';
-import { sidebarView, NodeData, NodeType, EdgeData } from '../pages/blurpmap.jsx';
+import { NODE_TYPE, sidebarState, sidebarView } from '../constants/constants.ts';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
 
-const sidebarState = {
-  closed: 'closed',
-  expanded: 'expanded',
-};
 class DataSidebar extends React.Component {
   constructor(props) {
     super(props);
-
     // Each of the four specifications below is an array: [collapsed, expanded].
     // The first element is what the specification is when the data-sidebar is collapsed,
     // and the second element is when it's expanded.
@@ -21,14 +17,9 @@ class DataSidebar extends React.Component {
     // Function to be called when the tab/button is clicked
     this.onclick = [this.expand, this.collapse];
     this.state = {
-      content: this.renderContent(sidebarState.closed, sidebarView.none),
-      view: sidebarView.closed,
+      content: this.renderContent(sidebarState.expanded, sidebarView.person),
+      view: sidebarView.person,
     };
-    // In the future this will be passed through from blurpmap, as the data
-    // will be coming from the map
-    this.NodeData = new NodeData();
-    this.NodeData.setData('bingus', 17, 'this is a test', NodeType.person);
-    this.EdgeData = null;
 
     // https://chafikgharbi.com/react-call-child-method/
     this.child = React.createRef();
@@ -39,27 +30,7 @@ class DataSidebar extends React.Component {
     */
     this.expand = this.expand.bind();
     this.collapse = this.collapse.bind(this);
-  }
-
-  /* 
-    probably isn't needed anymore, just have it like this for now while
-    working on the form 
-  */
-  getSidebar(view) {
-    if (view == sidebarView.closed) {
-      return <></>;
-    } else {
-      return (
-        <div className="data-sidebar-background grid justify-items-center">
-          <SidebarForm
-            ref={this.child}
-            view={view}
-            NodeData={this.NodeData}
-            EdgeData={this.EdgeData}
-          />
-        </div>
-      );
-    }
+    this.changeView = this.changeView.bind(this);
   }
 
   collapse = () => {
@@ -83,24 +54,23 @@ class DataSidebar extends React.Component {
 
   /* renderContent isn't actually necessary here as it works without it,
     but it's useful like this for updating the div and seeing it change */
-  changeView(new_view) {
-    if (new_view != sidebarView.closed) {
+  changeView = (new_view) => {
+    console.log('changing view...');
+    if (new_view != sidebarView.closed && new_view != sidebarView.none) {
       this.setState({
         content: this.renderContent(sidebarState.open, new_view),
         view: new_view,
       });
-      if (this.child.current) {
-        this.child.current.changeView(new_view);
-      }
     } else {
       this.setState({
         content: this.renderContent(sidebarState.closed, sidebarView.closed),
         view: new_view,
       });
     }
-  }
+    return 1;
+  };
 
-  renderContent(status, view) {
+  renderContent(status) {
     /* Fancy way to do an if/else statement, doing it since I was having issues
       getting variables to stay changed outside an if statement
       https://stackoverflow.com/questions/31971801/setting-a-javascript-variable-with-an-if-statement-should-the-var-x-be-in
@@ -115,36 +85,21 @@ class DataSidebar extends React.Component {
               <polygon points={this.svg_coods[barState]} />
             </svg>
           </div>
-          {this.getSidebar(view)}
+          <div className="data-sidebar-background grid justify-items-center">
+            <SidebarForm
+              ref={this.child}
+              parent_node={this.props.node}
+              parent_edge={this.edge}
+              changeNodeData={this.props.changeNodeData}
+            />
+          </div>
         </div>
       </>
     );
   }
 
   render() {
-    return (
-      <>
-        {this.state.content}
-
-        {/* Below are buttons used for testing each individual sidebar view
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.none)}>
-          None
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.person)}>
-          Person Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.place)}>
-          Place Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.idea)}>
-          Idea Node
-        </button>
-        <button className="btn-primary m-10" onClick={() => this.changeView(sidebarView.edge)}>
-          Edge/Relationship
-        </button>
-         */}
-      </>
-    );
+    return <>{this.state.content}</>;
   }
 }
 
