@@ -92,7 +92,7 @@ const TestPage = () => {
   return (
     //Sigma Graph Settings, reference graphology
     //Sigma inherits 100% of parent <div> width and height
-    <div className="static h-screen w-screen">
+    <div className="static h-screen w-screen overflow-hidden">
       <div>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
