@@ -27,11 +27,13 @@ function MapToolbar () {
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(obj) {
+    handleIsNode(true);
     clearIconSelection();
     setSelected(MAP_TOOLS.node);
     setNodeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEdgeSelection() {
+    handleIsNode(false);
     clearIconSelection();
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
