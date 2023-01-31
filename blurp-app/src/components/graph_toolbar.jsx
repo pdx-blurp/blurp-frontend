@@ -61,7 +61,7 @@ function GraphToolbar () {
         </button>
         </Tooltip>
         <div className='absolute mb-0 right-0 bottom-0'>
-          <Tooltip title='Normal mode' enterDelay={700} placement='left' arrow>
+          <Tooltip title='Select mode' enterDelay={700} placement='left' arrow>
           <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
             <img className={selectClass} src={select_icon}></img>
           </button>
