@@ -8,7 +8,7 @@ import select_icon from '../assets/select_icon.svg';
 import Tooltip from '@mui/material/Tooltip';
 
 
-function MapToolbar () {
+function MapToolbar (props) {
 
   const UNSELECTED_ICON_CLASSNAME = 'graph-toolbar-icon';
   const SELECTED_ICON_CLASSNAME = 'graph-toolbar-icon-selected';
@@ -27,13 +27,13 @@ function MapToolbar () {
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(obj) {
-    handleIsNode(true);
+    props.handleIsNode(true);
     clearIconSelection();
     setSelected(MAP_TOOLS.node);
     setNodeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEdgeSelection() {
-    handleIsNode(false);
+    props.handleIsNode(false);
     clearIconSelection();
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
