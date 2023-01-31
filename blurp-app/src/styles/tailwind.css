@@ -95,6 +95,10 @@
     @apply w-[30px] h-[30px] rounded hover:bg-gray-400;
   }
 
+  .graph-toolbar-icon-selected {
+    @apply graph-toolbar-icon bg-[#8c8c8c] hover:bg-[#8c8c8c];
+  }
+
   .landing-background {
     @apply bg-gray-800;
   }

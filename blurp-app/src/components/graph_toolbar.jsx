@@ -8,38 +8,59 @@ import select_icon from '../assets/select_icon.svg';
 
 function GraphToolbar () {
 
+  const unselectedIconClassName = 'graph-toolbar-icon';
+  const selectedIconClassName = 'graph-toolbar-icon-selected';
   // Keep track of which tool is currently selected
   const [selected, setSelected] = useState(graphTools.select);
+  const [nodeClass, setNodeClass] = useState(unselectedIconClassName);
+  const [edgeClass, setEdgeClass] = useState(unselectedIconClassName);
+  const [selectClass, setSelectClass] = useState(selectedIconClassName);
+  const [eraserClass, setEraserClass] = useState(unselectedIconClassName);
 
-  function handleNodeSelection() {
-
+  // Unselects the tool that was currently selected (visually).
+  function clearIconSelection() {
+    setNodeClass(unselectedIconClassName);
+    setEdgeClass(unselectedIconClassName);
+    setSelectClass(unselectedIconClassName);
+    setEraserClass(unselectedIconClassName);
+  }
+  function handleNodeSelection(obj) {
+    clearIconSelection();
+    setSelected(graphTools.node);
+    setNodeClass(selectedIconClassName);
   }
   function handleEdgeSelection() {
-
+    clearIconSelection();
+    setSelected(graphTools.edge);
+    setEdgeClass(selectedIconClassName);
   }
   function handleSelectSelection() {
-
+    clearIconSelection();
+    setSelected(graphTools.select);
+    setSelectClass(selectedIconClassName);
   }
   function handleEraserSelection() {
-
+    clearIconSelection();
+    setSelected(graphTools.eraser);
+    setEraserClass(selectedIconClassName);
   }
 
   return (
     <>
       <div className='graph-toolbar'>
-        <button className='graph-toolbar-btn' onClick={handleNodeSelection}>
-          <img className='graph-toolbar-icon' src={node_image}></img>
+        <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
+          <img className={nodeClass} src={node_image}></img>
         </button>
-        <button className='graph-toolbar-btn' onClick={handleEdgeSelection}>
-          <img className='graph-toolbar-icon' src={edge_image}></img>
+        <button className='graph-toolbar-btn' onClick={() => handleEdgeSelection()}>
+          <img className={edgeClass} src={edge_image}></img>
         </button>
 
         <div className='absolute mb-0 right-0 bottom-0'>
-          <button className='graph-toolbar-btn' onClick={handleSelectSelection}>
-            <img className='graph-toolbar-icon' src={select_icon}></img>
+          <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
+            <img className={selectClass} src={select_icon}></img>
           </button>
-          <button className='graph-toolbar-btn' onClick={handleEraserSelection}>
-            <img className='graph-toolbar-icon' src={eraser_icon}></img>
+          <button className='graph-toolbar-btn' onClick={() => handleEraserSelection()}>
+            <img className={eraserClass} src={eraser_icon}></img>
           </button>
         </div>
       </div>
