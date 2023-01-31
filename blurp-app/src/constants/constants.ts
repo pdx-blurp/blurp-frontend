@@ -10,12 +10,12 @@ export enum NODE_TYPE {
   IDEA = 'IDEA',
 }
 
-export enum sidebarState {
+export enum SIDEBAR_STATE {
   closed = 'closed',
   expanded = 'expanded',
 }
 
-export enum sidebarView {
+export enum SIDEBAR_VIEW {
   closed = 'closed',
   none = 'none',
   person = 'person',
@@ -24,11 +24,18 @@ export enum sidebarView {
   edge = 'edge',
 }
 
+export enum MAP_TOOLS {
+  node = 'node',
+  edge = 'edge',
+  select = 'select',
+  eraser = 'eraser',
+}
+
 /* 
   graphData and Relationships were both made according 
   to the data objects/map architecture docs
 */
-export enum Relationships {
+export enum RELATIONSHIPS {
   familial = 'familial',
   friendship = 'friendship',
   acquaintance = 'acquaintance',
