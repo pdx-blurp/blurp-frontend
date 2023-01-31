@@ -2,20 +2,29 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    jest,
+    globals: true,
   },
-  extends: [
-    'plugin:react/recommended',
-    'airbnb',
-  ],
-  overrides: [
-  ],
+  extends: ['plugin:react/recommended', 'plugin:jest/recommended', 'airbnb'],
+  overrides: [],
   parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: [
-    'react',
-  ],
+  plugins: ['react', 'jest'],
   rules: {
+    'no-underscore-dangle': 0,
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'always',
+        jsx: 'always',
+      },
+    ],
+    'linebreak-style': 0,
   },
 };

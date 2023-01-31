@@ -14,31 +14,17 @@ const Home = () => {
             <div className="grid justify-center">
               <img className="m-4" src={BrandName} alt="Blurp the Greatest" />
               <h2 className="text-center main-subtitle text-white">
-                A tool for you to map your relationships
+                Bridging Lives. Understanding Relaionships & People.
               </h2>
             </div>
           </div>
           <div className="my-5">
-            <div className="grid xl:grid-cols-2 grid-cols-1 gap-8 justify-items-center">
-              <Link to="/blurpmap" className="btn-start" role="button">
-                Start (Local)
-              </Link>
-              <Link to="/blurpmap" className="btn-start" role="button">
-                Start (Log In)
+            <div className="grid grid-cols-1 gap-8 justify-items-center">
+              <Link to="/blurp-map" className="btn-start" role="button">
+                Open App
               </Link>
             </div>
             <div className="grid lg:grid-cols-2"></div>
-            <div className="grid">
-              <h3 className="text-center text-lg">
-                You can get started without needing an account!
-              </h3>
-              <h3 className="text-center text-lg">
-                If you want to access your ecomaps on multiple computers,
-              </h3>
-              <h3 className="text-center text-lg">
-                <a href="">Create an account</a>
-              </h3>
-            </div>
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">What is an Ecomap?</h1>
@@ -70,18 +56,18 @@ const Home = () => {
               voluptatibus vero consequatur consectetur optio officiis harum facilis repellat?
             </p>
           </div>
-          <div>
+          {/* <div>
             <h3 className="my-5 text-2xl">Video on how to make an ecomap:</h3>
             <div className="youtube-placeholder flex items-center justify-center">
               <div className="relative bg-red-600 rounded-xl w-1/5 h-1/5 flex items-center justify-center">
                 <div className="youtube-triangle"></div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
-        <Spline className="order-first xl:order-last lg:scale-100 scale-75" scene={SplineModel} />
+        <Spline className="order-first xl:order-last xl:scale-[0.9] lg:scale-[0.88] md:scale-[0.72] scale-[0.55]" scene={SplineModel} />
       </div>
-      <footer className="text-center">Made in 2022 by PDX Blurp</footer>
+      <footer className="text-center text-white">Made with love in 2022 by PDX Blurp</footer>
     </div>
   );
 };

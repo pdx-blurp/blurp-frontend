@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   content: ['./src/**/*.{html,js,jsx}'],
   theme: {
@@ -24,6 +26,19 @@ module.exports = {
           550: '#d424a7',
         },
       },
+    },
+    screens: {
+      'sm': '400px',
+      'md': '685px',
+      'lg': '1250px',
+      'xl': '1595px',
+      /* Define your own custom screen size and classNames */
+      // 'tablet': '640px',
+      // 'laptop': '1024px',
+      // 'desktop': '1280px',
+
+      /* Imported default sizes from tailwindcss */
+      // ...defaultTheme.screens,
     },
   },
   plugins: [],
