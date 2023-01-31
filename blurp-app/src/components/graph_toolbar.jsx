@@ -5,6 +5,8 @@ import edge_image from '../assets/edge_image.svg';
 import eraser_icon from '../assets/eraser_icon.svg';
 import select_icon from '../assets/select_icon.svg';
 
+import Tooltip from '@mui/material/Tooltip';
+
 
 function GraphToolbar () {
 
@@ -48,20 +50,27 @@ function GraphToolbar () {
   return (
     <>
       <div className='graph-toolbar'>
-        <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
-          <img className={nodeClass} src={node_image}></img>
-        </button>
+        <Tooltip title='Node tool' enterDelay={700} placement='left' arrow>
+          <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
+            <img className={nodeClass} src={node_image}></img>
+          </button>
+        </Tooltip>
+        <Tooltip title='Edge tool' enterDelay={700} placement='left' arrow>
         <button className='graph-toolbar-btn' onClick={() => handleEdgeSelection()}>
           <img className={edgeClass} src={edge_image}></img>
         </button>
-
+        </Tooltip>
         <div className='absolute mb-0 right-0 bottom-0'>
+          <Tooltip title='Normal mode' enterDelay={700} placement='left' arrow>
           <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
             <img className={selectClass} src={select_icon}></img>
           </button>
+          </Tooltip>
+          <Tooltip title='Eraser' enterDelay={700} placement='left' arrow>
           <button className='graph-toolbar-btn' onClick={() => handleEraserSelection()}>
             <img className={eraserClass} src={eraser_icon}></img>
           </button>
+          </Tooltip>
         </div>
       </div>
     </>
