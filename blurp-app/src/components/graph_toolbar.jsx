@@ -1,14 +1,13 @@
-import node_image from "../assets/node_image.svg";
-import edge_image from "../assets/edge_image.svg";
+import node_image from '../assets/node_image.svg';
+import edge_image from '../assets/edge_image.svg';
 
-function GraphToolbar () {
-
+function GraphToolbar({ handleIsNode }) {
   function handleNodeSelection() {
-    alert("You selected 'node'.");
+    handleIsNode(true);
   }
 
   function handleEdgeSelection() {
-    alert("You selected 'edge'.");
+    handleIsNode(false);
   }
 
   return (

@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
-import { NODE_TYPE, sidebarView, Relationships } from '../constants/constants.ts';
+import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
 
 const notes_size = 255;
 
@@ -19,7 +19,7 @@ const SidebarForm = forwardRef((props, ref) => {
   useEffect(() => {
     setData();
   }, [props.parent_node]);
-  const [view, setView] = useState(sidebarView.person);
+  const [view, setView] = useState(SIDEBAR_VIEW.person);
   const [node, setNode] = useState({
     name: '',
     years: '',
@@ -29,7 +29,7 @@ const SidebarForm = forwardRef((props, ref) => {
   });
 
   const [edge, setEdge] = useState({
-    relation: Relationships.situational,
+    relation: RELATIONSHIPS.situational,
     familiarity: '',
     stressLevel: '',
     node1ID: '',
@@ -54,37 +54,37 @@ const SidebarForm = forwardRef((props, ref) => {
         case 'family':
           setEdge({
             ...edge,
-            relation: Relationships.familial,
+            relation: RELATIONSHIPS.familial,
           });
           break;
         case 'friend':
           setEdge({
             ...edge,
-            relation: Relationships.friendship,
+            relation: RELATIONSHIPS.friendship,
           });
           break;
         case 'acquaint':
           setEdge({
             ...edge,
-            relation: Relationships.acquaintance,
+            relation: RELATIONSHIPS.acquaintance,
           });
           break;
         case 'romantic':
           setEdge({
             ...edge,
-            relation: Relationships.romantic,
+            relation: RELATIONSHIPS.romantic,
           });
           break;
         case 'work':
           setEdge({
             ...edge,
-            relation: Relationships.work,
+            relation: RELATIONSHIPS.work,
           });
           break;
         case 'undefined':
           setEdge({
             ...edge,
-            relation: Relationships.situational,
+            relation: RELATIONSHIPS.situational,
           });
           break;
       }
@@ -123,7 +123,7 @@ const SidebarForm = forwardRef((props, ref) => {
     });
 
     setEdge({
-      relation: Relationships.situational,
+      relation: RELATIONSHIPS.situational,
       familiarity: '',
       stressLevel: '',
       node1ID: '',
@@ -144,9 +144,9 @@ const SidebarForm = forwardRef((props, ref) => {
         id: selected_node.id,
       });
       if (selected_node.type != '') {
-        if (selected_node.type == 'PERSON') setView(sidebarView.person);
-        else if (selected_node.type == 'PLACE') setView(sidebarView.place);
-        else if (selected_node.type == 'IDEA') setView(sidebarView.idea);
+        if (selected_node.type == 'PERSON') setView(SIDEBAR_VIEW.person);
+        else if (selected_node.type == 'PLACE') setView(SIDEBAR_VIEW.place);
+        else if (selected_node.type == 'IDEA') setView(SIDEBAR_VIEW.idea);
       }
     } else if (selected_edge) {
       setEdge({
@@ -161,13 +161,13 @@ const SidebarForm = forwardRef((props, ref) => {
 
   const selectView = (sel_view) => {
     switch (sel_view) {
-      case sidebarView.none:
+      case SIDEBAR_VIEW.none:
         return (
           <p className="m-4">
             This is a data sidebar. The data of the selected entity in the graph will appear here.
           </p>
         );
-      case sidebarView.person:
+      case SIDEBAR_VIEW.person:
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Person</h1>
@@ -203,7 +203,7 @@ const SidebarForm = forwardRef((props, ref) => {
             </button>
           </form>
         );
-      case sidebarView.place:
+      case SIDEBAR_VIEW.place:
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Place</h1>
@@ -231,7 +231,7 @@ const SidebarForm = forwardRef((props, ref) => {
             </button>
           </form>
         );
-      case sidebarView.idea:
+      case SIDEBAR_VIEW.idea:
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Idea</h1>
@@ -267,7 +267,7 @@ const SidebarForm = forwardRef((props, ref) => {
             </button>
           </form>
         );
-      case sidebarView.edge:
+      case SIDEBAR_VIEW.edge:
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>

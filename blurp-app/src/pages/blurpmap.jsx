@@ -10,7 +10,7 @@ import {
 import '@react-sigma/core/lib/react-sigma.min.css';
 
 import { v4 as uuidv4 } from 'uuid';
-import { COLORS, NODE_TYPE, sidebarView } from '../constants/constants.ts';
+import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import GraphToolbar from '../components/graph_toolbar.jsx';
@@ -23,7 +23,13 @@ const TestPage = () => {
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState('Add Node');
+  const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
+  const [nodes, setNodes] = useState([]);
+  const [node1, setNode1] = useState('');
+  const [node2, setNode2] = useState('');
+  const [isNode, setIsNode] = useState(true);
   const child = useRef();
 
   function changeNodeData(name, years, notes, id) {
@@ -37,23 +43,41 @@ const TestPage = () => {
     }
   }
 
+  function handleIsNode(data) {
+    if (data === true) {
+      setModalTitle('Add Node');
+      setIsNode(true);
+    } else {
+      setModalTitle('Add Edge');
+      setIsNode(false);
+    }
+  }
   function handleSubmit() {
-    const id = uuidv4();
-    graph.addNode(id, {
-      x: event.x,
-      y: event.y,
-      color: color,
-      size: size,
-      label: name,
-      years: '',
-      notes: '',
-      entity: nodeType,
-    });
+    if (isNode) {
+      const id = uuidv4();
+      graph.addNode(id, {
+        x: event.x,
+        y: event.y,
+        label: name,
+        entity: nodeType,
+        size: size,
+        years: '',
+        notes: '',
+        color: color,
+      });
+      setNodes(nodes.concat({ id: id, label: name }));
+    } else {
+      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship });
+    }
+
+    //closes modal
     setIsModalOpen(false);
   }
 
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
+    // const sigma = useSigma();
+
     useEffect(() => {
       // Register the events
       registerEvents({
@@ -65,11 +89,11 @@ const TestPage = () => {
           let selected_type = '';
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
-            child.current.changeView(sidebarView.person);
+            child.current.changeView(SIDEBAR_VIEW.person);
           } else if (retrieved.entity === NODE_TYPE.PLACE) {
-            child.current.changeView(sidebarView.place);
+            child.current.changeView(SIDEBAR_VIEW.place);
           } else if (retrieved.entity === NODE_TYPE.IDEA) {
-            child.current.changeView(sidebarView.idea);
+            child.current.changeView(SIDEBAR_VIEW.idea);
           }
           console.log(event.node);
           console.log(retrieved);
@@ -82,6 +106,18 @@ const TestPage = () => {
               event.node
             ),
           });
+        },
+        //Current rightClickNode will delete the node. Change in future
+        rightClickNode: (event) => {
+          //event.node contains node id
+          graph.dropNode(event.node);
+
+          //update nodes
+          setNodes(
+            nodes.filter((node) => {
+              return node.id !== event.node;
+            })
+          );
         },
       });
     }, [registerEvents]);
@@ -101,51 +137,111 @@ const TestPage = () => {
               <div className="relative flex w-full flex-col rounded-lg border-0 bg-white shadow-lg outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between rounded-t border-b border-solid border-slate-200 p-5">
-                  <h3 className="text-3xl font-semibold">Add Node</h3>
+                  <h3 className="text-3xl font-semibold">{modalTitle}</h3>
                 </div>
                 {/*body*/}
-                <div className="relative flex-auto p-6">
-                  <div>
+                {modalTitle === 'Add Node' && (
+                  <div className="relative p-6 flex-auto">
                     <div>
-                      <input
-                        placeholder="Name"
-                        type="text"
-                        onChange={(e) => setName(e.target.value)}
-                      />
-                    </div>
-                    <br />
-                    <div>
-                      <select type="text" value={color} onChange={(e) => setColor(e.target.value)}>
-                        {Object.entries(COLORS).map(([color, value]) => (
-                          <option key={color} value={value}>
-                            {color}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <br />
-                    <div>
-                      <input
-                        placeholder="Size"
-                        type="text"
-                        onChange={(e) => setSize(e.target.value)}
-                      />
-                    </div>
-                    <br />
-                    <div>
-                      <select
-                        type="text"
-                        value={nodeType}
-                        onChange={(e) => setNodeType(e.target.value)}>
-                        {Object.entries(NODE_TYPE).map(([key, value]) => (
-                          <option key={key} value={value}>
-                            {key}
-                          </option>
-                        ))}
-                      </select>
+                      <div>
+                        <input
+                          placeholder="Name"
+                          type="text"
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      </div>
+                      <br />
+                      <div>
+                        <select
+                          type="text"
+                          value={color}
+                          onChange={(e) => setColor(e.target.value)}>
+                          {Object.entries(COLORS).map(([color, value]) => (
+                            <option key={color} value={value}>
+                              {color}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <br />
+                      <div>
+                        <input
+                          placeholder="Size"
+                          type="text"
+                          onChange={(e) => setSize(e.target.value)}
+                        />
+                      </div>
+                      <br />
+                      <div>
+                        <select
+                          type="text"
+                          value={nodeType}
+                          onChange={(e) => setNodeType(e.target.value)}>
+                          {Object.entries(NODE_TYPE).map(([key, value]) => (
+                            <option key={key} value={value}>
+                              {key}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+                {modalTitle === 'Add Edge' && (
+                  <div className="relative p-6 flex-auto">
+                    <div>
+                      <div>
+                        <select
+                          value={node1}
+                          onChange={(e) => {
+                            setNode1(e.target.value);
+                          }}>
+                          <option value="" disabled hidden>
+                            Select Name
+                          </option>
+                          {nodes.map((node) => (
+                            <option key={node.id} value={node.id}>
+                              {node.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <br />
+                      <div>
+                        <select
+                          value={node2}
+                          onChange={(e) => {
+                            setNode2(e.target.value);
+                          }}>
+                          <option value="" disabled hidden>
+                            Select Name
+                          </option>
+                          {nodes
+                            .filter((node) => node.id !== node1)
+                            .map((node) => (
+                              <option key={node.id} value={node.id}>
+                                {node.label}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                      <br />
+                      <div>
+                        <select
+                          type="text"
+                          value={relationship}
+                          onChange={(e) => setRelationship(e.target.value)}>
+                          {Object.entries(RELATIONSHIPS).map(([relationship, value]) => (
+                            <option key={relationship} value={value}>
+                              {relationship}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                )}
                 {/*footer*/}
                 <div className="flex items-center justify-end rounded-b border-t border-solid border-slate-200 p-6">
                   <button
@@ -183,7 +279,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <GraphToolbar />
+        <GraphToolbar handleIsNode={handleIsNode} />
       </div>
     </div>
   );
