@@ -1,25 +1,47 @@
-import node_image from "../assets/node_image.svg";
-import edge_image from "../assets/edge_image.svg";
+import { useState } from 'react';
+import { graphTools } from '../constants/constants';
+import node_image from '../assets/node_image.svg';
+import edge_image from '../assets/edge_image.svg';
+import eraser_icon from '../assets/eraser_icon.svg';
+import select_icon from '../assets/select_icon.svg';
+
 
 function GraphToolbar () {
 
-  function handleNodeSelection() {
-    alert("You selected 'node'.");
-  }
+  // Keep track of which tool is currently selected
+  const [selected, setSelected] = useState(graphTools.select);
 
+  function handleNodeSelection() {
+
+  }
   function handleEdgeSelection() {
-    alert("You selected 'edge'.");
+
+  }
+  function handleSelectSelection() {
+
+  }
+  function handleEraserSelection() {
+
   }
 
   return (
     <>
-      <div className="h-full w-[40px] bg-gray-300 border-[2px] border-gray-400 h-[500px] my-[90px] right-0 p-0 rounded-l-lg justify-center">
-        <button onClick={handleNodeSelection}>
-          <img className="w-[40px] h-[40px]" src={node_image}></img>
+      <div className='graph-toolbar'>
+        <button className='graph-toolbar-btn' onClick={handleNodeSelection}>
+          <img className='graph-toolbar-icon' src={node_image}></img>
         </button>
-        <button onClick={handleEdgeSelection}>
-          <img className="w-[40px] h-[40px]" src={edge_image}></img>
+        <button className='graph-toolbar-btn' onClick={handleEdgeSelection}>
+          <img className='graph-toolbar-icon' src={edge_image}></img>
         </button>
+
+        <div className='absolute mb-0 right-0 bottom-0'>
+          <button className='graph-toolbar-btn' onClick={handleSelectSelection}>
+            <img className='graph-toolbar-icon' src={select_icon}></img>
+          </button>
+          <button className='graph-toolbar-btn' onClick={handleEraserSelection}>
+            <img className='graph-toolbar-icon' src={eraser_icon}></img>
+          </button>
+        </div>
       </div>
     </>
   );

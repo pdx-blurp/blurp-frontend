@@ -83,6 +83,18 @@
     @apply bg-fuchsia-750 m-2 inline-grid h-10 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
   }
 
+  .graph-toolbar {
+    @apply absolute w-[40px] bg-gray-300 border-[2px] border-gray-400 h-[500px] my-[90px] right-0 rounded-l-lg;
+  }
+
+  .graph-toolbar-btn {
+    @apply m-[4px];
+  }
+
+  .graph-toolbar-icon {
+    @apply w-[30px] h-[30px] rounded hover:bg-gray-400;
+  }
+
   .landing-background {
     @apply bg-gray-800;
   }

@@ -24,6 +24,13 @@ export enum sidebarView {
   edge = 'edge',
 }
 
+export enum graphTools {
+  node = 'node',
+  edge = 'edge',
+  select = 'select',
+  eraser = 'eraser',
+}
+
 /* 
   graphData and Relationships were both made according 
   to the data objects/map architecture docs
