@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE, sidebarView } from '../constants/constants.ts';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
-import GraphToolbar from '../components/graph_toolbar.jsx';
+import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 
 const TestPage = () => {
@@ -183,7 +183,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <GraphToolbar />
+        <MapToolbar />
       </div>
     </div>
   );

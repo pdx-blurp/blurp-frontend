@@ -24,7 +24,7 @@ export enum sidebarView {
   edge = 'edge',
 }
 
-export enum graphTools {
+export enum MAP_TOOLS {
   node = 'node',
   edge = 'edge',
   select = 'select',
