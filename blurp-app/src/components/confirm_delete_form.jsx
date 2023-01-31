@@ -7,7 +7,9 @@ function ConfirmDeleteForm (props) {
   const HIDDEN_MSG_CLASS = 'obj-deleted-msg opacity-0';
   const VISIBLE_MSG_CLASS = 'obj-deleted-msg';
 
-  const [formClass, setFormClass] = useState(VISIBLE_FORM_CLASS);
+  // The confirm delete form is hidden by default. To see it (for testing purposes),
+  // replace HIDDEN_FORM_CLASS with VISIBLE_FORM_CLASS in the line below.
+  const [formClass, setFormClass] = useState(HIDDEN_FORM_CLASS);
   const [objDeletedMsgClass, setObjDeletedMsgClass] = useState(HIDDEN_MSG_CLASS);
   const form_ref = useRef(null);
 
