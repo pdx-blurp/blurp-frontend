@@ -7,6 +7,9 @@
     "coverage": "jest --coverage"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/material": "^5.11.7",
     "@splinetool/react-spline": "^2.2.5",
     "@splinetool/runtime": "^0.9.183",
     "prettier-plugin-tailwindcss": "^0.2.1"
