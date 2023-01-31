@@ -15,6 +15,7 @@ import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import GraphToolbar from '../components/graph_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
+import ConfirmDeleteForm from '../components/confirm_delete_form';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -184,6 +185,9 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <GraphToolbar />
+      </div>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+        <ConfirmDeleteForm />
       </div>
     </div>
   );
