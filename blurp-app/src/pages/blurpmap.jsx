@@ -84,10 +84,12 @@ const TestPage = () => {
       registerEvents({
         // default mouse events
         doubleClick: (event) => {
+          // Soln for preventing zooming in on a double click found here:
+          // https://github.com/jacomyal/sigma.js/issues/1274
+          event.preventSigmaDefault();
           setIsModalOpen(true);
         }, // node events
         clickNode: (event) => {
-          let selected_type = '';
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
             child.current.changeView(SIDEBAR_VIEW.person);
