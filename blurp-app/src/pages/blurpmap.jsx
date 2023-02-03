@@ -8,6 +8,7 @@ import {
   useSigma,
 } from '@react-sigma/core';
 import '@react-sigma/core/lib/react-sigma.min.css';
+import Slider from '@mui/material/Slider';
 
 import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
@@ -69,7 +70,7 @@ const TestPage = () => {
       });
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship });
+      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
     }
 
     //closes modal
@@ -85,10 +86,12 @@ const TestPage = () => {
       registerEvents({
         // default mouse events
         doubleClick: (event) => {
+          // Soln for preventing zooming in on a double click found here:
+          // https://github.com/jacomyal/sigma.js/issues/1274
+          event.preventSigmaDefault();
           setIsModalOpen(true);
         }, // node events
         clickNode: (event) => {
-          let selected_type = '';
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
             child.current.changeView(SIDEBAR_VIEW.person);
@@ -97,8 +100,6 @@ const TestPage = () => {
           } else if (retrieved.entity === NODE_TYPE.IDEA) {
             child.current.changeView(SIDEBAR_VIEW.idea);
           }
-          console.log(event.node);
-          console.log(retrieved);
           setNode({
             selected: new NodeData(
               retrieved.label,
@@ -143,7 +144,7 @@ const TestPage = () => {
                 </div>
                 {/*body*/}
                 {modalTitle === 'Add Node' && (
-                  <div className="relative p-6 flex-auto">
+                  <div className="relative flex-auto p-6">
                     <div>
                       <div>
                         <input
@@ -167,10 +168,12 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <input
-                          placeholder="Size"
-                          type="text"
+                        <Slider
                           onChange={(e) => setSize(e.target.value)}
+                          min={20}
+                          max={120}
+                          aria-label="small"
+                          valueLabelDisplay="auto"
                         />
                       </div>
                       <br />
@@ -190,7 +193,7 @@ const TestPage = () => {
                   </div>
                 )}
                 {modalTitle === 'Add Edge' && (
-                  <div className="relative p-6 flex-auto">
+                  <div className="relative flex-auto p-6">
                     <div>
                       <div>
                         <select
@@ -239,6 +242,16 @@ const TestPage = () => {
                             </option>
                           ))}
                         </select>
+                      </div>
+                      <br />
+                      <div>
+                        <Slider
+                          onChange={(e) => setSize(e.target.value)}
+                          min={2}
+                          max={10}
+                          aria-label="small"
+                          valueLabelDisplay="auto"
+                        />
                       </div>
                       <br />
                     </div>

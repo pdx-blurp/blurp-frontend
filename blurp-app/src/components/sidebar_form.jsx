@@ -47,8 +47,6 @@ const SidebarForm = forwardRef((props, ref) => {
     const value = target.value;
     const e_name = target.name;
 
-    console.log(target + ' ' + value + ' ' + e_name);
-
     if (target.type == 'radio') {
       switch (value) {
         case 'family':
@@ -89,12 +87,10 @@ const SidebarForm = forwardRef((props, ref) => {
           break;
       }
     } else {
-      console.log('e_name: ' + e_name + '\nvalue :' + value);
       setNode({
         ...node,
         [e_name]: value,
       });
-      console.log(node);
     }
   };
 
