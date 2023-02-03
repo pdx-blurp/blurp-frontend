@@ -32,6 +32,7 @@ const TestPage = () => {
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
   const [isNode, setIsNode] = useState(true);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
   const child = useRef();
 
   function changeNodeData(name, years, notes, id) {
@@ -57,9 +58,11 @@ const TestPage = () => {
   function handleSubmit() {
     if (isNode) {
       const id = uuidv4();
+      console.log('setting position to: ');
+      console.log(pos.x, pos.y);
       graph.addNode(id, {
-        x: event.x,
-        y: event.y,
+        x: pos.x,
+        y: pos.y,
         label: name,
         entity: nodeType,
         size: size,
@@ -88,9 +91,17 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
+          setPos({ x: event.x, y: event.y });
+          console.log('position received: ');
+          console.log(event.x, event.y);
           setIsModalOpen(true);
         }, // node events
+        click: (event) => {
+          console.log('mouse pos ');
+          console.log(event.x, event.y);
+        },
         clickNode: (event) => {
+          console.log(event.event.x, event.event.y);
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
             child.current.changeView(SIDEBAR_VIEW.person);
@@ -167,10 +178,11 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
+                        <label>Size</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
-                          min={20}
-                          max={120}
+                          min={1}
+                          max={20}
                           aria-label="small"
                           valueLabelDisplay="auto"
                         />
@@ -244,6 +256,7 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
+                        <label>Thickness</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={2}
@@ -276,11 +289,13 @@ const TestPage = () => {
           </div>
         )}
       </div>
+      {/* ratio will change in the future, currently it's bigger while we're
+          working to get node placement to work based on the mouse pos*/}
       <SigmaContainer
         id="blurp-map-container"
         className="flex w-full justify-center"
         graph={graph}
-        settings={{ renderEdgeLabels: true }}>
+        settings={{ renderEdgeLabels: true, minCameraRatio: 0.1, maxCameraRatio: 5 }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
