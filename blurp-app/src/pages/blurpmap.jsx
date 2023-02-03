@@ -81,7 +81,12 @@ const TestPage = () => {
 
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
-    // const sigma = useSigma();
+    const sigma = useSigma();
+    /* 
+      Sigma used here for getting graph coordinates, which allows for us to place nodes
+      where the user clicked. Used this example to get it working:
+      https://sim51.github.io/react-sigma/docs/example/drag_n_drop 
+    */
 
     useEffect(() => {
       // Register the events
@@ -91,14 +96,15 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          setPos({ x: event.x, y: event.y });
+          const grabbed_pos = sigma.viewportToGraph(event);
+          setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
           console.log('position received: ');
-          console.log(event.x, event.y);
+          console.log(pos.x, pos.y);
           setIsModalOpen(true);
         }, // node events
         click: (event) => {
           console.log('mouse pos ');
-          console.log(event.x, event.y);
+          console.log(sigma.viewportToGraph(event));
         },
         clickNode: (event) => {
           console.log(event.event.x, event.event.y);
