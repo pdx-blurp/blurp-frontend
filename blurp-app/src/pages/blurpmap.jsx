@@ -7,6 +7,7 @@ import {
   SearchControl,
   useSigma,
 } from '@react-sigma/core';
+import Sigma from 'sigma';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 
@@ -33,6 +34,7 @@ const TestPage = () => {
   const [node2, setNode2] = useState('');
   const [isNode, setIsNode] = useState(true);
   const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [sigma, setSigma] = useState(null);
   const child = useRef();
 
   function changeNodeData(name, years, notes, id) {
@@ -56,10 +58,12 @@ const TestPage = () => {
     }
   }
   function handleSubmit() {
-    if (isNode) {
+    if (isNode && sigma) {
       const id = uuidv4();
-      console.log('setting position to: ');
-      console.log(pos.x, pos.y);
+      let prev_state = sigma.getCamera().getState();
+      if (graph.size < 4) {
+        prev_state.ratio = 1.5;
+      }
       graph.addNode(id, {
         x: pos.x,
         y: pos.y,
@@ -70,6 +74,7 @@ const TestPage = () => {
         notes: '',
         color: color,
       });
+      sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
       graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
@@ -98,14 +103,11 @@ const TestPage = () => {
           event.preventSigmaDefault();
           const grabbed_pos = sigma.viewportToGraph(event);
           setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-          console.log('position received: ');
-          console.log(pos.x, pos.y);
           setIsModalOpen(true);
         }, // node events
-        click: (event) => {
-          console.log('mouse pos ');
+        /* click: (event) => {
           console.log(sigma.viewportToGraph(event));
-        },
+        }, */
         clickNode: (event) => {
           console.log(event.event.x, event.event.y);
           let retrieved = graph.getNodeAttributes(event.node);
@@ -301,7 +303,13 @@ const TestPage = () => {
         id="blurp-map-container"
         className="flex w-full justify-center"
         graph={graph}
-        settings={{ renderEdgeLabels: true, minCameraRatio: 0.1, maxCameraRatio: 5 }}>
+        ref={setSigma}
+        settings={{
+          renderEdgeLabels: true,
+          minCameraRatio: 0.6,
+          maxCameraRatio: 2,
+          autoScale: false,
+        }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
