@@ -33,6 +33,7 @@ const TestPage = () => {
   const [node2, setNode2] = useState('');
   const [isNode, setIsNode] = useState(true);
   const child = useRef();
+  const [sigmaCursor, setSigmaCursor] = useState('cursor-default');
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -278,7 +279,7 @@ const TestPage = () => {
       </div>
       <SigmaContainer
         id="blurp-map-container"
-        className="flex w-full justify-center"
+        className={"flex w-full justify-center " + sigmaCursor}
         graph={graph}
         settings={{ renderEdgeLabels: true }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
@@ -293,7 +294,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} />
+        <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor}/>
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
