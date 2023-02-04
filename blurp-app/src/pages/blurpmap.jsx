@@ -7,7 +7,6 @@ import {
   SearchControl,
   useSigma,
 } from '@react-sigma/core';
-import Sigma from 'sigma';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 
@@ -62,7 +61,7 @@ const TestPage = () => {
       const id = uuidv4();
       let prev_state = sigma.getCamera().getState();
       if (graph.size < 4) {
-        prev_state.ratio = 1.5;
+        prev_state.ratio = 2.0;
       }
       graph.addNode(id, {
         x: pos.x,
@@ -105,11 +104,7 @@ const TestPage = () => {
           setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
           setIsModalOpen(true);
         }, // node events
-        /* click: (event) => {
-          console.log(sigma.viewportToGraph(event));
-        }, */
         clickNode: (event) => {
-          console.log(event.event.x, event.event.y);
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
             child.current.changeView(SIDEBAR_VIEW.person);
