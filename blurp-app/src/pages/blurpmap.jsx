@@ -35,6 +35,7 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
+  const [sigmaCursor, setSigmaCursor] = useState('cursor-default');
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -296,7 +297,7 @@ const TestPage = () => {
           working to get node placement to work based on the mouse pos*/}
       <SigmaContainer
         id="blurp-map-container"
-        className="flex w-full justify-center"
+        className={"flex w-full justify-center " + sigmaCursor}
         graph={graph}
         ref={setSigma}
         settings={{
@@ -317,7 +318,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} />
+        <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor}/>
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />

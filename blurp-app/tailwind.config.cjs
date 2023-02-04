@@ -26,6 +26,11 @@ module.exports = {
           550: '#d424a7',
         },
       },
+      cursor: {
+        'eraser': 'url(./src/assets/eraser_cursor.svg), pointer',
+        'node': 'url(./src/assets/node_cursor.svg), pointer',
+        'edge': 'url(./src/assets/edge_cursor.svg), pointer',
+      }
     },
     screens: {
       'sm': '400px',

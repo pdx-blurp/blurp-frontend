@@ -28,23 +28,27 @@ function MapToolbar (props) {
   }
   function handleNodeSelection(obj) {
     props.handleIsNode(true);
+    props.setSigmaCursor('cursor-node');
     clearIconSelection();
     setSelected(MAP_TOOLS.node);
     setNodeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEdgeSelection() {
     props.handleIsNode(false);
+    props.setSigmaCursor('cursor-edge');
     clearIconSelection();
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleSelectSelection() {
     clearIconSelection();
+    props.setSigmaCursor('cursor-default');
     setSelected(MAP_TOOLS.select);
     setSelectClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEraserSelection() {
     clearIconSelection();
+    props.setSigmaCursor('cursor-eraser');
     setSelected(MAP_TOOLS.eraser);
     setEraserClass(SELECTED_ICON_CLASSNAME);
   }
