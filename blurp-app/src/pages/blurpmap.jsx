@@ -28,6 +28,7 @@ const TestPage = () => {
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
+  const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
@@ -43,6 +44,19 @@ const TestPage = () => {
       graph.setNodeAttribute(id, 'notes', notes);
     } catch {
       console.log('ERROR: failed to retrieve node with that ID');
+      console.log('ID used: ' + id);
+    }
+  }
+
+  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
+    try {
+      graph.setEdgeAttribute(id, 'label', category);
+      graph.setEdgeAttribute(id, 'familiarity', familiarity);
+      graph.setEdgeAttribute(id, 'stressCode', stressCode);
+      graph.setEdgeAttribute(id, 'node1ID', node1ID);
+      graph.setEdgeAttribute(id, 'node2ID', node2ID);
+    } catch {
+      console.log('ERROR: failed to retrieve edge with that ID');
       console.log('ID used: ' + id);
     }
   }
@@ -76,7 +90,13 @@ const TestPage = () => {
       sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
+      let key = uuidv4();
+      console.log(key);
+      graph.addEdgeWithKey(key, node1, node2, {
+        label: relationship,
+        size: size,
+        color: 'grey',
+      });
     }
 
     //closes modal
@@ -105,6 +125,9 @@ const TestPage = () => {
           setIsModalOpen(true);
         }, // node events
         clickNode: (event) => {
+          // Done to clear data and avoid reopening old selections
+          setNode({ selected: new NodeData('', '', '', '', '') });
+          setEdge({ selected: new EdgeData('', '', '', '', '', '') });
           let retrieved = graph.getNodeAttributes(event.node);
           if (retrieved.entity === NODE_TYPE.PERSON) {
             child.current.changeView(SIDEBAR_VIEW.person);
@@ -120,6 +143,24 @@ const TestPage = () => {
               retrieved.notes,
               retrieved.entity,
               event.node
+            ),
+          });
+        },
+        clickEdge: (event) => {
+          // Done to clear data and avoid reopening old selections
+          setNode({ selected: new NodeData('', '', '', '', '') });
+          setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+          let retrieved = graph.getEdgeAttributes(event.edge);
+          console.log(event.edge);
+          child.current.changeView(SIDEBAR_VIEW.edge);
+          setEdge({
+            selected: new EdgeData(
+              retrieved.category,
+              retrieved.familiarity,
+              retrieved.stressCode,
+              retrieved.node1ID,
+              retrieved.node2ID,
+              event.edge
             ),
           });
         },
@@ -311,7 +352,13 @@ const TestPage = () => {
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
+        <DataSidebar
+          ref={child}
+          node={node}
+          edge={edge}
+          changeNodeData={changeNodeData}
+          changeEdgeData={changeEdgeData}
+        />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />

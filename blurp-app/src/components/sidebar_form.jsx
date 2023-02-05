@@ -18,7 +18,7 @@ const SidebarForm = forwardRef((props, ref) => {
 
   useEffect(() => {
     setData();
-  }, [props.parent_node]);
+  }, [props.parent_node, props.parent_edge]);
   const [view, setView] = useState(SIDEBAR_VIEW.person);
   const [node, setNode] = useState({
     name: '',
@@ -34,6 +34,7 @@ const SidebarForm = forwardRef((props, ref) => {
     stressLevel: '',
     node1ID: '',
     node2ID: '',
+    id: '',
   });
   /* 
     Using this to work on pulling info from the forms:
@@ -105,7 +106,18 @@ const SidebarForm = forwardRef((props, ref) => {
   };
 
   const handleSubmit = (e) => {
-    props.changeNodeData(node.name, node.years, node.notes, node.id);
+    if (view == SIDEBAR_VIEW.edge) {
+      props.changeEdgeData(
+        edge.relation,
+        edge.familiarity,
+        edge.stressLevel,
+        edge.node1ID,
+        edge.node2ID,
+        edge.id
+      );
+    } else {
+      props.changeNodeData(node.name, node.years, node.notes, node.id);
+    }
     e.preventDefault();
   };
 
@@ -124,14 +136,15 @@ const SidebarForm = forwardRef((props, ref) => {
       stressLevel: '',
       node1ID: '',
       node2ID: '',
+      id: '',
     });
   };
 
   const setData = () => {
     const selected_node = props.parent_node.selected;
-    const selected_edge = props.parent_edge;
+    const selected_edge = props.parent_edge.selected;
     clearState();
-    if (selected_node) {
+    if (selected_node.id != '') {
       setNode({
         name: selected_node.name,
         years: selected_node.years,
@@ -144,14 +157,16 @@ const SidebarForm = forwardRef((props, ref) => {
         else if (selected_node.type == 'PLACE') setView(SIDEBAR_VIEW.place);
         else if (selected_node.type == 'IDEA') setView(SIDEBAR_VIEW.idea);
       }
-    } else if (selected_edge) {
+    } else if (selected_edge.id != '') {
       setEdge({
         category: selected_edge.category,
         familiarity: selected_edge.familiarity,
-        stressLevel: selected_edge.stressLevel,
+        stressLevel: selected_edge.stressCode,
         node1ID: selected_edge.node1ID,
         node2ID: selected_edge.node2ID,
+        id: selected_edge.id,
       });
+      setView(SIDEBAR_VIEW.edge);
     }
   };
 
@@ -267,32 +282,32 @@ const SidebarForm = forwardRef((props, ref) => {
         return (
           <form onSubmit={handleSubmit}>
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
-            <div className="m-2 w-11/12" onChange={handleChange}>
+            <fieldset className="m-2 w-11/12" onChange={handleChange} value={edge.relation}>
               <legend>Relationship Type:</legend>
-              <input type="radio" value="family" name="relation" />
+              <input type="radio" value="family" onChange={handleChange} name="relation" />
               <label htmlFor="family">Familial Relationship</label>
               <br />
-              <input type="radio" value="friend" name="relation" />
+              <input type="radio" value="friend" onChange={handleChange} name="relation" />
               <label htmlFor="friend">Friendships</label>
               <br />
-              <input type="radio" value="acquaint" name="relation" />
+              <input type="radio" value="acquaint" onChange={handleChange} name="relation" />
               <label htmlFor="acquaint">Acquaintances</label>
               <br />
-              <input type="radio" value="romantic" name="relation" />
+              <input type="radio" value="romantic" onChange={handleChange} name="relation" />
               <label htmlFor="romantic">Romantic Relationships</label>
               <br />
-              <input type="radio" value="work" name="relation" />
+              <input type="radio" value="work" onChange={handleChange} name="relation" />
               <label htmlFor="work">Work Relationships</label>
               <br />
-              <input type="radio" value="undefined" name="relation" />
+              <input type="radio" value="undefined" onChange={handleChange} name="relation" />
               <label htmlFor="undefined">Situational/Undefined Relationships</label>
               <br />
-            </div>
+            </fieldset>
             <input
               type="number"
               name="familiarity"
               placeholder="Familiarity"
-              value={node.familiarity}
+              value={edge.familiarity}
               onChange={handleChange}
               className="textbox-sidebar"
             />
@@ -300,12 +315,12 @@ const SidebarForm = forwardRef((props, ref) => {
               type="number"
               name="stressLevel"
               placeholder="Stress Level"
-              value={node.stressLevel}
+              value={edge.stressLevel}
               onChange={handleChange}
               className="textbox-sidebar"
             />
             <div className="m-4 w-11/12 text-lg">
-              <u>{node.node1ID}</u> is related to <u>{node.node2ID}</u>
+              <u>{edge.node1ID}</u> is related to <u>{edge.node2ID}</u>
             </div>
             <button type="submit" className="btn-sidebar">
               Save

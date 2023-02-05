@@ -61,8 +61,9 @@ class DataSidebar extends React.Component {
             <SidebarForm
               ref={this.child}
               parent_node={this.props.node}
-              parent_edge={this.edge}
+              parent_edge={this.props.edge}
               changeNodeData={this.props.changeNodeData}
+              changeEdgeData={this.props.changeEdgeData}
             />
           </div>
         </div>
