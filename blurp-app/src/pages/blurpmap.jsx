@@ -44,6 +44,14 @@ const TestPage = () => {
       console.log('ERROR: failed to retrieve node with that ID');
       console.log('ID used: ' + id);
     }
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => {
+        if (node.id === id) {
+          return { ...node, label: name };
+        }
+        return node;
+      })
+    );
   }
 
   function handleIsNode(data) {
@@ -279,7 +287,7 @@ const TestPage = () => {
       </div>
       <SigmaContainer
         id="blurp-map-container"
-        className={"flex w-full justify-center " + sigmaCursor}
+        className={'flex w-full justify-center ' + sigmaCursor}
         graph={graph}
         settings={{ renderEdgeLabels: true }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
@@ -294,7 +302,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor}/>
+        <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
