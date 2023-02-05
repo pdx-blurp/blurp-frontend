@@ -90,10 +90,12 @@ const TestPage = () => {
       sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      let key = uuidv4();
-      console.log(key);
-      graph.addEdgeWithKey(key, node1, node2, {
+      graph.addEdgeWithKey(uuidv4(), node1, node2, {
         label: relationship,
+        familiarity: '',
+        stressCode: '',
+        node1: '',
+        node2: '',
         size: size,
         color: 'grey',
       });
@@ -152,14 +154,15 @@ const TestPage = () => {
           setEdge({ selected: new EdgeData('', '', '', '', '', '') });
           let retrieved = graph.getEdgeAttributes(event.edge);
           console.log(event.edge);
+          console.log(retrieved);
           child.current.changeView(SIDEBAR_VIEW.edge);
           setEdge({
             selected: new EdgeData(
               retrieved.category,
               retrieved.familiarity,
               retrieved.stressCode,
-              retrieved.node1ID,
-              retrieved.node2ID,
+              retrieved.node1,
+              retrieved.node2,
               event.edge
             ),
           });

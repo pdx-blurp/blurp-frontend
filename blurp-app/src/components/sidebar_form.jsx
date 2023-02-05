@@ -46,52 +46,29 @@ const SidebarForm = forwardRef((props, ref) => {
   const handleChange = (e) => {
     const target = e.target;
     const value = target.value;
-    const e_name = target.name;
-
+    const e_name = target.name.split('.');
+    console.log(target.type);
     if (target.type == 'radio') {
-      switch (value) {
-        case 'family':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.familial,
-          });
-          break;
-        case 'friend':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.friendship,
-          });
-          break;
-        case 'acquaint':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.acquaintance,
-          });
-          break;
-        case 'romantic':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.romantic,
-          });
-          break;
-        case 'work':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.work,
-          });
-          break;
-        case 'undefined':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.situational,
-          });
-          break;
-      }
-    } else {
-      setNode({
-        ...node,
-        [e_name]: value,
+      console.log(target.checked);
+      console.log(target.value);
+      setEdge({
+        ...edge,
+        relation: target.value,
       });
+    } else {
+      switch (e_name[0]) {
+        case 'node':
+          setNode({
+            ...node,
+            [e_name[1]]: value,
+          });
+          break;
+        case 'edge':
+          setEdge({
+            ...edge,
+            [e_name[1]]: value,
+          });
+      }
     }
   };
 
@@ -162,8 +139,8 @@ const SidebarForm = forwardRef((props, ref) => {
         category: selected_edge.category,
         familiarity: selected_edge.familiarity,
         stressLevel: selected_edge.stressCode,
-        node1ID: selected_edge.node1ID,
-        node2ID: selected_edge.node2ID,
+        node1ID: selected_edge.node1,
+        node2ID: selected_edge.node2,
         id: selected_edge.id,
       });
       setView(SIDEBAR_VIEW.edge);
@@ -184,7 +161,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Person</h1>
             <input
               type="text"
-              name="name"
+              name="node.name"
               placeholder="Name"
               className="textbox-sidebar"
               value={node.name}
@@ -192,7 +169,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <input
               type="number"
-              name="years"
+              name="node.years"
               placeholder="Age"
               value={node.years}
               onChange={handleChange}
@@ -200,7 +177,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -220,7 +197,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Place</h1>
             <input
               type="text"
-              name="name"
+              name="node.name"
               placeholder="Name"
               value={node.name}
               onChange={handleChange}
@@ -228,7 +205,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -248,7 +225,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Idea</h1>
             <input
               type="name"
-              name="name"
+              name="node.name"
               placeholder="Name"
               value={node.name}
               onChange={handleChange}
@@ -256,7 +233,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <input
               type="number"
-              name="years"
+              name="node.years"
               placeholder="Age/History"
               value={node.years}
               onChange={handleChange}
@@ -264,7 +241,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -284,28 +261,64 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
             <fieldset className="m-2 w-11/12" onChange={handleChange} value={edge.relation}>
               <legend>Relationship Type:</legend>
-              <input type="radio" value="family" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.familial}
+                checked={RELATIONSHIPS.familial}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="family">Familial Relationship</label>
               <br />
-              <input type="radio" value="friend" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.friendship}
+                checked={RELATIONSHIPS.friendship}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="friend">Friendships</label>
               <br />
-              <input type="radio" value="acquaint" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.acquaintance}
+                checked={RELATIONSHIPS.acquaintance}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="acquaint">Acquaintances</label>
               <br />
-              <input type="radio" value="romantic" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.romantic}
+                checked={RELATIONSHIPS.romantic}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="romantic">Romantic Relationships</label>
               <br />
-              <input type="radio" value="work" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.work}
+                checked={RELATIONSHIPS.work}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="work">Work Relationships</label>
               <br />
-              <input type="radio" value="undefined" onChange={handleChange} name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.situational}
+                checked={RELATIONSHIPS.situational}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="undefined">Situational/Undefined Relationships</label>
               <br />
             </fieldset>
             <input
               type="number"
-              name="familiarity"
+              name="edge.familiarity"
               placeholder="Familiarity"
               value={edge.familiarity}
               onChange={handleChange}
@@ -313,7 +326,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <input
               type="number"
-              name="stressLevel"
+              name="edge.stressLevel"
               placeholder="Stress Level"
               value={edge.stressLevel}
               onChange={handleChange}
