@@ -9,6 +9,7 @@ import {
 } from '@react-sigma/core';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
+import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
 import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
@@ -36,6 +37,16 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
+
+  function SaveToDB() {
+    console.log(JSON.stringify(graph));
+    axios
+      .get('http://localhost:3000/')
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  }
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -348,6 +359,12 @@ const TestPage = () => {
           autoScale: false,
         }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
+          <button onClick={SaveToDB} className="btn-test">
+            Save to Cloud
+          </button>
+          <button onClick={() => console.log('Not implemented')} className="btn-test">
+            Load from Cloud
+          </button>
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
