@@ -2,6 +2,7 @@ import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import Slider from '@mui/material/Slider';
 
 const notes_size = 255;
 
@@ -30,8 +31,8 @@ const SidebarForm = forwardRef((props, ref) => {
 
   const [edge, setEdge] = useState({
     relation: RELATIONSHIPS.situational,
-    familiarity: '',
-    stressLevel: '',
+    familiarity: 0,
+    stressLevel: 0,
     node1ID: '',
     node2ID: '',
     id: '',
@@ -47,13 +48,10 @@ const SidebarForm = forwardRef((props, ref) => {
     const target = e.target;
     const value = target.value;
     const e_name = target.name.split('.');
-    console.log(target.type);
     if (target.type == 'radio') {
-      console.log(target.checked);
-      console.log(target.value);
       setEdge({
         ...edge,
-        relation: target.value,
+        relation: value,
       });
     } else {
       switch (e_name[0]) {
@@ -86,8 +84,8 @@ const SidebarForm = forwardRef((props, ref) => {
     if (view == SIDEBAR_VIEW.edge) {
       props.changeEdgeData(
         edge.relation,
-        edge.familiarity,
-        edge.stressLevel,
+        edge.familiarity.toString(),
+        edge.stressLevel.toString(),
         edge.node1ID,
         edge.node2ID,
         edge.id
@@ -136,9 +134,9 @@ const SidebarForm = forwardRef((props, ref) => {
       }
     } else if (selected_edge.id != '') {
       setEdge({
-        category: selected_edge.category,
-        familiarity: selected_edge.familiarity,
-        stressLevel: selected_edge.stressCode,
+        relation: selected_edge.category,
+        familiarity: Number(selected_edge.familiarity),
+        stressLevel: Number(selected_edge.stressCode),
         node1ID: selected_edge.node1,
         node2ID: selected_edge.node2,
         id: selected_edge.id,
@@ -257,14 +255,14 @@ const SidebarForm = forwardRef((props, ref) => {
         );
       case SIDEBAR_VIEW.edge:
         return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="grid justify-center">
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
             <fieldset className="m-2 w-11/12" onChange={handleChange} value={edge.relation}>
               <legend>Relationship Type:</legend>
               <input
                 type="radio"
                 value={RELATIONSHIPS.familial}
-                checked={RELATIONSHIPS.familial}
+                checked={edge.relation === RELATIONSHIPS.familial}
                 onChange={handleChange}
                 name="edge.relation"
               />
@@ -273,7 +271,7 @@ const SidebarForm = forwardRef((props, ref) => {
               <input
                 type="radio"
                 value={RELATIONSHIPS.friendship}
-                checked={RELATIONSHIPS.friendship}
+                checked={edge.relation === RELATIONSHIPS.friendship}
                 onChange={handleChange}
                 name="edge.relation"
               />
@@ -282,7 +280,7 @@ const SidebarForm = forwardRef((props, ref) => {
               <input
                 type="radio"
                 value={RELATIONSHIPS.acquaintance}
-                checked={RELATIONSHIPS.acquaintance}
+                checked={edge.relation === RELATIONSHIPS.acquaintance}
                 onChange={handleChange}
                 name="edge.relation"
               />
@@ -291,7 +289,7 @@ const SidebarForm = forwardRef((props, ref) => {
               <input
                 type="radio"
                 value={RELATIONSHIPS.romantic}
-                checked={RELATIONSHIPS.romantic}
+                checked={edge.relation === RELATIONSHIPS.romantic}
                 onChange={handleChange}
                 name="edge.relation"
               />
@@ -300,7 +298,7 @@ const SidebarForm = forwardRef((props, ref) => {
               <input
                 type="radio"
                 value={RELATIONSHIPS.work}
-                checked={RELATIONSHIPS.work}
+                checked={edge.relation === RELATIONSHIPS.work}
                 onChange={handleChange}
                 name="edge.relation"
               />
@@ -309,29 +307,35 @@ const SidebarForm = forwardRef((props, ref) => {
               <input
                 type="radio"
                 value={RELATIONSHIPS.situational}
-                checked={RELATIONSHIPS.situational}
+                checked={edge.relation === RELATIONSHIPS.situational}
                 onChange={handleChange}
                 name="edge.relation"
               />
               <label htmlFor="undefined">Situational/Undefined Relationships</label>
               <br />
             </fieldset>
-            <input
-              type="number"
-              name="edge.familiarity"
-              placeholder="Familiarity"
-              value={edge.familiarity}
-              onChange={handleChange}
-              className="textbox-sidebar"
-            />
-            <input
-              type="number"
-              name="edge.stressLevel"
-              placeholder="Stress Level"
-              value={edge.stressLevel}
-              onChange={handleChange}
-              className="textbox-sidebar"
-            />
+            <div className="m-2 grid w-11/12">
+              <label>Familiarity</label>
+              <Slider
+                sx={{ width: '90%' }}
+                aria-label="Small"
+                name="edge.familiarity"
+                value={edge.familiarity}
+                valueLabelDisplay="auto"
+                onChange={handleChange}
+                className="mx-3"
+              />
+              <label>Stress Level</label>
+              <Slider
+                sx={{ width: '90%' }}
+                aria-label="Small"
+                name="edge.stressLevel"
+                value={edge.stressLevel}
+                valueLabelDisplay="auto"
+                onChange={handleChange}
+                className="mx-3"
+              />
+            </div>
             <div className="m-4 w-11/12 text-lg">
               <u>{edge.node1ID}</u> is related to <u>{edge.node2ID}</u>
             </div>

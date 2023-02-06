@@ -153,12 +153,10 @@ const TestPage = () => {
           setNode({ selected: new NodeData('', '', '', '', '') });
           setEdge({ selected: new EdgeData('', '', '', '', '', '') });
           let retrieved = graph.getEdgeAttributes(event.edge);
-          console.log(event.edge);
-          console.log(retrieved);
           child.current.changeView(SIDEBAR_VIEW.edge);
           setEdge({
             selected: new EdgeData(
-              retrieved.category,
+              retrieved.label,
               retrieved.familiarity,
               retrieved.stressCode,
               retrieved.node1,
