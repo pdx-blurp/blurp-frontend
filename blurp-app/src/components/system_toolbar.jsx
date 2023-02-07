@@ -48,7 +48,7 @@ function System_Toolbar_State (props) {
   }
 
   function handleExportClick() {
-    alert("Export clicked.");
+    props.download();
   }
 
   return (
@@ -73,7 +73,7 @@ function System_Toolbar_State (props) {
   )
 }
 
-function System_Toolbar() {
+function System_Toolbar(props) {
 
   const [expanded, setExpanded] = useState(false);
   // Function to collapse if expanded, expand if collapsed:
@@ -90,7 +90,7 @@ function System_Toolbar() {
 
   return (
     <>
-    <System_Toolbar_State expanded={expanded}
+    <System_Toolbar_State download={props.download} expanded={expanded}
       toggle_toolbar={switchToolbar} onClickOutside={collapseToolbar} show/>
     </>
   )

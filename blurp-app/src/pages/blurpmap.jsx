@@ -46,6 +46,40 @@ const TestPage = () => {
     }
   }
 
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph.toJSON()));
+
+    // Create the download link
+    let downloadElement = document.createElement("a");
+    downloadElement.download = "map.blurp";
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers an import of the data to replace the existing graph.
+   * @param data The data as a JSON string to import.
+   */
+  function uploadMapJson(data) {
+	  // Convert to JSON
+	  let jsonDataString = JSON.parse(data);
+	  // TODO: add error when JSON cannot be parsed (invalid file?)
+
+	  // Replace graph
+	  // TODO: add confirmation that existing graph will be replaced
+      useSigma().setGraph(new sigma({
+		  graph: jsonDataString
+	  }));
+  }
+
   function handleIsNode(data) {
     if (data === true) {
       setModalTitle('Add Node');
@@ -291,7 +325,7 @@ const TestPage = () => {
         <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar />
+        <System_Toolbar download={downloadMapJson} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor}/>
