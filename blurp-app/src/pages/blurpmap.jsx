@@ -47,6 +47,14 @@ const TestPage = () => {
       graph.setNodeAttribute(id, 'label', name);
       graph.setNodeAttribute(id, 'years', years);
       graph.setNodeAttribute(id, 'notes', notes);
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, label: name };
+          }
+          return node;
+        })
+      );
     } catch {
       console.log('ERROR: failed to retrieve node with that ID');
       console.log('ID used: ' + id);
