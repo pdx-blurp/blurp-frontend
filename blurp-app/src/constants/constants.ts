@@ -31,6 +31,13 @@ export enum MAP_TOOLS {
   eraser = 'eraser',
 }
 
+export enum SIGMA_CURSOR {
+  DEFAULT = 'cursor-default',
+  NODE = 'cursor-node',
+  EDGE = 'cursor-edge',
+  ERASER = 'cursor-eraser',
+}
+
 /* 
   graphData and Relationships were both made according 
   to the data objects/map architecture docs

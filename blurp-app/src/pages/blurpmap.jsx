@@ -11,7 +11,14 @@ import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 
 import { v4 as uuidv4 } from 'uuid';
-import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import {
+  COLORS,
+  NODE_TYPE,
+  SIDEBAR_VIEW,
+  RELATIONSHIPS,
+  SIGMA_CURSOR,
+  MAP_TOOLS,
+} from '../constants/constants.ts';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
@@ -31,9 +38,9 @@ const TestPage = () => {
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
-  const [isNode, setIsNode] = useState(true);
   const child = useRef();
-  const [sigmaCursor, setSigmaCursor] = useState('cursor-default');
+  const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
+  const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -54,17 +61,21 @@ const TestPage = () => {
     }
   }
 
-  function handleIsNode(data) {
-    if (data === true) {
+  function handleToolbarEvent(data) {
+    if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
-      setIsNode(true);
-    } else {
+      setMapToolbar(MAP_TOOLS.node);
+    } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
-      setIsNode(false);
+      setMapToolbar(MAP_TOOLS.edge);
+    } else if (data === MAP_TOOLS.eraser) {
+      setMapToolbar(MAP_TOOLS.eraser);
+    } else {
+      setMapToolbar(MAP_TOOLS.select);
     }
   }
   function handleSubmit() {
-    if (isNode) {
+    if (mapToolbar === MAP_TOOLS.node) {
       const id = uuidv4();
       graph.addNode(id, {
         x: event.x,
@@ -97,38 +108,40 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          setIsModalOpen(true);
+          if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+            setIsModalOpen(true);
+          }
         }, // node events
         clickNode: (event) => {
-          let retrieved = graph.getNodeAttributes(event.node);
-          if (retrieved.entity === NODE_TYPE.PERSON) {
-            child.current.changeView(SIDEBAR_VIEW.person);
-          } else if (retrieved.entity === NODE_TYPE.PLACE) {
-            child.current.changeView(SIDEBAR_VIEW.place);
-          } else if (retrieved.entity === NODE_TYPE.IDEA) {
-            child.current.changeView(SIDEBAR_VIEW.idea);
-          }
-          setNode({
-            selected: new NodeData(
-              retrieved.label,
-              retrieved.years,
-              retrieved.notes,
-              retrieved.entity,
-              event.node
-            ),
-          });
-        },
-        //Current rightClickNode will delete the node. Change in future
-        rightClickNode: (event) => {
-          //event.node contains node id
-          graph.dropNode(event.node);
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.node;
+            graph.dropNode(id);
 
-          //update nodes
-          setNodes(
-            nodes.filter((node) => {
-              return node.id !== event.node;
-            })
-          );
+            //update nodes
+            setNodes(
+              nodes.filter((node) => {
+                return node.id !== id;
+              })
+            );
+          } else {
+            let retrieved = graph.getNodeAttributes(event.node);
+            if (retrieved.entity === NODE_TYPE.PERSON) {
+              child.current.changeView(SIDEBAR_VIEW.person);
+            } else if (retrieved.entity === NODE_TYPE.PLACE) {
+              child.current.changeView(SIDEBAR_VIEW.place);
+            } else if (retrieved.entity === NODE_TYPE.IDEA) {
+              child.current.changeView(SIDEBAR_VIEW.idea);
+            }
+            setNode({
+              selected: new NodeData(
+                retrieved.label,
+                retrieved.years,
+                retrieved.notes,
+                retrieved.entity,
+                event.node
+              ),
+            });
+          }
         },
       });
     }, [registerEvents]);
@@ -302,7 +315,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor} />
+        <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
