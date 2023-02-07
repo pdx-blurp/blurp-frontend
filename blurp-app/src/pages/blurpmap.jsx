@@ -38,12 +38,6 @@ const TestPage = () => {
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
-
-//MERGED FROM Thomasg/bugfixing #92
-  const [isNode, setIsNode] = useState(true);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [sigma, setSigma] = useState(null);
-
   const child = useRef();
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
@@ -73,19 +67,11 @@ const TestPage = () => {
     }
   }
   function handleSubmit() {
-    if (isNode && sigma) {
-
-    //REMOVED AFTER MERGING Thomasg/bugfixing #92
-    //if (mapToolbar === MAP_TOOLS.node) {
-
+    if (mapToolbar === MAP_TOOLS.node) {
       const id = uuidv4();
-      let prev_state = sigma.getCamera().getState();
-      if (graph.size < 4) {
-        prev_state.ratio = 2.0;
-      }
       graph.addNode(id, {
-        x: pos.x,
-        y: pos.y,
+        x: event.x,
+        y: event.y,
         label: name,
         entity: nodeType,
         size: size,
@@ -93,7 +79,6 @@ const TestPage = () => {
         notes: '',
         color: color,
       });
-      sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
       graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
@@ -105,12 +90,7 @@ const TestPage = () => {
 
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
-    const sigma = useSigma();
-    /* 
-      Sigma used here for getting graph coordinates, which allows for us to place nodes
-      where the user clicked. Used this example to get it working:
-      https://sim51.github.io/react-sigma/docs/example/drag_n_drop 
-    */
+    // const sigma = useSigma();
 
     useEffect(() => {
       // Register the events
@@ -120,15 +100,9 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          
-          //MERGED FROM Thomasg/bugfixing #92
-          const grabbed_pos = sigma.viewportToGraph(event);
-          setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-          setIsModalOpen(true);
-          //if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-          //  setIsModalOpen(true);
-          //}
-
+          if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+            setIsModalOpen(true);
+          }
         }, // node events
         clickNode: (event) => {
           if (mapToolbar === MAP_TOOLS.eraser) {
@@ -207,11 +181,10 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <label>Size</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
-                          min={1}
-                          max={20}
+                          min={20}
+                          max={120}
                           aria-label="small"
                           valueLabelDisplay="auto"
                         />
@@ -285,7 +258,6 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <label>Thickness</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={2}
@@ -318,19 +290,11 @@ const TestPage = () => {
           </div>
         )}
       </div>
-      {/* ratio will change in the future, currently it's bigger while we're
-          working to get node placement to work based on the mouse pos*/}
       <SigmaContainer
         id="blurp-map-container"
         className={'flex w-full justify-center ' + sigmaCursor}
         graph={graph}
-        ref={setSigma}
-        settings={{
-          renderEdgeLabels: true,
-          minCameraRatio: 0.6,
-          maxCameraRatio: 2,
-          autoScale: false,
-        }}>
+        settings={{ renderEdgeLabels: true }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
