@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MAP_TOOLS } from '../constants/constants';
+import { MAP_TOOLS, SIGMA_CURSOR } from '../constants/constants';
 import node_image from '../assets/node_image.svg';
 import edge_image from '../assets/edge_image.svg';
 import eraser_icon from '../assets/eraser_icon.svg';
@@ -7,9 +7,7 @@ import select_icon from '../assets/select_icon.svg';
 
 import Tooltip from '@mui/material/Tooltip';
 
-
-function MapToolbar (props) {
-
+function MapToolbar(props) {
   const UNSELECTED_ICON_CLASSNAME = 'graph-toolbar-icon';
   const SELECTED_ICON_CLASSNAME = 'graph-toolbar-icon-selected';
   // Keep track of which tool is currently selected
@@ -27,55 +25,57 @@ function MapToolbar (props) {
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(obj) {
-    props.handleIsNode(true);
-    props.setSigmaCursor('cursor-node');
+    props.handleToolbarEvent(MAP_TOOLS.node);
+    props.setSigmaCursor(SIGMA_CURSOR.NODE);
     clearIconSelection();
     setSelected(MAP_TOOLS.node);
     setNodeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEdgeSelection() {
-    props.handleIsNode(false);
-    props.setSigmaCursor('cursor-edge');
+    props.handleToolbarEvent(MAP_TOOLS.edge);
+    props.setSigmaCursor(SIGMA_CURSOR.EDGE);
     clearIconSelection();
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleSelectSelection() {
+    props.handleToolbarEvent(MAP_TOOLS.select);
     clearIconSelection();
-    props.setSigmaCursor('cursor-default');
+    props.setSigmaCursor(SIGMA_CURSOR.DEFAULT);
     setSelected(MAP_TOOLS.select);
     setSelectClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEraserSelection() {
+    props.handleToolbarEvent(MAP_TOOLS.eraser);
     clearIconSelection();
-    props.setSigmaCursor('cursor-eraser');
+    props.setSigmaCursor(SIGMA_CURSOR.ERASER);
     setSelected(MAP_TOOLS.eraser);
     setEraserClass(SELECTED_ICON_CLASSNAME);
   }
 
   return (
     <>
-      <div className='graph-toolbar'>
-        <Tooltip title='Node tool' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
+      <div className="graph-toolbar">
+        <Tooltip title="Node tool" enterDelay={700} placement="left" arrow>
+          <button className="graph-toolbar-btn" onClick={() => handleNodeSelection()}>
             <img className={nodeClass} src={node_image}></img>
           </button>
         </Tooltip>
-        <Tooltip title='Edge tool' enterDelay={700} placement='left' arrow>
-        <button className='graph-toolbar-btn' onClick={() => handleEdgeSelection()}>
-          <img className={edgeClass} src={edge_image}></img>
-        </button>
+        <Tooltip title="Edge tool" enterDelay={700} placement="left" arrow>
+          <button className="graph-toolbar-btn" onClick={() => handleEdgeSelection()}>
+            <img className={edgeClass} src={edge_image}></img>
+          </button>
         </Tooltip>
-        <div className='absolute mb-0 right-0 bottom-0'>
-          <Tooltip title='Select mode' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
-            <img className={selectClass} src={select_icon}></img>
-          </button>
+        <div className="absolute mb-0 right-0 bottom-0">
+          <Tooltip title="Select mode" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleSelectSelection()}>
+              <img className={selectClass} src={select_icon}></img>
+            </button>
           </Tooltip>
-          <Tooltip title='Eraser' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleEraserSelection()}>
-            <img className={eraserClass} src={eraser_icon}></img>
-          </button>
+          <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleEraserSelection()}>
+              <img className={eraserClass} src={eraser_icon}></img>
+            </button>
           </Tooltip>
         </div>
       </div>
