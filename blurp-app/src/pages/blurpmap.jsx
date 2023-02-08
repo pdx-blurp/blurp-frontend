@@ -12,7 +12,14 @@ import Slider from '@mui/material/Slider';
 import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
-import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import {
+  COLORS,
+  NODE_TYPE,
+  SIDEBAR_VIEW,
+  RELATIONSHIPS,
+  SIGMA_CURSOR,
+  MAP_TOOLS,
+} from '../constants/constants.ts';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
@@ -33,7 +40,8 @@ const TestPage = () => {
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
-  const [isNode, setIsNode] = useState(true);
+  const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
+  const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
@@ -53,6 +61,14 @@ const TestPage = () => {
       graph.setNodeAttribute(id, 'label', name);
       graph.setNodeAttribute(id, 'years', years);
       graph.setNodeAttribute(id, 'notes', notes);
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, label: name };
+          }
+          return node;
+        })
+      );
     } catch {
       console.log('ERROR: failed to retrieve node with that ID');
       console.log('ID used: ' + id);
@@ -72,17 +88,21 @@ const TestPage = () => {
     }
   }
 
-  function handleIsNode(data) {
-    if (data === true) {
+  function handleToolbarEvent(data) {
+    if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
-      setIsNode(true);
-    } else {
+      setMapToolbar(MAP_TOOLS.node);
+    } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
-      setIsNode(false);
+      setMapToolbar(MAP_TOOLS.edge);
+    } else if (data === MAP_TOOLS.eraser) {
+      setMapToolbar(MAP_TOOLS.eraser);
+    } else {
+      setMapToolbar(MAP_TOOLS.select);
     }
   }
   function handleSubmit() {
-    if (isNode && sigma) {
+    if (mapToolbar === MAP_TOOLS.node && sigma) {
       const id = uuidv4();
       let prev_state = sigma.getCamera().getState();
       if (graph.size < 4) {
@@ -119,11 +139,6 @@ const TestPage = () => {
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
     const sigma = useSigma();
-    /* 
-      Sigma used here for getting graph coordinates, which allows for us to place nodes
-      where the user clicked. Used this example to get it working:
-      https://sim51.github.io/react-sigma/docs/example/drag_n_drop 
-    */
 
     useEffect(() => {
       // Register the events
@@ -135,58 +150,70 @@ const TestPage = () => {
           event.preventSigmaDefault();
           const grabbed_pos = sigma.viewportToGraph(event);
           setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-          setIsModalOpen(true);
+          if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+            setIsModalOpen(true);
+          }
         }, // node events
         clickNode: (event) => {
-          // Done to clear data and avoid reopening old selections
-          setNode({ selected: new NodeData('', '', '', '', '') });
-          setEdge({ selected: new EdgeData('', '', '', '', '', '') });
-          let retrieved = graph.getNodeAttributes(event.node);
-          if (retrieved.entity === NODE_TYPE.PERSON) {
-            child.current.changeView(SIDEBAR_VIEW.person);
-          } else if (retrieved.entity === NODE_TYPE.PLACE) {
-            child.current.changeView(SIDEBAR_VIEW.place);
-          } else if (retrieved.entity === NODE_TYPE.IDEA) {
-            child.current.changeView(SIDEBAR_VIEW.idea);
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.node;
+            graph.dropNode(id);
+            //update nodes
+            setNodes(
+              nodes.filter((node) => {
+                return node.id !== id;
+              })
+            );
+          } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            let retrieved = graph.getNodeAttributes(event.node);
+            if (retrieved.entity === NODE_TYPE.PERSON) {
+              child.current.changeView(SIDEBAR_VIEW.person);
+            } else if (retrieved.entity === NODE_TYPE.PLACE) {
+              child.current.changeView(SIDEBAR_VIEW.place);
+            } else if (retrieved.entity === NODE_TYPE.IDEA) {
+              child.current.changeView(SIDEBAR_VIEW.idea);
+            }
+            setNode({
+              selected: new NodeData(
+                retrieved.label,
+                retrieved.years,
+                retrieved.notes,
+                retrieved.entity,
+                event.node
+              ),
+            });
           }
-          setNode({
-            selected: new NodeData(
-              retrieved.label,
-              retrieved.years,
-              retrieved.notes,
-              retrieved.entity,
-              event.node
-            ),
-          });
         },
         clickEdge: (event) => {
-          // Done to clear data and avoid reopening old selections
-          setNode({ selected: new NodeData('', '', '', '', '') });
-          setEdge({ selected: new EdgeData('', '', '', '', '', '') });
-          let retrieved = graph.getEdgeAttributes(event.edge);
-          child.current.changeView(SIDEBAR_VIEW.edge);
-          setEdge({
-            selected: new EdgeData(
-              retrieved.label,
-              retrieved.familiarity,
-              retrieved.stressCode,
-              retrieved.node1,
-              retrieved.node2,
-              event.edge
-            ),
-          });
-        },
-        //Current rightClickNode will delete the node. Change in future
-        rightClickNode: (event) => {
-          //event.node contains node id
-          graph.dropNode(event.node);
-
-          //update nodes
-          setNodes(
-            nodes.filter((node) => {
-              return node.id !== event.node;
-            })
-          );
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.edge;
+            graph.dropEdge(id);
+            //update nodes
+            /* setNodes(
+              nodes.filter((node) => {
+                return node.id !== id;
+              })
+            ); */
+          } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            let retrieved = graph.getEdgeAttributes(event.edge);
+            child.current.changeView(SIDEBAR_VIEW.edge);
+            setEdge({
+              selected: new EdgeData(
+                retrieved.label,
+                retrieved.familiarity,
+                retrieved.stressCode,
+                retrieved.node1,
+                retrieved.node2,
+                event.edge
+              ),
+            });
+          }
         },
       });
     }, [registerEvents]);
@@ -234,7 +261,6 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <label>Size</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={1}
@@ -312,7 +338,6 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <label>Thickness</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={2}
@@ -345,17 +370,15 @@ const TestPage = () => {
           </div>
         )}
       </div>
-      {/* ratio will change in the future, currently it's bigger while we're
-          working to get node placement to work based on the mouse pos*/}
       <SigmaContainer
         id="blurp-map-container"
-        className="flex w-full justify-center"
+        className={'flex w-full justify-center ' + sigmaCursor}
         graph={graph}
         ref={setSigma}
         settings={{
           renderEdgeLabels: true,
           minCameraRatio: 0.6,
-          maxCameraRatio: 2,
+          maxCameraRatio: 2.0,
           autoScale: false,
         }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
@@ -382,7 +405,7 @@ const TestPage = () => {
         <System_Toolbar />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} />
+        <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
