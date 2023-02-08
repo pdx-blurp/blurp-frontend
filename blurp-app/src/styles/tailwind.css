@@ -16,7 +16,11 @@
   }
 
   .btn-navbar {
-    @apply cursor-pointer rounded border-2 border-transparent py-2 px-6 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
+    @apply cursor-pointer rounded border-2 border-transparent py-2 px-6 mx-3 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
+  }
+
+  .sign-in-btn {
+    @apply bg-gray-200 text-black hover:text-white;
   }
 
   .btn-leave {
