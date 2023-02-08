@@ -378,7 +378,7 @@ const TestPage = () => {
         settings={{
           renderEdgeLabels: true,
           minCameraRatio: 0.6,
-          maxCameraRatio: 2.0,
+          maxCameraRatio: 1.2,
           autoScale: false,
         }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
