@@ -54,7 +54,13 @@ function System_Toolbar_State (props) {
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
-        <p>More tools!</p>
+        {/* <p>More tools!</p> */}
+        <button onClick={props.SaveToDB} className="btn-test">
+          Save to Cloud
+        </button>
+        <button onClick={() => console.log('Not implemented')} className="btn-test">
+          Load from Cloud
+        </button>
       </div>
 
       <div className="absolute h-[100%] w-[40px] bg-gray-400">

@@ -50,3 +50,14 @@ export enum RELATIONSHIPS {
   work = 'work',
   situational = 'situational',
 }
+
+/* 
+Decided to use ints here as the data object doc specifies that the stress code is stored in an int
+*/
+export enum STRESS_CODE {
+  VERY_HIGH = 5,
+  HIGH = 4,
+  MEDIUM = 3,
+  LOW = 2,
+  MINIMAL = 1,
+}

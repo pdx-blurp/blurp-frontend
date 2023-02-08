@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
-import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS, STRESS_CODE } from '../constants/constants.ts';
 import Slider from '@mui/material/Slider';
 
 const notes_size = 255;
@@ -32,7 +32,7 @@ const SidebarForm = forwardRef((props, ref) => {
   const [edge, setEdge] = useState({
     relation: RELATIONSHIPS.situational,
     familiarity: 0,
-    stressLevel: 0,
+    stressCode: STRESS_CODE.MINIMAL,
     node1ID: '',
     node2ID: '',
     id: '',
@@ -77,7 +77,7 @@ const SidebarForm = forwardRef((props, ref) => {
     console.log('type: ' + node.type);
     console.log('relation: ' + edge.relation);
     console.log('familiarity: ' + edge.familiarity);
-    console.log('stressLevel: ' + edge.stressLevel);
+    console.log('stressCode: ' + edge.stressCode);
   };
 
   const handleSubmit = (e) => {
@@ -85,7 +85,7 @@ const SidebarForm = forwardRef((props, ref) => {
       props.changeEdgeData(
         edge.relation,
         edge.familiarity.toString(),
-        edge.stressLevel.toString(),
+        edge.stressCode,
         edge.node1ID,
         edge.node2ID,
         edge.id
@@ -108,7 +108,7 @@ const SidebarForm = forwardRef((props, ref) => {
     setEdge({
       relation: RELATIONSHIPS.situational,
       familiarity: '',
-      stressLevel: '',
+      stressCode: STRESS_CODE.MINIMAL,
       node1ID: '',
       node2ID: '',
       id: '',
@@ -136,7 +136,7 @@ const SidebarForm = forwardRef((props, ref) => {
       setEdge({
         relation: selected_edge.category,
         familiarity: Number(selected_edge.familiarity),
-        stressLevel: Number(selected_edge.stressCode),
+        stressCode: selected_edge.stressCode,
         node1ID: selected_edge.node1,
         node2ID: selected_edge.node2,
         id: selected_edge.id,
@@ -326,17 +326,15 @@ const SidebarForm = forwardRef((props, ref) => {
                 className="mx-3"
               />
               <label>Stress Level</label>
-              <Slider
-                sx={{ width: '90%' }}
-                aria-label="Small"
-                name="edge.stressLevel"
-                value={edge.stressLevel}
-                valueLabelDisplay="auto"
-                onChange={handleChange}
-                className="mx-3"
-              />
+              <select name="edge.stressCode" className="bg-slate-50 rounded text-center" value={edge.stressCode} onChange={handleChange}>
+                <option value="STRESS_CODE.MINIMAL">1 - feeling good</option>
+                <option value="STRESS_CODE.LOW">2 - feeling fine</option>
+                <option value="STRESS_CODE.MEDIUM">3 - feeling anxious</option>
+                <option value="STRESS_CODE.HIGH">4 - high stress/discomfort</option>
+                <option value="STRESS_CODE.VERY_HIGH">5 - very high stress</option>
+              </select>
             </div>
-            <div className="m-4 w-11/12 text-lg">
+            <div className="m-2 w-11/12 text-lg">
               <u>{edge.node1ID}</u> is related to <u>{edge.node2ID}</u>
             </div>
             <button type="submit" className="btn-sidebar">

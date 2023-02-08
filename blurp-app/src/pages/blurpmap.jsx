@@ -17,6 +17,7 @@ import {
   NODE_TYPE,
   SIDEBAR_VIEW,
   RELATIONSHIPS,
+  STRESS_CODE,
   SIGMA_CURSOR,
   MAP_TOOLS,
 } from '../constants/constants.ts';
@@ -42,6 +43,7 @@ const TestPage = () => {
   const [node2, setNode2] = useState('');
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
+  const [edgeData, setEdgeData] = useState({familiarity: 0, stressCode: STRESS_CODE.MINIMAL});
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
@@ -106,7 +108,7 @@ const TestPage = () => {
       const id = uuidv4();
       let prev_state = sigma.getCamera().getState();
       if (graph.size < 4) {
-        prev_state.ratio = 2.0;
+        prev_state.ratio = 3.0;
       }
       graph.addNode(id, {
         x: pos.x,
@@ -123,8 +125,8 @@ const TestPage = () => {
     } else {
       graph.addEdgeWithKey(uuidv4(), node1, node2, {
         label: relationship,
-        familiarity: '',
-        stressCode: '',
+        familiarity: edgeData.familiarity,
+        stressCode: edgeData.stressCode, 
         node1: '',
         node2: '',
         size: size,
@@ -290,6 +292,7 @@ const TestPage = () => {
                     <div>
                       <div>
                         <select
+                          className="w-4/5 rounded text-center"
                           value={node1}
                           onChange={(e) => {
                             setNode1(e.target.value);
@@ -308,6 +311,7 @@ const TestPage = () => {
                       <div>
                         <select
                           value={node2}
+                          className="w-4/5 rounded text-center"
                           onChange={(e) => {
                             setNode2(e.target.value);
                           }}>
@@ -327,6 +331,7 @@ const TestPage = () => {
                       <div>
                         <select
                           type="text"
+                          className="w-4/5 rounded text-center"
                           value={relationship}
                           onChange={(e) => setRelationship(e.target.value)}>
                           {Object.entries(RELATIONSHIPS).map(([relationship, value]) => (
@@ -338,13 +343,49 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
+                        <label>Edge Thickness</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={2}
                           max={10}
                           aria-label="small"
                           valueLabelDisplay="auto"
+                          sx={{ width: '75%'}}
+                          className="mx-3"
                         />
+                      </div>
+                      <br />
+                      <div>
+                      <label>Familiarity</label>
+                      <br />
+                      <Slider
+                        sx={{ width: '75%'}}
+                        aria-label="Small"
+                        name="edgeData.familiarity"
+                        value={edgeData.familiarity}
+                        valueLabelDisplay="auto"
+                        onChange={(e) => setEdgeData({...edgeData, familiarity: e.target.value})}
+                        className="mx-3"
+                      />
+                      </div>
+                      <br />
+                      <div>
+                        <label>Stress Level</label>
+                        <br />
+                        <select 
+                          name="edgeData.stressCode" 
+                          value={edgeData.stressCode}
+                          className="rounded text-center"
+                          onChange={(e) => 
+                            setEdgeData({...edgeData, 
+                              stressCode: e.target.value})
+                          }>
+                          <option value="STRESS_CODE.MINIMAL">1 - feeling good</option>
+                          <option value="STRESS_CODE.LOW">2 - feeling fine</option>
+                          <option value="STRESS_CODE.MEDIUM">3 - feeling anxious</option>
+                          <option value="STRESS_CODE.HIGH">4 - high stress/discomfort</option>
+                          <option value="STRESS_CODE.VERY_HIGH">5 - very high stress</option>
+                        </select>
                       </div>
                       <br />
                     </div>
@@ -377,17 +418,11 @@ const TestPage = () => {
         ref={setSigma}
         settings={{
           renderEdgeLabels: true,
-          minCameraRatio: 0.6,
-          maxCameraRatio: 1.2,
+          minCameraRatio: 0.5,
+          maxCameraRatio: 3.0,
           autoScale: false,
         }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
-          <button onClick={SaveToDB} className="btn-test">
-            Save to Cloud
-          </button>
-          <button onClick={() => console.log('Not implemented')} className="btn-test">
-            Load from Cloud
-          </button>
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
@@ -402,7 +437,7 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar />
+        <System_Toolbar SaveToDB={SaveToDB} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />

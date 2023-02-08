@@ -84,11 +84,11 @@
   }
 
   .btn-sidebar {
-    @apply bg-fuchsia-750 m-2 inline-grid h-10 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
+    @apply bg-fuchsia-750 m-2 inline-grid h-8 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
   }
 
   .btn-test {
-    @apply bg-fuchsia-750 m-2 inline-grid h-10 w-2/5 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
+    @apply my-2 w-full inline-grid place-items-center text-xl font-bold text-black hover:text-white hover:bg-neutral-600;
   }
 
   .graph-toolbar {
