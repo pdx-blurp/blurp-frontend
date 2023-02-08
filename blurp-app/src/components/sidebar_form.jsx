@@ -2,6 +2,7 @@ import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import Slider from '@mui/material/Slider';
 
 const notes_size = 255;
 
@@ -18,7 +19,7 @@ const SidebarForm = forwardRef((props, ref) => {
 
   useEffect(() => {
     setData();
-  }, [props.parent_node]);
+  }, [props.parent_node, props.parent_edge]);
   const [view, setView] = useState(SIDEBAR_VIEW.person);
   const [node, setNode] = useState({
     name: '',
@@ -30,10 +31,11 @@ const SidebarForm = forwardRef((props, ref) => {
 
   const [edge, setEdge] = useState({
     relation: RELATIONSHIPS.situational,
-    familiarity: '',
-    stressLevel: '',
+    familiarity: 0,
+    stressLevel: 0,
     node1ID: '',
     node2ID: '',
+    id: '',
   });
   /* 
     Using this to work on pulling info from the forms:
@@ -45,52 +47,26 @@ const SidebarForm = forwardRef((props, ref) => {
   const handleChange = (e) => {
     const target = e.target;
     const value = target.value;
-    const e_name = target.name;
-
+    const e_name = target.name.split('.');
     if (target.type == 'radio') {
-      switch (value) {
-        case 'family':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.familial,
-          });
-          break;
-        case 'friend':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.friendship,
-          });
-          break;
-        case 'acquaint':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.acquaintance,
-          });
-          break;
-        case 'romantic':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.romantic,
-          });
-          break;
-        case 'work':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.work,
-          });
-          break;
-        case 'undefined':
-          setEdge({
-            ...edge,
-            relation: RELATIONSHIPS.situational,
-          });
-          break;
-      }
-    } else {
-      setNode({
-        ...node,
-        [e_name]: value,
+      setEdge({
+        ...edge,
+        relation: value,
       });
+    } else {
+      switch (e_name[0]) {
+        case 'node':
+          setNode({
+            ...node,
+            [e_name[1]]: value,
+          });
+          break;
+        case 'edge':
+          setEdge({
+            ...edge,
+            [e_name[1]]: value,
+          });
+      }
     }
   };
 
@@ -105,7 +81,18 @@ const SidebarForm = forwardRef((props, ref) => {
   };
 
   const handleSubmit = (e) => {
-    props.changeNodeData(node.name, node.years, node.notes, node.id);
+    if (view == SIDEBAR_VIEW.edge) {
+      props.changeEdgeData(
+        edge.relation,
+        edge.familiarity.toString(),
+        edge.stressLevel.toString(),
+        edge.node1ID,
+        edge.node2ID,
+        edge.id
+      );
+    } else {
+      props.changeNodeData(node.name, node.years, node.notes, node.id);
+    }
     e.preventDefault();
   };
 
@@ -124,14 +111,15 @@ const SidebarForm = forwardRef((props, ref) => {
       stressLevel: '',
       node1ID: '',
       node2ID: '',
+      id: '',
     });
   };
 
   const setData = () => {
     const selected_node = props.parent_node.selected;
-    const selected_edge = props.parent_edge;
+    const selected_edge = props.parent_edge.selected;
     clearState();
-    if (selected_node) {
+    if (selected_node.id != '') {
       setNode({
         name: selected_node.name,
         years: selected_node.years,
@@ -144,14 +132,16 @@ const SidebarForm = forwardRef((props, ref) => {
         else if (selected_node.type == 'PLACE') setView(SIDEBAR_VIEW.place);
         else if (selected_node.type == 'IDEA') setView(SIDEBAR_VIEW.idea);
       }
-    } else if (selected_edge) {
+    } else if (selected_edge.id != '') {
       setEdge({
-        category: selected_edge.category,
-        familiarity: selected_edge.familiarity,
-        stressLevel: selected_edge.stressLevel,
-        node1ID: selected_edge.node1ID,
-        node2ID: selected_edge.node2ID,
+        relation: selected_edge.category,
+        familiarity: Number(selected_edge.familiarity),
+        stressLevel: Number(selected_edge.stressCode),
+        node1ID: selected_edge.node1,
+        node2ID: selected_edge.node2,
+        id: selected_edge.id,
       });
+      setView(SIDEBAR_VIEW.edge);
     }
   };
 
@@ -169,7 +159,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Person</h1>
             <input
               type="text"
-              name="name"
+              name="node.name"
               placeholder="Name"
               className="textbox-sidebar"
               value={node.name}
@@ -177,7 +167,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <input
               type="number"
-              name="years"
+              name="node.years"
               placeholder="Age"
               value={node.years}
               onChange={handleChange}
@@ -185,7 +175,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -205,7 +195,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Place</h1>
             <input
               type="text"
-              name="name"
+              name="node.name"
               placeholder="Name"
               value={node.name}
               onChange={handleChange}
@@ -213,7 +203,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -233,7 +223,7 @@ const SidebarForm = forwardRef((props, ref) => {
             <h1 className="m-2 text-center text-xl">Idea</h1>
             <input
               type="name"
-              name="name"
+              name="node.name"
               placeholder="Name"
               value={node.name}
               onChange={handleChange}
@@ -241,7 +231,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <input
               type="number"
-              name="years"
+              name="node.years"
               placeholder="Age/History"
               value={node.years}
               onChange={handleChange}
@@ -249,7 +239,7 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <textarea
               type="text"
-              name="notes"
+              name="node.notes"
               className="textbox-sidebar resize-none"
               rows="10"
               cols="25"
@@ -265,47 +255,89 @@ const SidebarForm = forwardRef((props, ref) => {
         );
       case SIDEBAR_VIEW.edge:
         return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="grid justify-center">
             <h1 className="m-2 text-center text-xl">Edges/Relationships</h1>
-            <div className="m-2 w-11/12" onChange={handleChange}>
+            <fieldset className="m-2 w-11/12" onChange={handleChange} value={edge.relation}>
               <legend>Relationship Type:</legend>
-              <input type="radio" value="family" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.familial}
+                checked={edge.relation === RELATIONSHIPS.familial}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="family">Familial Relationship</label>
               <br />
-              <input type="radio" value="friend" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.friendship}
+                checked={edge.relation === RELATIONSHIPS.friendship}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="friend">Friendships</label>
               <br />
-              <input type="radio" value="acquaint" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.acquaintance}
+                checked={edge.relation === RELATIONSHIPS.acquaintance}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="acquaint">Acquaintances</label>
               <br />
-              <input type="radio" value="romantic" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.romantic}
+                checked={edge.relation === RELATIONSHIPS.romantic}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="romantic">Romantic Relationships</label>
               <br />
-              <input type="radio" value="work" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.work}
+                checked={edge.relation === RELATIONSHIPS.work}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="work">Work Relationships</label>
               <br />
-              <input type="radio" value="undefined" name="relation" />
+              <input
+                type="radio"
+                value={RELATIONSHIPS.situational}
+                checked={edge.relation === RELATIONSHIPS.situational}
+                onChange={handleChange}
+                name="edge.relation"
+              />
               <label htmlFor="undefined">Situational/Undefined Relationships</label>
               <br />
+            </fieldset>
+            <div className="m-2 grid w-11/12">
+              <label>Familiarity</label>
+              <Slider
+                sx={{ width: '90%' }}
+                aria-label="Small"
+                name="edge.familiarity"
+                value={edge.familiarity}
+                valueLabelDisplay="auto"
+                onChange={handleChange}
+                className="mx-3"
+              />
+              <label>Stress Level</label>
+              <Slider
+                sx={{ width: '90%' }}
+                aria-label="Small"
+                name="edge.stressLevel"
+                value={edge.stressLevel}
+                valueLabelDisplay="auto"
+                onChange={handleChange}
+                className="mx-3"
+              />
             </div>
-            <input
-              type="number"
-              name="familiarity"
-              placeholder="Familiarity"
-              value={node.familiarity}
-              onChange={handleChange}
-              className="textbox-sidebar"
-            />
-            <input
-              type="number"
-              name="stressLevel"
-              placeholder="Stress Level"
-              value={node.stressLevel}
-              onChange={handleChange}
-              className="textbox-sidebar"
-            />
             <div className="m-4 w-11/12 text-lg">
-              <u>{node.node1ID}</u> is related to <u>{node.node2ID}</u>
+              <u>{edge.node1ID}</u> is related to <u>{edge.node2ID}</u>
             </div>
             <button type="submit" className="btn-sidebar">
               Save

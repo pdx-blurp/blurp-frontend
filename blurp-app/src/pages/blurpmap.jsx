@@ -9,6 +9,7 @@ import {
 } from '@react-sigma/core';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
+import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -35,12 +36,25 @@ const TestPage = () => {
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
+  const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
-  const child = useRef();
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [sigma, setSigma] = useState(null);
+  const child = useRef();
+
+  function SaveToDB() {
+    console.log(JSON.stringify(graph));
+    axios
+      .get('http://localhost:3000/')
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  }
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -61,6 +75,19 @@ const TestPage = () => {
     }
   }
 
+  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
+    try {
+      graph.setEdgeAttribute(id, 'label', category);
+      graph.setEdgeAttribute(id, 'familiarity', familiarity);
+      graph.setEdgeAttribute(id, 'stressCode', stressCode);
+      graph.setEdgeAttribute(id, 'node1ID', node1ID);
+      graph.setEdgeAttribute(id, 'node2ID', node2ID);
+    } catch {
+      console.log('ERROR: failed to retrieve edge with that ID');
+      console.log('ID used: ' + id);
+    }
+  }
+
   function handleToolbarEvent(data) {
     if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
@@ -75,11 +102,15 @@ const TestPage = () => {
     }
   }
   function handleSubmit() {
-    if (mapToolbar === MAP_TOOLS.node) {
+    if (mapToolbar === MAP_TOOLS.node && sigma) {
       const id = uuidv4();
+      let prev_state = sigma.getCamera().getState();
+      if (graph.size < 4) {
+        prev_state.ratio = 2.0;
+      }
       graph.addNode(id, {
-        x: event.x,
-        y: event.y,
+        x: pos.x,
+        y: pos.y,
         label: name,
         entity: nodeType,
         size: size,
@@ -87,9 +118,18 @@ const TestPage = () => {
         notes: '',
         color: color,
       });
+      sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
+      graph.addEdgeWithKey(uuidv4(), node1, node2, {
+        label: relationship,
+        familiarity: '',
+        stressCode: '',
+        node1: '',
+        node2: '',
+        size: size,
+        color: 'grey',
+      });
     }
 
     //closes modal
@@ -98,7 +138,7 @@ const TestPage = () => {
 
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
-    // const sigma = useSigma();
+    const sigma = useSigma();
 
     useEffect(() => {
       // Register the events
@@ -108,6 +148,8 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
+          const grabbed_pos = sigma.viewportToGraph(event);
+          setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
           if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
             setIsModalOpen(true);
           }
@@ -116,7 +158,6 @@ const TestPage = () => {
           if (mapToolbar === MAP_TOOLS.eraser) {
             const id = event.node;
             graph.dropNode(id);
-
             //update nodes
             setNodes(
               nodes.filter((node) => {
@@ -124,6 +165,9 @@ const TestPage = () => {
               })
             );
           } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
             let retrieved = graph.getNodeAttributes(event.node);
             if (retrieved.entity === NODE_TYPE.PERSON) {
               child.current.changeView(SIDEBAR_VIEW.person);
@@ -139,6 +183,34 @@ const TestPage = () => {
                 retrieved.notes,
                 retrieved.entity,
                 event.node
+              ),
+            });
+          }
+        },
+        clickEdge: (event) => {
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.edge;
+            graph.dropEdge(id);
+            //update nodes
+            /* setNodes(
+              nodes.filter((node) => {
+                return node.id !== id;
+              })
+            ); */
+          } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            let retrieved = graph.getEdgeAttributes(event.edge);
+            child.current.changeView(SIDEBAR_VIEW.edge);
+            setEdge({
+              selected: new EdgeData(
+                retrieved.label,
+                retrieved.familiarity,
+                retrieved.stressCode,
+                retrieved.node1,
+                retrieved.node2,
+                event.edge
               ),
             });
           }
@@ -191,8 +263,8 @@ const TestPage = () => {
                       <div>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
-                          min={20}
-                          max={120}
+                          min={1}
+                          max={20}
                           aria-label="small"
                           valueLabelDisplay="auto"
                         />
@@ -302,14 +374,32 @@ const TestPage = () => {
         id="blurp-map-container"
         className={'flex w-full justify-center ' + sigmaCursor}
         graph={graph}
-        settings={{ renderEdgeLabels: true }}>
+        ref={setSigma}
+        settings={{
+          renderEdgeLabels: true,
+          minCameraRatio: 0.6,
+          maxCameraRatio: 2.0,
+          autoScale: false,
+        }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
+          <button onClick={SaveToDB} className="btn-test">
+            Save to Cloud
+          </button>
+          <button onClick={() => console.log('Not implemented')} className="btn-test">
+            Load from Cloud
+          </button>
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
+        <DataSidebar
+          ref={child}
+          node={node}
+          edge={edge}
+          changeNodeData={changeNodeData}
+          changeEdgeData={changeEdgeData}
+        />
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar />
