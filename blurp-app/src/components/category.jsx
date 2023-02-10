@@ -6,11 +6,13 @@ import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
 const filters = [
   {
     id: 'category',
-    name: 'Category',
+    name: 'Categories',
     options: [
-      { value: 'people', label: 'People', checked: false },
-      { value: 'ideas', label: 'Ideas', checked: false },
-      { value: 'place', label: 'Place', checked: false },
+      { value: 'blue', label: 'Blue Stress Level', checked: false },
+      { value: 'green', label: 'Green Stress Level', checked: false },
+      { value: 'yellow', label: 'Yellow Stress Level', checked: false },
+      { value: 'orange', label: 'Orange Stress Level', checked: false },
+      { value: 'red', label: 'Red Stress Level', checked: false },
     ],
   },
 ];
@@ -88,6 +90,7 @@ function Category() {
                                     defaultChecked={option.checked}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
+
                                   <label
                                     htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
                                     className="ml-3 min-w-0 flex-1 text-gray-500">

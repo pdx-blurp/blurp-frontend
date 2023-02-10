@@ -29,6 +29,7 @@ export enum MAP_TOOLS {
   edge = 'edge',
   select = 'select',
   eraser = 'eraser',
+  category = 'category'
 }
 
 /* 

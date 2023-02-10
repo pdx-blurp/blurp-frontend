@@ -16,13 +16,14 @@ function MapToolbar(props) {
   const [edgeClass, setEdgeClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [selectClass, setSelectClass] = useState(SELECTED_ICON_CLASSNAME);
   const [eraserClass, setEraserClass] = useState(UNSELECTED_ICON_CLASSNAME);
-
+  const [categoryClass, setCategoryClass] = useState(UNSELECTED_ICON_CLASSNAME);
   // Unselects the tool that was currently selected (visually).
   function clearIconSelection() {
     setNodeClass(UNSELECTED_ICON_CLASSNAME);
     setEdgeClass(UNSELECTED_ICON_CLASSNAME);
     setSelectClass(UNSELECTED_ICON_CLASSNAME);
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
+    setCategoryClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(obj) {
     props.handleIsNode(true);
@@ -46,7 +47,11 @@ function MapToolbar(props) {
     setSelected(MAP_TOOLS.eraser);
     setEraserClass(SELECTED_ICON_CLASSNAME);
   }
-
+  function handleCategorySelection() {
+    clearIconSelection();
+    setSelected(MAP_TOOLS.category);
+    setCategoryClass(SELECTED_ICON_CLASSNAME);
+  }
   return (
     <>
       <div className="graph-toolbar">
@@ -71,8 +76,10 @@ function MapToolbar(props) {
               <img className={eraserClass} src={eraser_icon}></img>
             </button>
           </Tooltip>
-          <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
-            <Category />
+          <Tooltip title="Filters" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleCategorySelection()}>
+              <Category />
+            </button>
           </Tooltip>
         </div>
       </div>
