@@ -4,12 +4,10 @@ import node_image from '../assets/node_image.svg';
 import edge_image from '../assets/edge_image.svg';
 import eraser_icon from '../assets/eraser_icon.svg';
 import select_icon from '../assets/select_icon.svg';
-
+import Category from './category';
 import Tooltip from '@mui/material/Tooltip';
 
-
-function MapToolbar (props) {
-
+function MapToolbar(props) {
   const UNSELECTED_ICON_CLASSNAME = 'graph-toolbar-icon';
   const SELECTED_ICON_CLASSNAME = 'graph-toolbar-icon-selected';
   // Keep track of which tool is currently selected
@@ -51,27 +49,30 @@ function MapToolbar (props) {
 
   return (
     <>
-      <div className='graph-toolbar'>
-        <Tooltip title='Node tool' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
+      <div className="graph-toolbar">
+        <Tooltip title="Node tool" enterDelay={700} placement="left" arrow>
+          <button className="graph-toolbar-btn" onClick={() => handleNodeSelection()}>
             <img className={nodeClass} src={node_image}></img>
           </button>
         </Tooltip>
-        <Tooltip title='Edge tool' enterDelay={700} placement='left' arrow>
-        <button className='graph-toolbar-btn' onClick={() => handleEdgeSelection()}>
-          <img className={edgeClass} src={edge_image}></img>
-        </button>
+        <Tooltip title="Edge tool" enterDelay={700} placement="left" arrow>
+          <button className="graph-toolbar-btn" onClick={() => handleEdgeSelection()}>
+            <img className={edgeClass} src={edge_image}></img>
+          </button>
         </Tooltip>
-        <div className='absolute mb-0 right-0 bottom-0'>
-          <Tooltip title='Select mode' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
-            <img className={selectClass} src={select_icon}></img>
-          </button>
+        <div className="absolute right-0 bottom-0 mb-0">
+          <Tooltip title="Select mode" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleSelectSelection()}>
+              <img className={selectClass} src={select_icon}></img>
+            </button>
           </Tooltip>
-          <Tooltip title='Eraser' enterDelay={700} placement='left' arrow>
-          <button className='graph-toolbar-btn' onClick={() => handleEraserSelection()}>
-            <img className={eraserClass} src={eraser_icon}></img>
-          </button>
+          <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleEraserSelection()}>
+              <img className={eraserClass} src={eraser_icon}></img>
+            </button>
+          </Tooltip>
+          <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
+            <Category />
           </Tooltip>
         </div>
       </div>

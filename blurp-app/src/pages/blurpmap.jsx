@@ -17,7 +17,7 @@ import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
-
+import Category from '../components/category';
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
   const [nodeType, setNodeType] = useState('PERSON');
@@ -295,6 +295,9 @@ const TestPage = () => {
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleIsNode={handleIsNode} />
       </div>
+
+      <div className="absolute inset-y-0 top-0 right-0"></div>
+
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
       </div>

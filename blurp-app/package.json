@@ -11,6 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@headlessui/react": "^1.7.10",
+    "@heroicons/react": "^2.0.14",
     "@mui/material": "^5.11.7",
     "@react-sigma/core": "^3.1.0",
     "@splinetool/react-spline": "^2.2.5",
