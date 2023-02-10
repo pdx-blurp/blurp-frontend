@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { React, useEffect, useState, useRef } from 'react';
 import { MultiGraph } from 'graphology';
 import {
   SigmaContainer,
@@ -48,15 +48,22 @@ const TestPage = () => {
   const [sigma, setSigma] = useState(null);
   const child = useRef();
 
-  function SaveToDB() {
-    console.log(JSON.stringify(graph));
-    axios
-      .get('http://localhost:3000/')
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => console.log(error));
-  }
+  const DBref = useRef({
+    SaveToDB() {
+      console.log(JSON.stringify(graph));
+      axios
+        .get('http://localhost:3000/')
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => console.log(
+          "ERROR: " + error.message + "\n" +
+          "Failed to communicate with database\n" +
+          "error name: " + error.name +
+          "request name: " + error.request
+        ));
+    }
+  });
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -437,7 +444,7 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar SaveToDB={SaveToDB} />
+        <System_Toolbar ref={DBref} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
