@@ -3,6 +3,7 @@ import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import guestPic from '../assets/guest_profile_pic.svg';
 import x_button from '../assets/x_button.svg';
 import axios from 'axios';
+import Cookies from 'universal-cookie';
 
 function GoogleLoginButton (props) {
 
@@ -10,10 +11,24 @@ function GoogleLoginButton (props) {
   const [renderedContent, setRenderedContent] = useState(signInButton());
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const cookies = new Cookies();
+
+  // Load cookies
+  if(!user && cookies.get('googleLoginUser')){
+    setUser(cookies.get('googleLoginUser'));
+  }
+
+  // Update cookies when user/profile change
+  useEffect(() => {
+    if(user && user != 'null')
+      cookies.set('googleLoginUser', user, {path: '/'});
+    else
+      cookies.remove('googleLoginUser');
+  }, [user, profile]);
 
   // If the user changes, update the profile
   useEffect(() => {
-    if(user) {
+    if(user && user != 'null') {
       axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
         headers: {
           Authorization: `Basic ${user.access_token}`,
@@ -28,31 +43,31 @@ function GoogleLoginButton (props) {
     }
   }, [user]);
 
-  // If the profile changes (logged in, logged out, image change, etc)
+  // If the profile changes (logged in, logged out, image change, etc),
+  // then we should change what is rendered
   useEffect(() => {
-    if(profile)
+    if(profile && profile != 'null')
       setRenderedContent(userProfile(false));
     else
       setRenderedContent(signInButton);
   }, [profile]);
-
 
   function onLoginSuccess(googleUser) {
     setUser(googleUser);
   }
   
   const onLoginFailure = (error) => {
-    alert("Google sign-in failed.");
+    console.log("Google sign-in failed.");
   }
 
-  function onLogoutSuccess() {
-    setRenderedContent(signInButton());
-  }
-
+  // Close the popout that appears when user clicks on
+  // their profile picture
   function closePopout () {
     setRenderedContent(userProfile(false));
   }
 
+  // Expand the popout that appears when user clicks on
+  // their profile picture
   function expandPopout () {
     setRenderedContent(userProfile(true));
   }
@@ -62,10 +77,12 @@ function GoogleLoginButton (props) {
     onError: error => onLoginFailure(error)
   });
 
-
+  // When the user clicks logout
   function logout () {
     googleLogout();
     setUser(null);
+    setProfile(null);
+    cookies.remove('googleLoginUser');
   }
   
   function signInButton () {
@@ -102,7 +119,7 @@ function GoogleLoginButton (props) {
       </>
     );
   }
-    
+  
   return (
     <>
       {renderedContent}
