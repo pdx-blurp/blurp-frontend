@@ -1,9 +1,9 @@
 import cogwheel_icon from "../assets/cogwheel.svg";
 import ellipses_icon from "../assets/ellipses.svg";
 import export_icon from "../assets/export_icon.svg";
-import React, {useState, useEffect, useRef} from "react";
+import React, {useState, useEffect, useRef, forwardRef} from "react";
 
-function System_Toolbar_State (props) {
+const System_Toolbar_State = forwardRef((props, ref) => {
 
   // Set the className based on whether the toolbar is expanded
   let system_toolbar_className;
@@ -54,7 +54,13 @@ function System_Toolbar_State (props) {
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
-        <p>More tools!</p>
+        {/* <p>More tools!</p> */}
+        <button onClick={ref.current.SaveToDB} className="btn-test">
+          Save to Cloud
+        </button>
+        <button onClick={() => console.log('Not implemented')} className="btn-test">
+          Load from Cloud
+        </button>
       </div>
 
       <div className="absolute h-[100%] w-[40px] bg-gray-400">
@@ -71,9 +77,9 @@ function System_Toolbar_State (props) {
       </div>
     </>
   )
-}
+});
 
-function System_Toolbar() {
+const System_Toolbar = forwardRef((props, ref) => {
 
   const [expanded, setExpanded] = useState(false);
   // Function to collapse if expanded, expand if collapsed:
@@ -90,10 +96,10 @@ function System_Toolbar() {
 
   return (
     <>
-    <System_Toolbar_State expanded={expanded}
+    <System_Toolbar_State ref={ref} expanded={expanded}
       toggle_toolbar={switchToolbar} onClickOutside={collapseToolbar} show/>
     </>
   )
-}
+})
 
 export default System_Toolbar;
