@@ -30,7 +30,7 @@ import ConfirmDeleteForm from '../components/confirm_delete_form';
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
   const [nodeType, setNodeType] = useState('PERSON');
-  const [color, setColor] = useState('#FF0000');
+  const [color, setColor] = useState(COLORS.BROWN);
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +43,7 @@ const TestPage = () => {
   const [node2, setNode2] = useState('');
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
-  const [edgeData, setEdgeData] = useState({familiarity: 0, stressCode: STRESS_CODE.MINIMAL});
+  const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
@@ -56,13 +56,19 @@ const TestPage = () => {
         .then((response) => {
           console.log(response);
         })
-        .catch((error) => console.log(
-          "ERROR: " + error.message + "\n" +
-          "Failed to communicate with database\n" +
-          "error name: " + error.name +
-          "request name: " + error.request
-        ));
-    }
+        .catch((error) =>
+          console.log(
+            'ERROR: ' +
+              error.message +
+              '\n' +
+              'Failed to communicate with database\n' +
+              'error name: ' +
+              error.name +
+              'request name: ' +
+              error.request
+          )
+        );
+    },
   });
 
   function changeNodeData(name, years, notes, id) {
@@ -91,6 +97,7 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'stressCode', stressCode);
       graph.setEdgeAttribute(id, 'node1ID', node1ID);
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
+      graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
     } catch {
       console.log('ERROR: failed to retrieve edge with that ID');
       console.log('ID used: ' + id);
@@ -110,6 +117,15 @@ const TestPage = () => {
       setMapToolbar(MAP_TOOLS.select);
     }
   }
+
+  const edgeColor = (stressCode) => {
+    if (stressCode == 1) return COLORS.BLUE;
+    else if (stressCode == 2) return COLORS.GREEN;
+    else if (stressCode == 3) return COLORS.YELLOW;
+    else if (stressCode == 4) return COLORS.ORANGE;
+    else return COLORS.RED;
+  };
+
   function handleSubmit() {
     if (mapToolbar === MAP_TOOLS.node && sigma) {
       const id = uuidv4();
@@ -117,6 +133,7 @@ const TestPage = () => {
       if (graph.size < 4) {
         prev_state.ratio = 3.0;
       }
+      console.log(color);
       graph.addNode(id, {
         x: pos.x,
         y: pos.y,
@@ -133,11 +150,11 @@ const TestPage = () => {
       graph.addEdgeWithKey(uuidv4(), node1, node2, {
         label: relationship,
         familiarity: edgeData.familiarity,
-        stressCode: edgeData.stressCode, 
+        stressCode: edgeData.stressCode,
         node1: '',
         node2: '',
         size: size,
-        color: 'grey',
+        color: edgeColor(edgeData.stressCode),
       });
     }
 
@@ -200,12 +217,6 @@ const TestPage = () => {
           if (mapToolbar === MAP_TOOLS.eraser) {
             const id = event.edge;
             graph.dropEdge(id);
-            //update nodes
-            /* setNodes(
-              nodes.filter((node) => {
-                return node.id !== id;
-              })
-            ); */
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -257,23 +268,11 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <select
-                          type="text"
-                          value={color}
-                          onChange={(e) => setColor(e.target.value)}>
-                          {Object.entries(COLORS).map(([color, value]) => (
-                            <option key={color} value={value}>
-                              {color}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
+                        <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value)}
+                          onChange={(e) => setSize(e.target.value * 3)}
                           min={1}
-                          max={20}
+                          max={10}
                           aria-label="small"
                           valueLabelDisplay="auto"
                         />
@@ -283,7 +282,21 @@ const TestPage = () => {
                         <select
                           type="text"
                           value={nodeType}
-                          onChange={(e) => setNodeType(e.target.value)}>
+                          className="rounded text-center"
+                          onChange={(e) => {
+                            setNodeType(e.target.value);
+                            switch (e.target.value) {
+                              case NODE_TYPE.PERSON:
+                                setColor(COLORS.BROWN);
+                                break;
+                              case NODE_TYPE.PLACE:
+                                setColor(COLORS.GREY);
+                                break;
+                              case NODE_TYPE.IDEA:
+                                setColor(COLORS.OLIVE);
+                                break;
+                            }
+                          }}>
                           {Object.entries(NODE_TYPE).map(([key, value]) => (
                             <option key={key} value={value}>
                               {key}
@@ -357,41 +370,42 @@ const TestPage = () => {
                           max={10}
                           aria-label="small"
                           valueLabelDisplay="auto"
-                          sx={{ width: '75%'}}
+                          sx={{ width: '75%' }}
                           className="mx-3"
                         />
                       </div>
                       <br />
                       <div>
-                      <label>Familiarity</label>
-                      <br />
-                      <Slider
-                        sx={{ width: '75%'}}
-                        aria-label="Small"
-                        name="edgeData.familiarity"
-                        value={edgeData.familiarity}
-                        valueLabelDisplay="auto"
-                        onChange={(e) => setEdgeData({...edgeData, familiarity: e.target.value})}
-                        className="mx-3"
-                      />
+                        <label>Familiarity</label>
+                        <br />
+                        <Slider
+                          sx={{ width: '75%' }}
+                          aria-label="Small"
+                          name="edgeData.familiarity"
+                          value={edgeData.familiarity}
+                          valueLabelDisplay="auto"
+                          onChange={(e) =>
+                            setEdgeData({ ...edgeData, familiarity: e.target.value })
+                          }
+                          className="mx-3"
+                        />
                       </div>
                       <br />
                       <div>
                         <label>Stress Level</label>
                         <br />
-                        <select 
-                          name="edgeData.stressCode" 
+                        <select
+                          name="edgeData.stressCode"
                           value={edgeData.stressCode}
                           className="rounded text-center"
-                          onChange={(e) => 
-                            setEdgeData({...edgeData, 
-                              stressCode: e.target.value})
+                          onChange={(e) =>
+                            setEdgeData({ ...edgeData, stressCode: e.target.value })
                           }>
-                          <option value="STRESS_CODE.MINIMAL">1 - feeling good</option>
-                          <option value="STRESS_CODE.LOW">2 - feeling fine</option>
-                          <option value="STRESS_CODE.MEDIUM">3 - feeling anxious</option>
-                          <option value="STRESS_CODE.HIGH">4 - high stress/discomfort</option>
-                          <option value="STRESS_CODE.VERY_HIGH">5 - very high stress</option>
+                          <option value="1">1 - feeling good</option>
+                          <option value="2">2 - feeling fine</option>
+                          <option value="3">3 - feeling anxious</option>
+                          <option value="4">4 - high stress/discomfort</option>
+                          <option value="5">5 - very high stress</option>
                         </select>
                       </div>
                       <br />

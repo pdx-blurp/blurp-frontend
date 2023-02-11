@@ -32,7 +32,7 @@ const SidebarForm = forwardRef((props, ref) => {
   const [edge, setEdge] = useState({
     relation: RELATIONSHIPS.situational,
     familiarity: 0,
-    stressCode: STRESS_CODE.MINIMAL,
+    stressCode: 1,
     node1ID: '',
     node2ID: '',
     id: '',
@@ -326,12 +326,16 @@ const SidebarForm = forwardRef((props, ref) => {
                 className="mx-3"
               />
               <label>Stress Level</label>
-              <select name="edge.stressCode" className="bg-slate-50 rounded text-center" value={edge.stressCode} onChange={handleChange}>
-                <option value="STRESS_CODE.MINIMAL">1 - feeling good</option>
-                <option value="STRESS_CODE.LOW">2 - feeling fine</option>
-                <option value="STRESS_CODE.MEDIUM">3 - feeling anxious</option>
-                <option value="STRESS_CODE.HIGH">4 - high stress/discomfort</option>
-                <option value="STRESS_CODE.VERY_HIGH">5 - very high stress</option>
+              <select
+                name="edge.stressCode"
+                className="rounded bg-slate-50 text-center"
+                value={edge.stressCode}
+                onChange={handleChange}>
+                <option value="1">1 - feeling good</option>
+                <option value="2">2 - feeling fine</option>
+                <option value="3">3 - feeling anxious</option>
+                <option value="4">4 - high stress/discomfort</option>
+                <option value="5">5 - very high stress</option>
               </select>
             </div>
             <div className="m-2 w-11/12 text-lg">

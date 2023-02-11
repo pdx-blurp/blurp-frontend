@@ -1,7 +1,14 @@
 export enum COLORS {
-  RED = '#FF0000',
-  BLUE = '#0000FF',
-  GREEN = '#00FF00',
+  // node colors
+  BROWN = '#836953',
+  GREY = '#848482',
+  OLIVE = '#665D1E',
+  // stress level colors
+  RED = '#C41E3A',
+  ORANGE = '#FF6700',
+  YELLOW = '#FFCC00',
+  GREEN = '#008000',
+  BLUE = '#446CCF',
 }
 
 export enum NODE_TYPE {
