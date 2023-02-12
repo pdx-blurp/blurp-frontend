@@ -63,7 +63,7 @@ function GoogleLoginButton (props) {
     const handleClickOutside = (event) => {
       if(expanded_div_ref.current && !expanded_div_ref.current.contains(event.target) &&
         profile_pic_ref.current && !profile_pic_ref.current.contains(event.target)) {
-        closePopout && closePopout();
+        closePopout();
       }
     };
     document.addEventListener('mousedown', handleClickOutside, true);
