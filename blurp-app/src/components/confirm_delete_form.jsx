@@ -28,7 +28,7 @@ function ConfirmDeleteForm (props) {
     // Collapse toolbar if the click was outside the toolbar or (...) button.
     const handleClickOutside = (event) => {
       if(form_ref.current && !form_ref.current.contains(event.target)) {
-        hideForm && hideForm();
+        hideForm();
       }
     };
     document.addEventListener("mousedown", handleClickOutside, true);
