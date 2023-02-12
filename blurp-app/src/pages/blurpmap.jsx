@@ -147,15 +147,30 @@ const TestPage = () => {
       sigma.getCamera().setState(prev_state);
       setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, {
-        label: relationship,
-        familiarity: edgeData.familiarity,
-        stressCode: edgeData.stressCode,
-        node1: '',
-        node2: '',
-        size: size,
-        color: edgeColor(edgeData.stressCode),
-      });
+      const edgeExists = () => {
+        console.log(graph.edges(node1));
+        for (const x of graph.edges(node1, node2)) {
+          if (x) {
+            console.log('found edge!');
+            console.log(x);
+            return true;
+          }
+        }
+        return false;
+      };
+      if (!edgeExists()) {
+        graph.addEdgeWithKey(uuidv4(), node1, node2, {
+          label: relationship,
+          familiarity: edgeData.familiarity,
+          stressCode: edgeData.stressCode,
+          node1: '',
+          node2: '',
+          size: size,
+          color: edgeColor(edgeData.stressCode),
+        });
+      } else {
+        alert('ERROR: edge exists between those two nodes');
+      }
     }
 
     //closes modal

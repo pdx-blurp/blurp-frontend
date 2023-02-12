@@ -16,7 +16,7 @@
   }
 
   .btn-navbar {
-    @apply cursor-pointer rounded border-2 border-transparent py-2 px-6 mx-3 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
+    @apply mx-3 cursor-pointer rounded border-2 border-transparent py-2 px-6 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
   }
 
   .sign-in-btn {
@@ -88,7 +88,7 @@
   }
 
   .btn-test {
-    @apply my-2 w-full inline-grid place-items-center text-xl font-bold text-black hover:text-white hover:bg-neutral-600;
+    @apply my-2 inline-grid w-full place-items-center text-xl font-bold text-black hover:bg-neutral-600 hover:text-white;
   }
 
   .graph-toolbar {
@@ -134,6 +134,6 @@
   }
 
   .obj-deleted-msg {
-    @apply pointer-events-none absolute right-[-90px] top-[100px] flex h-[30px] w-[180px] items-center justify-center rounded-lg border border-black bg-[#f4f466] transition transition-all duration-300 ease-in-out;
+    @apply pointer-events-none absolute right-[-90px] top-[100px] flex h-[30px] w-[18px] items-center justify-center rounded-lg border border-black bg-[#f4f466] transition transition-all duration-300 ease-in-out;
   }
 }
