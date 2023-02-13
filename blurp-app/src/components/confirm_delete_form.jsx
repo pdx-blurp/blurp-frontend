@@ -1,41 +1,34 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from 'react';
+import TempMessage from './temp_msg_display';
 
 function ConfirmDeleteForm (props) {
 
   const HIDDEN_FORM_CLASS = 'confirm-delete-form hidden';
   const VISIBLE_FORM_CLASS = 'confirm-delete-form';
-  const HIDDEN_MSG_CLASS = 'obj-deleted-msg opacity-0';
-  const VISIBLE_MSG_CLASS = 'obj-deleted-msg';
+  const tempMsgRef = useRef(null);
 
-  // The confirm delete form is hidden by default. To see it (for testing purposes),
-  // replace HIDDEN_FORM_CLASS with VISIBLE_FORM_CLASS in the line below.
+  // The confirm delete form is hidden by default:
   const [formClass, setFormClass] = useState(HIDDEN_FORM_CLASS);
-  const [objDeletedMsgClass, setObjDeletedMsgClass] = useState(HIDDEN_MSG_CLASS);
   const form_ref = useRef(null);
 
   function hideForm() {
     setFormClass(HIDDEN_FORM_CLASS);
   }
+
   function showForm() {
     setFormClass(VISIBLE_FORM_CLASS);
   }
+
   function delete_clicked() {
     hideForm();
-    show_deleted_message();
-  }
-  function show_deleted_message() {
-    setObjDeletedMsgClass(VISIBLE_MSG_CLASS);
-    setTimeout(hide_deleted_message, 1500);
-  }
-  function hide_deleted_message() {
-    setObjDeletedMsgClass(HIDDEN_MSG_CLASS);
+    tempMsgRef.current.showMessage();
   }
 
   useEffect(() => {
     // Collapse toolbar if the click was outside the toolbar or (...) button.
     const handleClickOutside = (event) => {
       if(form_ref.current && !form_ref.current.contains(event.target)) {
-        hideForm && hideForm();
+        hideForm();
       }
     };
     document.addEventListener("mousedown", handleClickOutside, true);
@@ -59,9 +52,7 @@ function ConfirmDeleteForm (props) {
         </button>
         </div>
       </div>
-      <div className={objDeletedMsgClass}>
-        <p>Object was deleted</p>
-      </div>
+      <TempMessage message='Object was deleted' duration={1500} ref={tempMsgRef}></TempMessage>
     </>
   );
 }
