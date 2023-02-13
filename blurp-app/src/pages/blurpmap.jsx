@@ -132,45 +132,53 @@ const TestPage = () => {
 
   function handleSubmit() {
     if (mapToolbar === MAP_TOOLS.node && sigma) {
-      const id = uuidv4();
-      let prev_state = sigma.getCamera().getState();
-      if (graph.order < 4) {
-        prev_state.ratio = 3.0;
-      }
-      graph.addNode(id, {
-        x: pos.x,
-        y: pos.y,
-        label: name,
-        entity: nodeType,
-        size: size,
-        years: '',
-        notes: '',
-        color: color,
-      });
-      sigma.getCamera().setState(prev_state);
-      setNodes(nodes.concat({ id: id, label: name }));
-    } else {
-      const edgeExists = () => {
-        for (const x of graph.edges(node1, node2)) {
-          if (x) {
-            return true;
-          }
-        }
-        return false;
-      };
-      if (!edgeExists()) {
-        graph.addEdgeWithKey(uuidv4(), node1, node2, {
-          label: relationship,
-          familiarity: edgeData.familiarity,
-          stressCode: edgeData.stressCode,
-          node1: '',
-          node2: '',
-          size: size,
-          color: edgeColor(edgeData.stressCode),
-        });
+      if (name == '') {
+        msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        // setUserNotification('Edge already exists between those nodes');
-        msgRef.current.showMessage('Edge already exists between those nodes');
+        let prev_state = sigma.getCamera().getState();
+        if (graph.order < 4) {
+          prev_state.ratio = 3.0;
+        }
+        const id = uuidv4();
+        graph.addNode(id, {
+          x: pos.x,
+          y: pos.y,
+          label: name,
+          entity: nodeType,
+          size: size,
+          years: '',
+          notes: '',
+          color: color,
+        });
+        sigma.getCamera().setState(prev_state);
+        setNodes(nodes.concat({ id: id, label: name }));
+      }
+    } else {
+      if (node1 == '' || node2 == '') {
+        msgRef.current.showMessage('Need to select two nodes to attach an edge to');
+      } else {
+        const edgeExists = () => {
+          for (const x of graph.edges(node1, node2)) {
+            if (x) {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (!edgeExists()) {
+          graph.addEdgeWithKey(uuidv4(), node1, node2, {
+            label: relationship,
+            familiarity: edgeData.familiarity,
+            stressCode: edgeData.stressCode,
+            node1: '',
+            node2: '',
+            size: size,
+            color: edgeColor(edgeData.stressCode),
+          });
+        } else {
+          // setUserNotification('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between those nodes');
+        }
       }
     }
 
