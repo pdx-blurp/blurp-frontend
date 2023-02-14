@@ -50,31 +50,107 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
-  const [clickTrigger, setClickTrigger] = useState(true);
-  // Used for the message box that pops up and notifys users of errors
-  const [userNotification, setUserNotification] = useState('');
-  const msgRef = useRef();
 
   const DBref = useRef({
     SaveToDB() {
-      console.log(JSON.stringify(graph));
+      graph.forEachNode((current, attr) => {
+        if (current) {
+          console.log(current);
+          axios
+            .post('http://localhost:3000/map/node/create', {
+              userID: userID,
+              mapID: mapID,
+              nodeinfo: {
+                nodeName: attr.label,
+                nodeID: current,
+                color: attr.color,
+                age: attr.years,
+                type: attr.entity.toLowerCase(),
+                description: attr.notes,
+                pos: {
+                  x: attr.x,
+                  y: attr.y,
+                },
+              },
+            })
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      });
+      // The last two here are sourceAttributes and targetAttributes
+      graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
+        if (current) {
+          axios
+            .post('http://localhost:3000/map/relationship/create', {
+              mapID: mapID,
+              relationshipinfo: {
+                relationshipID: current,
+                nodePair: {
+                  nodeOne: source,
+                  nodeTwo: target,
+                },
+                description: 'unused',
+                relationshipType: {
+                  type: attr.label,
+                  familiarity: attr.familiarity,
+                  stressCode: attr.stressCode,
+                },
+              },
+            })
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      });
+    },
+    LoadFromDB() {
       axios
-        .get('http://localhost:3000/')
+        .post('http://localhost:3000/map/get', {
+          mapID: mapID,
+        })
         .then((response) => {
           console.log(response);
+          response.data.forEach((data) => {
+            data.nodes.forEach((node) => {
+              graph.addNode(node.nodeID, {
+                x: node.pos.x,
+                y: node.pos.y,
+                label: node.nodeName,
+                entity: node.type.toUpperCase(),
+                size: 30,
+                years: node.age,
+                notes: node.description,
+                color: node.color,
+              });
+            });
+            data.relationships.forEach((edge) => {
+              graph.addEdgeWithKey(
+                edge.relationshipID,
+                edge.nodePair.nodeOne,
+                edge.nodePair.nodeTwo,
+                {
+                  label: edge.relationshipType.type,
+                  familiarity: edge.relationshipType.familiarity,
+                  stressCode: edge.relationshipType.stressCode,
+                  node1: '',
+                  node2: '',
+                  size: 5,
+                  color: edgeColor(edge.relationshipType.stressCode),
+                }
+              );
+            });
+          });
         })
-        .catch((error) =>
-          console.log(
-            'ERROR: ' +
-              error.message +
-              '\n' +
-              'Failed to communicate with database\n' +
-              'error name: ' +
-              error.name +
-              'request name: ' +
-              error.request
-          )
-        );
+        .catch((error) => {
+          console.log(error);
+        });
     },
   });
 

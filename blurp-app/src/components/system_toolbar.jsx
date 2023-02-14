@@ -1,9 +1,7 @@
-import cogwheel_icon from '../assets/cogwheel.svg';
-import upload_icon from '../assets/temp_upload_icon.png';
-import ellipses_icon from '../assets/ellipses.svg';
-import export_icon from '../assets/export_icon.svg';
-import React, { useState, useEffect, useRef, forwardRef } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import cogwheel_icon from "../assets/cogwheel.svg";
+import ellipses_icon from "../assets/ellipses.svg";
+import export_icon from "../assets/export_icon.svg";
+import React, {useState, useEffect, useRef, forwardRef} from "react";
 
 const System_Toolbar_State = forwardRef((props, ref) => {
   // Set the className based on whether the toolbar is expanded
@@ -46,58 +44,36 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   if (!props.show) return null;
 
   function handleCogwheelClick() {
-    alert('Cogwheel clicked.');
-  }
-
-  function handleImportClick() {
-    props.upload();
+    alert("Cogwheel clicked.");
   }
 
   function handleExportClick() {
-    props.download();
+    alert("Export clicked.");
   }
 
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
         {/* <p>More tools!</p> */}
-        <button onClick={() => alert('Coming soon!')} className="btn-test">
+        <button onClick={ref.current.SaveToDB} className="btn-test">
+          Save to Cloud
+        </button>
+        <button onClick={() => console.log('Not implemented')} className="btn-test">
           Load from Cloud
         </button>
       </div>
-      <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
-        <Tooltip title="More tools" enterDelay={600} placement="right" arrow>
-          <button
-            ref={expanded_div_ref}
-            className="system-toolbar-button"
-            onClick={props.toggle_toolbar}>
-            <img alt="More tools" className="w-[40px]" src={ellipses_icon}></img>
-          </button>
-        </Tooltip>
-        <Tooltip title="Save to file" enterDelay={600} placement="right" arrow>
-          <button className="system-toolbar-button">
-            <img
-              alt="Export map"
-              className="w-[40px]"
-              src={export_icon}
-              onClick={handleExportClick}></img>
-          </button>
-        </Tooltip>
-        <Tooltip title="Load from file" enterDelay={600} placement="right" arrow>
-          <button className="system-toolbar-button" onClick={handleImportClick}>
-            <img alt="Import map" className="w-[40px]" src={upload_icon}></img>
-          </button>
-        </Tooltip>
-        <Tooltip
-          className="absolute left-0 bottom-0"
-          title="Settings"
-          enterDelay={600}
-          placement="right"
-          arrow>
-          <button className="system-toolbar-button" onClick={handleCogwheelClick}>
-            <img alt="Settings" className="w-[40px]" src={cogwheel_icon}></img>
-          </button>
-        </Tooltip>
+
+      <div className="absolute h-[100%] w-[40px] bg-gray-400">
+        <button ref={expanded_div_ref} className="system-toolbar-button"
+          onClick={props.toggle_toolbar}>
+          <img className="w-[40px]" src={ellipses_icon}></img>
+        </button>
+        <button className="system-toolbar-button" onClick={handleCogwheelClick}>
+          <img className="w-[40px]" src={cogwheel_icon}></img>
+        </button>
+        <button className="system-toolbar-button">
+          <img className="w-[40px]" src={export_icon} onClick={handleExportClick}></img>
+        </button>
       </div>
     </>
   );
@@ -119,15 +95,8 @@ const System_Toolbar = forwardRef((props, ref) => {
 
   return (
     <>
-      <System_Toolbar_State
-        ref={ref}
-        download={props.download}
-        upload={props.upload}
-        expanded={expanded}
-        toggle_toolbar={switchToolbar}
-        onClickOutside={collapseToolbar}
-        show
-      />
+    <System_Toolbar_State ref={ref} expanded={expanded}
+      toggle_toolbar={switchToolbar} onClickOutside={collapseToolbar} show/>
     </>
   );
 });
