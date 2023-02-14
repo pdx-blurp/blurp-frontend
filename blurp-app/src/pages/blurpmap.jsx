@@ -26,6 +26,7 @@ import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
+import TempMessage from '../components/temp_msg_display';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -47,6 +48,9 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
+  // Used for the message box that pops up and notifys users of errors
+  const [userNotification, setUserNotification] = useState('');
+  const msgRef = useRef();
 
   const DBref = useRef({
     SaveToDB() {
@@ -128,34 +132,54 @@ const TestPage = () => {
 
   function handleSubmit() {
     if (mapToolbar === MAP_TOOLS.node && sigma) {
-      const id = uuidv4();
-      let prev_state = sigma.getCamera().getState();
-      if (graph.size < 4) {
-        prev_state.ratio = 3.0;
+      if (name == '') {
+        msgRef.current.showMessage('Need to provide name for the node');
+      } else {
+        let prev_state = sigma.getCamera().getState();
+        if (graph.order < 4) {
+          prev_state.ratio = 3.0;
+        }
+        const id = uuidv4();
+        graph.addNode(id, {
+          x: pos.x,
+          y: pos.y,
+          label: name,
+          entity: nodeType,
+          size: size,
+          years: '',
+          notes: '',
+          color: color,
+        });
+        sigma.getCamera().setState(prev_state);
+        setNodes(nodes.concat({ id: id, label: name }));
       }
-      console.log(color);
-      graph.addNode(id, {
-        x: pos.x,
-        y: pos.y,
-        label: name,
-        entity: nodeType,
-        size: size,
-        years: '',
-        notes: '',
-        color: color,
-      });
-      sigma.getCamera().setState(prev_state);
-      setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, {
-        label: relationship,
-        familiarity: edgeData.familiarity,
-        stressCode: edgeData.stressCode,
-        node1: '',
-        node2: '',
-        size: size,
-        color: edgeColor(edgeData.stressCode),
-      });
+      if (node1 == '' || node2 == '') {
+        msgRef.current.showMessage('Need to select two nodes to attach an edge to');
+      } else {
+        const edgeExists = () => {
+          for (const x of graph.edges(node1, node2)) {
+            if (x) {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (!edgeExists()) {
+          graph.addEdgeWithKey(uuidv4(), node1, node2, {
+            label: relationship,
+            familiarity: edgeData.familiarity,
+            stressCode: edgeData.stressCode,
+            node1: '',
+            node2: '',
+            size: size,
+            color: edgeColor(edgeData.stressCode),
+          });
+        } else {
+          // setUserNotification('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between those nodes');
+        }
+      }
     }
 
     //closes modal
@@ -177,7 +201,11 @@ const TestPage = () => {
           const grabbed_pos = sigma.viewportToGraph(event);
           setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
           if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-            setIsModalOpen(true);
+            if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+              msgRef.current.showMessage('Not enough nodes to add edges to');
+            } else {
+              setIsModalOpen(true);
+            }
           }
         }, // node events
         clickNode: (event) => {
@@ -462,6 +490,9 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
+      </div>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+        <TempMessage message={userNotification} ref={msgRef} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
