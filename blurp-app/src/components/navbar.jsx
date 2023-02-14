@@ -1,6 +1,6 @@
 import logo_image from '../assets/blurp_purplebrain.png';
-import profile_pic from '../assets/chubby_yellow_duck.png';
 import { Link } from 'react-router-dom';
+import GoogleLoginButton from './google_signin';
 
 function NavbarProp() {
   return (
@@ -21,9 +21,11 @@ function NavbarProp() {
           <Link to="/contact">
             <li className="btn-navbar">Contact</li>
           </Link>
-          <li className="cursor-pointer">
+          {/* <li className="cursor-pointer">
             <img className="w-9 h-9 rounded-full" src={profile_pic} />
-          </li>
+          </li> */}
+          {/* <li className='btn-navbar sign-in-btn'>Sign In</li> */}
+          <GoogleLoginButton />
         </ul>
         <div className="flex md:hidden flex-1 justify-end">
           <div className="cursor-pointer space-y-2">

@@ -16,7 +16,11 @@
   }
 
   .btn-navbar {
-    @apply cursor-pointer rounded border-2 border-transparent py-2 px-6 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
+    @apply mx-3 cursor-pointer rounded border-2 border-transparent py-2 px-6 text-sm text-white hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25;
+  }
+
+  .sign-in-btn {
+    @apply bg-gray-200 text-black hover:text-white;
   }
 
   .btn-leave {
@@ -68,11 +72,11 @@
   }
 
   .data-sidebar {
-    @apply absolute w-full h-full bg-gray-200 border-2 border-gray-400 border-r-0 rounded-l-xl pointer-events-auto grid justify-items-center duration-100;
+    @apply pointer-events-auto absolute grid h-full w-full justify-items-center rounded-l-xl border-2 border-r-0 border-gray-400 bg-gray-200 duration-100;
   }
 
   .data-sidebar-frame {
-    @apply absolute right-[40px] w-[260px] h-[470px] my-[100px] overflow-hidden pointer-events-none;
+    @apply pointer-events-none absolute right-[40px] my-[100px] h-[470px] w-[260px] overflow-hidden;
   }
 
   .textbox-sidebar {
@@ -80,11 +84,15 @@
   }
 
   .btn-sidebar {
-    @apply bg-fuchsia-750 m-2 inline-grid h-10 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
+    @apply bg-fuchsia-750 m-2 inline-grid h-8 w-11/12 place-items-center rounded-xl text-xl font-bold text-white shadow-md;
+  }
+
+  .btn-test {
+    @apply my-2 inline-grid w-full place-items-center text-xl font-bold text-black hover:bg-neutral-600 hover:text-white;
   }
 
   .graph-toolbar {
-    @apply absolute w-[40px] bg-gray-300 border-[2px] border-gray-400 h-[500px] my-[90px] right-0 rounded-l-lg;
+    @apply absolute right-0 my-[90px] h-[500px] w-[40px] rounded-l-lg border-[2px] border-gray-400 bg-gray-300;
   }
 
   .graph-toolbar-btn {
@@ -92,7 +100,7 @@
   }
 
   .graph-toolbar-icon {
-    @apply w-[30px] h-[30px] rounded hover:bg-gray-400;
+    @apply h-[30px] w-[30px] rounded hover:bg-gray-400;
   }
 
   .graph-toolbar-icon-selected {
@@ -112,20 +120,20 @@
   }
 
   .confirm-delete-form {
-    @apply absolute flex w-[360px] h-[100px] right-[-180px] top-[-50px] rounded-lg bg-gray-200 border border-black border-[2px];
+    @apply absolute right-[-180px] top-[-50px] flex h-[100px] w-[360px] rounded-lg border border-[2px] border-black bg-gray-200;
   }
 
   .confirm-delete-btn {
-    @apply w-[130px] h-[40px] rounded-lg mx-[10px];
+    @apply mx-[10px] h-[40px] w-[130px] rounded-lg;
   }
   .confirm-delete-btn-yes {
-    @apply confirm-delete-btn bg-white text-red-700 hover:bg-red-700 hover:text-white border border-red-700 border-[2px];
+    @apply confirm-delete-btn border border-[2px] border-red-700 bg-white text-red-700 hover:bg-red-700 hover:text-white;
   }
   .confirm-delete-btn-no {
-    @apply confirm-delete-btn bg-white text-black hover:bg-black hover:text-white border border-black border-[2px];
+    @apply confirm-delete-btn border border-[2px] border-black bg-white text-black hover:bg-black hover:text-white;
   }
 
   .obj-deleted-msg {
-    @apply absolute flex w-[180px] h-[30px] right-[-90px] top-[100px] bg-[#f4f466] justify-center items-center border border-black rounded-lg transition transition-all ease-in-out duration-300 pointer-events-none;
+    @apply pointer-events-none absolute right-[-90px] top-[100px] flex h-[40px] w-[200px] items-center justify-center rounded-lg border border-black bg-[#f4f466] text-center transition transition-all duration-300 ease-in-out;
   }
 }
