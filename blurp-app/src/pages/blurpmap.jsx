@@ -48,6 +48,7 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
+  const [clickTrigger, setClickTrigger] = useState(true);
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
   const msgRef = useRef();
@@ -194,17 +195,22 @@ const TestPage = () => {
       // Register the events
       registerEvents({
         // default mouse events
-        doubleClick: (event) => {
+        click: (event) => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          const grabbed_pos = sigma.viewportToGraph(event);
-          setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-          if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-            if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-              msgRef.current.showMessage('Not enough nodes to add edges to');
+          
+          
+          //PR MERGED #106
+          if (clickTrigger === true) {
+            event.preventSigmaDefault();
+            const grabbed_pos = sigma.viewportToGraph(event);
+            setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
+            if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+              if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+                msgRef.current.showMessage('Not enough nodes to add edges to');
             } else {
-              setIsModalOpen(true);
+                setIsModalOpen(true);
             }
           }
         }, // node events
@@ -218,6 +224,8 @@ const TestPage = () => {
                 return node.id !== id;
               })
             );
+            //reenable the click trigger
+            setClickTrigger(true);
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -262,6 +270,13 @@ const TestPage = () => {
               ),
             });
           }
+        },
+        enterNode: (event) => {
+          //once we enter a node, we do not want to trigger the click event. Only the clickNode.
+          setClickTrigger(false);
+        },
+        leaveNode: (event) => {
+          setClickTrigger(true);
         },
       });
     }, [registerEvents]);
