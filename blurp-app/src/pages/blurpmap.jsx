@@ -94,7 +94,63 @@ const TestPage = () => {
       console.log('ID used: ' + id);
     }
   }
+  
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph.toJSON()));
 
+    // Create the download link
+    let downloadElement = document.createElement("a");
+    downloadElement.download = "map.blurp";
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
+   */
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement("input");
+    uploadElement.type = "file";
+    uploadElement.accept = ".blurp";
+    uploadElement.multiple = false; // Only allow one map to be selected
+
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener("change", (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (confirm("Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.")) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
+  }
+  
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
@@ -501,7 +557,7 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar ref={DBref} />
+        <System_Toolbar ref={DBref} download={downloadMapJson} upload={uploadMapJson} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
