@@ -65,19 +65,41 @@ const TestPage = () => {
   }
 
   /**
-   * Triggers an import of the data to replace the existing graph.
-   * @param data The data as a JSON string to import.
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
    */
-  function uploadMapJson(data) {
-	  // Convert to JSON
-	  let jsonDataString = JSON.parse(data);
-	  // TODO: add error when JSON cannot be parsed (invalid file?)
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement("input");
+    uploadElement.type = "file";
+    uploadElement.accept = ".blurp";
+    uploadElement.multiple = false; // Only allow one map to be selected
 
-	  // Replace graph
-	  // TODO: add confirmation that existing graph will be replaced
-      useSigma().setGraph(new sigma({
-		  graph: jsonDataString
-	  }));
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener("change", (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (confirm("Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.")) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
   }
 
   function handleIsNode(data) {
@@ -325,7 +347,7 @@ const TestPage = () => {
         <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar download={downloadMapJson} />
+        <System_Toolbar download={downloadMapJson} upload={uploadMapJson} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleIsNode={handleIsNode} setSigmaCursor={setSigmaCursor}/>
