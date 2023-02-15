@@ -265,8 +265,9 @@ const TestPage = () => {
             if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
               if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
                 msgRef.current.showMessage('Not enough nodes to add edges to');
-            } else {
+              } else {
                 setIsModalOpen(true);
+              }
             }
           }
         }, // node events
