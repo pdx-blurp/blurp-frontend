@@ -251,15 +251,13 @@ const TestPage = () => {
       // Register the events
       registerEvents({
         // default mouse events
-        click: (event) => {
+        doubleClick: (event) => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          
-          
-          //PR MERGED #106
+        },
+        click: (event) => {
           if (clickTrigger === true) {
-            event.preventSigmaDefault();
             const grabbed_pos = sigma.viewportToGraph(event);
             setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
             if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
@@ -270,7 +268,7 @@ const TestPage = () => {
               }
             }
           }
-        }, // node events
+        },
         clickNode: (event) => {
           if (mapToolbar === MAP_TOOLS.eraser) {
             const id = event.node;

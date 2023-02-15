@@ -1,4 +1,5 @@
-import logo_image from '../assets/blurp_purplebrain.png';
+import logo_image from '../assets/blurp_purplebrain_transparent.png';
+import navbar_logo_text from '../assets/blurp_text_white.png'
 import { Link } from 'react-router-dom';
 import GoogleLoginButton from './google_signin';
 
@@ -8,10 +9,8 @@ function NavbarProp() {
       <nav className="flex items-center sticky top-0 z-50 px-4 py-2 bg-gray-900/75 shadow-2xl">
         <Link to="/">
           <div className="cursor-pointer mx-2 flex items-center flex-shrink-0">
-            <img className="mr-4 h-8 w-8" src={logo_image} alt="Home Page" />
-            <div className="font-mono text-xl font-semibold tracking-wider text-white">
-              blurp
-            </div>
+            <img className="mr-2 h-[23px] w-[28px]" src={logo_image} alt="Home Page" />
+            <img className="h-[25px] w-[64px]" src={navbar_logo_text}/>
           </div>
         </Link>
         <ul className="hidden md:flex flex-row flex-1 justify-end items-center gap-8 uppercase text-xs">
