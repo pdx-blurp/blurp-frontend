@@ -26,6 +26,7 @@ import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
+import TempMessage from '../components/temp_msg_display';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -47,6 +48,12 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const child = useRef();
+
+  // Used for the message box that pops up and notifys users of errors
+  const [userNotification, setUserNotification] = useState('');
+  const msgRef = useRef();
+
+  // Temporary db userID/mapID for testing
   const userID = 'bb9e434a-7bb9-493a-80b6-abafd0210de3';
   const mapID = '71328e4f-15b6-4189-99a5-dca424b1fea8';
 
@@ -172,6 +179,67 @@ const TestPage = () => {
     }
   }
 
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
+
+    // Create the download link
+    let downloadElement = document.createElement('a');
+    downloadElement.download = 'map.blurp';
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
+   */
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement('input');
+    uploadElement.type = 'file';
+    uploadElement.accept = '.blurp';
+    uploadElement.multiple = false; // Only allow one map to be selected
+
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener('change', (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (
+          confirm(
+            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
+          )
+        ) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
+  }
+
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
@@ -210,34 +278,54 @@ const TestPage = () => {
 
   function handleSubmit() {
     if (mapToolbar === MAP_TOOLS.node && sigma) {
-      const id = uuidv4();
-      let prev_state = sigma.getCamera().getState();
-      if (graph.size < 4) {
-        prev_state.ratio = 3.0;
+      if (name == '') {
+        msgRef.current.showMessage('Need to provide name for the node');
+      } else {
+        let prev_state = sigma.getCamera().getState();
+        if (graph.order < 4) {
+          prev_state.ratio = 3.0;
+        }
+        const id = uuidv4();
+        graph.addNode(id, {
+          x: pos.x,
+          y: pos.y,
+          label: name,
+          entity: nodeType,
+          size: size,
+          years: '',
+          notes: '',
+          color: color,
+        });
+        sigma.getCamera().setState(prev_state);
+        setNodes(nodes.concat({ id: id, label: name }));
       }
-      console.log(color);
-      graph.addNode(id, {
-        x: pos.x,
-        y: pos.y,
-        label: name,
-        entity: nodeType,
-        size: size,
-        years: '',
-        notes: '',
-        color: color,
-      });
-      sigma.getCamera().setState(prev_state);
-      setNodes(nodes.concat({ id: id, label: name }));
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, {
-        label: relationship,
-        familiarity: edgeData.familiarity,
-        stressCode: edgeData.stressCode,
-        node1: '',
-        node2: '',
-        size: size,
-        color: edgeColor(edgeData.stressCode),
-      });
+      if (node1 == '' || node2 == '') {
+        msgRef.current.showMessage('Need to select two nodes to attach an edge to');
+      } else {
+        const edgeExists = () => {
+          for (const x of graph.edges(node1, node2)) {
+            if (x) {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (!edgeExists()) {
+          graph.addEdgeWithKey(uuidv4(), node1, node2, {
+            label: relationship,
+            familiarity: edgeData.familiarity,
+            stressCode: edgeData.stressCode,
+            node1: '',
+            node2: '',
+            size: size,
+            color: edgeColor(edgeData.stressCode),
+          });
+        } else {
+          // setUserNotification('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between those nodes');
+        }
+      }
     }
 
     //closes modal
@@ -252,14 +340,23 @@ const TestPage = () => {
       // Register the events
       registerEvents({
         // default mouse events
-        doubleClick: (event) => {
+        click: (event) => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          const grabbed_pos = sigma.viewportToGraph(event);
-          setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-          if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-            setIsModalOpen(true);
+
+          //PR MERGED #106
+          if (clickTrigger === true) {
+            event.preventSigmaDefault();
+            const grabbed_pos = sigma.viewportToGraph(event);
+            setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
+            if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+              if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+                msgRef.current.showMessage('Not enough nodes to add edges to');
+              } else {
+                setIsModalOpen(true);
+              }
+            }
           }
         }, // node events
         clickNode: (event) => {
@@ -272,6 +369,8 @@ const TestPage = () => {
                 return node.id !== id;
               })
             );
+            //reenable the click trigger
+            setClickTrigger(true);
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -316,6 +415,13 @@ const TestPage = () => {
               ),
             });
           }
+        },
+        enterNode: (event) => {
+          //once we enter a node, we do not want to trigger the click event. Only the clickNode.
+          setClickTrigger(false);
+        },
+        leaveNode: (event) => {
+          setClickTrigger(true);
         },
       });
     }, [registerEvents]);
@@ -540,10 +646,13 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar ref={DBref} />
+        <System_Toolbar ref={DBref} download={downloadMapJson} upload={uploadMapJson} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
+      </div>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+        <TempMessage message={userNotification} ref={msgRef} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />

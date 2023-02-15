@@ -47,8 +47,12 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     alert('Cogwheel clicked.');
   }
 
+  function handleImportClick() {
+    props.upload();
+  }
+
   function handleExportClick() {
-    alert('Export clicked.');
+    props.download();
   }
 
   return (
@@ -68,13 +72,20 @@ const System_Toolbar_State = forwardRef((props, ref) => {
           ref={expanded_div_ref}
           className="system-toolbar-button"
           onClick={props.toggle_toolbar}>
-          <img className="w-[40px]" src={ellipses_icon}></img>
+          <img alt="More tools" className="w-[40px]" src={ellipses_icon}></img>
         </button>
         <button className="system-toolbar-button" onClick={handleCogwheelClick}>
-          <img className="w-[40px]" src={cogwheel_icon}></img>
+          <img alt="Settings" className="w-[40px]" src={cogwheel_icon}></img>
         </button>
         <button className="system-toolbar-button">
-          <img className="w-[40px]" src={export_icon} onClick={handleExportClick}></img>
+          <img
+            alt="Export map"
+            className="w-[40px]"
+            src={export_icon}
+            onClick={handleExportClick}></img>
+        </button>
+        <button className="system-toolbar-button" onClick={handleImportClick}>
+          <img alt="Import map" className="w-[40px]" src={cogwheel_icon}></img>
         </button>
       </div>
     </>
@@ -99,6 +110,8 @@ const System_Toolbar = forwardRef((props, ref) => {
     <>
       <System_Toolbar_State
         ref={ref}
+        download={props.download}
+        upload={props.upload}
         expanded={expanded}
         toggle_toolbar={switchToolbar}
         onClickOutside={collapseToolbar}
