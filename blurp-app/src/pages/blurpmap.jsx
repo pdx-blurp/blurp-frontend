@@ -47,6 +47,7 @@ const TestPage = () => {
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
+  const [clickTrigger, setClickTrigger] = useState(true);
   const child = useRef();
 
   // Used for the message box that pops up and notifys users of errors
@@ -87,7 +88,6 @@ const TestPage = () => {
             });
         }
       });
-      // The last two here are sourceAttributes and targetAttributes
       graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
         if (current) {
           axios
@@ -157,27 +157,12 @@ const TestPage = () => {
         .catch((error) => {
           console.log(error);
         });
+      // should be done better, I don't like doing it this way
+      let camState = sigma.getCamera().getState();
+      camState.ratio = 3.0;
+      sigma.getCamera.setState(camState);
     },
   });
-
-  function changeNodeData(name, years, notes, id) {
-    try {
-      graph.setNodeAttribute(id, 'label', name);
-      graph.setNodeAttribute(id, 'years', years);
-      graph.setNodeAttribute(id, 'notes', notes);
-      setNodes((prevNodes) =>
-        prevNodes.map((node) => {
-          if (node.id === id) {
-            return { ...node, label: name };
-          }
-          return node;
-        })
-      );
-    } catch {
-      console.log('ERROR: failed to retrieve node with that ID');
-      console.log('ID used: ' + id);
-    }
-  }
 
   /**
    * Triggers the user to download the map JSON as "map.blurp".
@@ -240,6 +225,42 @@ const TestPage = () => {
     document.body.removeChild(uploadElement);
   }
 
+  function changeNodeData(name, years, notes, id) {
+    try {
+      graph.setNodeAttribute(id, 'label', name);
+      graph.setNodeAttribute(id, 'years', years);
+      graph.setNodeAttribute(id, 'notes', notes);
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, label: name };
+          }
+          return node;
+        })
+      );
+
+      const node = graph.getNodeAttributes(id);
+      axios.patch('http://localhost:3000/map/node/update', {
+        nodeID: id,
+        mapID: mapID,
+        nodeinfo: {
+          nodeName: node.name,
+          color: node.color,
+          age: node.years,
+          type: node.type.toLowerCase(),
+          description: node.notes,
+          pos: {
+            x: node.x,
+            y: node.y,
+          },
+        },
+      }); // come back to this, need to work out error handling
+    } catch {
+      console.log('ERROR: failed to retrieve node with that ID');
+      console.log('ID used: ' + id);
+    }
+  }
+
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
@@ -248,6 +269,24 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node1ID', node1ID);
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
+
+      const edge = graph.getEdgeAttributes(id);
+      axios.patch('https://localhost:3000/map/relationship/update', {
+        relationshipID: id,
+        mapID: mapID,
+        relationshipinfo: {
+          nodePair: {
+            nodeOne: graph.source(edge),
+            nodeTwo: graph.target(edge),
+          },
+          description: 'unused',
+          relationshipType: {
+            type: edge.label,
+            familiarity: edge.familiarity,
+            stressCode: edge.stressCode,
+          },
+        },
+      }); // come back to this
     } catch {
       console.log('ERROR: failed to retrieve edge with that ID');
       console.log('ID used: ' + id);
@@ -369,6 +408,31 @@ const TestPage = () => {
                 return node.id !== id;
               })
             );
+            // loop through the edges and delete each one connecting
+            // to the deleted node
+            // could rewrite this to filter based on source and target by
+            // using the filterEdges iterator
+            graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
+              if (source == id || target == id) {
+                axios
+                  .delete('http://localhost:3000/map/relationship/delete', {
+                    data: {
+                      mapID: mapID,
+                      relationshipID: current,
+                    },
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }
+            });
+            axios.delete('http://localhost:3000/map/node/delete', {
+              data: {
+                mapID: mapID,
+                nodeID: id,
+              },
+            });
+
             //reenable the click trigger
             setClickTrigger(true);
           } else {
@@ -398,6 +462,17 @@ const TestPage = () => {
           if (mapToolbar === MAP_TOOLS.eraser) {
             const id = event.edge;
             graph.dropEdge(id);
+
+            axios
+              .delete('http://loclahost:3000/map/relationship/delete', {
+                data: {
+                  mapID: mapID,
+                  relationshipID: id,
+                },
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
