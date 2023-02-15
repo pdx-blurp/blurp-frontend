@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import BrandName from '../assets/blurp_noslogan_dark.png';
+import BrandName from '../assets/blurp_full_logo_white.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
@@ -12,8 +12,8 @@ const Home = () => {
         <div className="relative grid justify-center grid-cols-1 mx-20 px-6/12 py-10 text-neutral-75 lg:w-5/6 order-last xl:order-first">
           <div className="my-5">
             <div className="grid justify-center">
-              <img className="m-4" src={BrandName} alt="Blurp the Greatest" />
-              <h2 className="text-center main-subtitle text-white">
+              <img className="mx-24" src={BrandName} alt="Blurp the Greatest" />
+              <h2 className="text-center main-subtitle text-indigo-500">
                 Bridging Lives. Understanding Relaionships & People.
               </h2>
             </div>
@@ -28,7 +28,7 @@ const Home = () => {
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">What is an Ecomap?</h1>
-            <p className="text-2xl">
+            <p className="text-2xl text-neutral-300">
               Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor veritatis, illum velit
               quasi, sed tenetur ipsa recusandae assumenda distinctio asperiores, a non rerum
               repellat. Nulla quae velit harum quisquam aspernatur. Lorem ipsum dolor, sit amet
@@ -39,7 +39,7 @@ const Home = () => {
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">How it can help you</h1>
-            <p className="text-2xl">
+            <p className="text-2xl text-neutral-300">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur labore facilis
               assumenda, laborum quae rerum beatae non magni ipsam quasi doloremque omnis facere ab
               quos officiis ipsum saepe quo molestias. Lorem ipsum, dolor sit amet consectetur
@@ -50,7 +50,7 @@ const Home = () => {
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">How to make an ecomap</h1>
-            <p className="text-2xl">
+            <p className="text-2xl text-neutral-300">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, rem eaque culpa
               reiciendis nostrum suscipit exercitationem magni eum ratione, mollitia itaque
               voluptatibus vero consequatur consectetur optio officiis harum facilis repellat?

@@ -23,20 +23,8 @@
     @apply bg-gray-200 text-black hover:text-white;
   }
 
-  .btn-leave {
-    @apply w-32 rounded-lg bg-red-500 py-2 px-4 font-semibold text-white shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75;
-  }
-
-  .btn-callback {
-    @apply w-32 rounded-lg bg-green-500/80 py-2 px-4 font-semibold text-white shadow-md hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75;
-  }
-
-  .btn-skip {
-    @apply w-32 rounded-lg bg-gray-500/80 py-2 px-4 font-semibold text-white shadow-md hover:bg-gray-500/90 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-75;
-  }
-
   .btn-start {
-    @apply my-4 inline-grid h-20 w-96 place-items-center rounded-xl bg-red-400 text-3xl font-bold text-white shadow-md xl:w-64;
+    @apply my-4 inline-grid h-20 w-96 place-items-center rounded-xl bg-violet-500 text-3xl font-bold text-white shadow-md xl:w-64;
   }
 
   .main-title {
@@ -48,7 +36,7 @@
   }
 
   .section-title {
-    @apply text-pink-550 py-5 text-6xl font-bold;
+    @apply text-slate-200 py-5 text-6xl font-bold;
   }
 
   .hero-card {
@@ -108,7 +96,7 @@
   }
 
   .landing-background {
-    @apply bg-gray-800;
+    @apply bg-slate-900;
   }
 
   .system-toolbar {
