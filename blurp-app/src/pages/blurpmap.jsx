@@ -135,6 +135,7 @@ const TestPage = () => {
                 notes: node.description,
                 color: node.color,
               });
+              console.log(node);
             });
             data.relationships.forEach((edge) => {
               graph.addEdgeWithKey(
@@ -157,10 +158,6 @@ const TestPage = () => {
         .catch((error) => {
           console.log(error);
         });
-      // should be done better, I don't like doing it this way
-      let camState = sigma.getCamera().getState();
-      camState.ratio = 3.0;
-      sigma.getCamera.setState(camState);
     },
   });
 
@@ -239,25 +236,30 @@ const TestPage = () => {
         })
       );
 
-      const node = graph.getNodeAttributes(id);
       axios.patch('http://localhost:3000/map/node/update', {
         nodeID: id,
         mapID: mapID,
-        nodeinfo: {
-          nodeName: node.name,
-          color: node.color,
-          age: node.years,
-          type: node.type.toLowerCase(),
-          description: node.notes,
-          pos: {
-            x: node.x,
-            y: node.y,
-          },
+        changes: {
+          nodeName: name,
+          age: years,
+          description: notes,
         },
-      }); // come back to this, need to work out error handling
-    } catch {
-      console.log('ERROR: failed to retrieve node with that ID');
-      console.log('ID used: ' + id);
+      });
+    } catch (error) {
+      /* followed the link below for handling errors involving axios
+         https://stackabuse.com/handling-errors-with-axios/ */
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        console.log("Error: Backend didn't respond to request sent.");
+        console.log(error.request);
+      } else {
+        console.log('ERROR: failed to retrieve node with that ID');
+        console.log('ID used: ' + id);
+        console.log(error.message);
+      }
     }
   }
 
@@ -270,26 +272,32 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
-      const edge = graph.getEdgeAttributes(id);
-      axios.patch('https://localhost:3000/map/relationship/update', {
-        relationshipID: id,
-        mapID: mapID,
-        relationshipinfo: {
-          nodePair: {
-            nodeOne: graph.source(edge),
-            nodeTwo: graph.target(edge),
+      axios
+        .patch('https://localhost:3000/map/relationship/update', {
+          relationshipID: id,
+          mapID: mapID,
+          changes: {
+            type: category,
+            familiarity: familiarity,
+            stressCode: stressCode,
           },
-          description: 'unused',
-          relationshipType: {
-            type: edge.label,
-            familiarity: edge.familiarity,
-            stressCode: edge.stressCode,
-          },
-        },
-      }); // come back to this
-    } catch {
-      console.log('ERROR: failed to retrieve edge with that ID');
-      console.log('ID used: ' + id);
+        })
+        .catch((error) => console.log(error));
+    } catch (error) {
+      /* followed the link below for handling errors involving axios
+         https://stackabuse.com/handling-errors-with-axios/ */
+      if (error.response) {
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        console.log("Error: Backend didn't respond to request sent.");
+        console.log(error.request);
+      } else {
+        console.log('ERROR: failed to retrieve edge with that ID');
+        console.log('ID used: ' + id);
+        console.log(error.message);
+      }
     }
   }
 
