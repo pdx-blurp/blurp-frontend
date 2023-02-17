@@ -122,7 +122,7 @@ const TestPage = () => {
           mapID: mapID,
         })
         .then((response) => {
-          console.log(response);
+          let nodeList = [];
           response.data.forEach((data) => {
             data.nodes.forEach((node) => {
               graph.addNode(node.nodeID, {
@@ -135,7 +135,7 @@ const TestPage = () => {
                 notes: node.description,
                 color: node.color,
               });
-              console.log(node);
+              nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
             });
             data.relationships.forEach((edge) => {
               graph.addEdgeWithKey(
@@ -154,6 +154,7 @@ const TestPage = () => {
               );
             });
           });
+          setNodes(nodeList);
         })
         .catch((error) => {
           console.log(error);
@@ -272,14 +273,18 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
+      console.log(id);
+
       axios
-        .patch('https://localhost:3000/map/relationship/update', {
+        .patch('http://localhost:3000/map/relationship/update', {
           relationshipID: id,
           mapID: mapID,
           changes: {
-            type: category,
-            familiarity: familiarity,
-            stressCode: stressCode,
+            relationshipType: {
+              type: category,
+              familiarity: familiarity,
+              stressCode: stressCode,
+            },
           },
         })
         .catch((error) => console.log(error));
@@ -345,6 +350,30 @@ const TestPage = () => {
         });
         sigma.getCamera().setState(prev_state);
         setNodes(nodes.concat({ id: id, label: name }));
+        axios
+          .post('http://localhost:3000/map/node/create', {
+            userID: userID,
+            mapID: mapID,
+            nodeinfo: {
+              nodeName: name,
+              nodeID: id,
+              color: color,
+              age: 0,
+              type: nodeType.toLowerCase(),
+              description: '',
+              pos: {
+                x: pos.x,
+                y: pos.y,
+              },
+            },
+          })
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log('An error has occured with creating a node on the server side');
+            console.log(error);
+          });
       }
     } else {
       if (node1 == '' || node2 == '') {
@@ -359,7 +388,8 @@ const TestPage = () => {
           return false;
         };
         if (!edgeExists()) {
-          graph.addEdgeWithKey(uuidv4(), node1, node2, {
+          const id = uuidv4();
+          graph.addEdgeWithKey(id, node1, node2, {
             label: relationship,
             familiarity: edgeData.familiarity,
             stressCode: edgeData.stressCode,
@@ -367,6 +397,23 @@ const TestPage = () => {
             node2: '',
             size: size,
             color: edgeColor(edgeData.stressCode),
+          });
+
+          axios.post('http://localhost:3000/map/relationship/create', {
+            mapID: mapID,
+            relationshipinfo: {
+              relationshipID: id,
+              nodePair: {
+                nodeOne: node1,
+                nodeTwo: node2,
+              },
+              description: 'unused',
+              relationshipType: {
+                type: relationship,
+                familiarity: edgeData.familiarity,
+                stressCode: edgeData.stressCode,
+              },
+            },
           });
         } else {
           // setUserNotification('Edge already exists between those nodes');
@@ -471,7 +518,7 @@ const TestPage = () => {
             graph.dropEdge(id);
 
             axios
-              .delete('http://loclahost:3000/map/relationship/delete', {
+              .delete('http://localhost:3000/map/relationship/delete', {
                 data: {
                   mapID: mapID,
                   relationshipID: id,
