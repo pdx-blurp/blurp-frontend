@@ -1,10 +1,13 @@
+import NavbarProp from "../components/navbar"
+import FooterProp from "../components/footer"
+
 //Fun Spline3D page
 const AboutPage = () => {
     return (
-        <>
-        <div> ABOUT PAGE</div>
-        <h1> ...PSU student ran team... blah blah</h1>
-        </>
+        <div className="landing-background h-screen w-screen">
+            <NavbarProp/>
+            <FooterProp/>
+        </div>
     )
 } 
 
