@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MAP_TOOLS } from '../constants/constants';
+import { MAP_TOOLS, SIGMA_CURSOR } from '../constants/constants';
 import node_image from '../assets/node_image.svg';
 import edge_image from '../assets/edge_image.svg';
 import eraser_icon from '../assets/eraser_icon.svg';
@@ -26,24 +26,30 @@ function MapToolbar(props) {
     setCategoryClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(obj) {
-    props.handleIsNode(true);
+    props.handleToolbarEvent(MAP_TOOLS.node);
+    props.setSigmaCursor(SIGMA_CURSOR.NODE);
     clearIconSelection();
     setSelected(MAP_TOOLS.node);
     setNodeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEdgeSelection() {
-    props.handleIsNode(false);
+    props.handleToolbarEvent(MAP_TOOLS.edge);
+    props.setSigmaCursor(SIGMA_CURSOR.EDGE);
     clearIconSelection();
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
   }
   function handleSelectSelection() {
+    props.handleToolbarEvent(MAP_TOOLS.select);
     clearIconSelection();
+    props.setSigmaCursor(SIGMA_CURSOR.DEFAULT);
     setSelected(MAP_TOOLS.select);
     setSelectClass(SELECTED_ICON_CLASSNAME);
   }
   function handleEraserSelection() {
+    props.handleToolbarEvent(MAP_TOOLS.eraser);
     clearIconSelection();
+    props.setSigmaCursor(SIGMA_CURSOR.ERASER);
     setSelected(MAP_TOOLS.eraser);
     setEraserClass(SELECTED_ICON_CLASSNAME);
   }
@@ -54,32 +60,33 @@ function MapToolbar(props) {
   }
   return (
     <>
-      <div className="graph-toolbar">
-        <Tooltip title="Node tool" enterDelay={700} placement="left" arrow>
-          <button className="graph-toolbar-btn" onClick={() => handleNodeSelection()}>
-            <img className={nodeClass} src={node_image}></img>
+     
+      <div className='graph-toolbar'>
+        <Tooltip title='Node tool' enterDelay={700} placement='left' arrow>
+          <button className='graph-toolbar-btn' onClick={() => handleNodeSelection()}>
+            <img alt='Node tool' className={nodeClass} src={node_image}></img>
           </button>
         </Tooltip>
-        <Tooltip title="Edge tool" enterDelay={700} placement="left" arrow>
-          <button className="graph-toolbar-btn" onClick={() => handleEdgeSelection()}>
-            <img className={edgeClass} src={edge_image}></img>
+        <Tooltip title='Edge tool' enterDelay={700} placement='left' arrow>
+          <button className='graph-toolbar-btn' onClick={() => handleEdgeSelection()}>
+            <img alt='Edge tool' className={edgeClass} src={edge_image}></img>
           </button>
         </Tooltip>
-        <div className="absolute right-0 bottom-0 mb-0">
-          <Tooltip title="Select mode" enterDelay={700} placement="left" arrow>
-            <button className="graph-toolbar-btn" onClick={() => handleSelectSelection()}>
-              <img className={selectClass} src={select_icon}></img>
+        <div className='absolute mb-0 right-0 bottom-0'>
+          <Tooltip title='Select mode' enterDelay={700} placement='left' arrow>
+            <button className='graph-toolbar-btn' onClick={() => handleSelectSelection()}>
+              <img alt='Select mode' className={selectClass} src={select_icon}></img>
             </button>
           </Tooltip>
-          <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
-            <button className="graph-toolbar-btn" onClick={() => handleEraserSelection()}>
-              <img className={eraserClass} src={eraser_icon}></img>
+          <Tooltip title='Eraser' enterDelay={700} placement='left' arrow>
+            <button className='graph-toolbar-btn' onClick={() => handleEraserSelection()}>
+              <img alt='Eraser' className={eraserClass} src={eraser_icon}></img>
             </button>
           </Tooltip>
           <Tooltip title="Filters" enterDelay={700} placement="left" arrow>
             <button className="graph-toolbar-btn" onClick={() => handleCategorySelection()}>
               <Category />
-            </button>
+              </button>
           </Tooltip>
         </div>
       </div>

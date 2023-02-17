@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { React, useEffect, useState, useRef } from 'react';
 import { MultiGraph } from 'graphology';
 import {
   SigmaContainer,
@@ -9,67 +9,235 @@ import {
 } from '@react-sigma/core';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
+import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
-import { COLORS, NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS } from '../constants/constants.ts';
+import {
+  COLORS,
+  NODE_TYPE,
+  SIDEBAR_VIEW,
+  RELATIONSHIPS,
+  STRESS_CODE,
+  SIGMA_CURSOR,
+  MAP_TOOLS,
+} from '../constants/constants.ts';
 import { NodeData, EdgeData } from '../constants/classes.jsx';
 import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import Category from '../components/category';
+import TempMessage from '../components/temp_msg_display';
+
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
   const [nodeType, setNodeType] = useState('PERSON');
-  const [color, setColor] = useState('#FF0000');
+  const [color, setColor] = useState(COLORS.BROWN);
   const [name, setName] = useState('');
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
+  const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
-  const [isNode, setIsNode] = useState(true);
+  const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
+  const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
+  const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [sigma, setSigma] = useState(null);
   const child = useRef();
+  const [clickTrigger, setClickTrigger] = useState(true);
+  // Used for the message box that pops up and notifys users of errors
+  const [userNotification, setUserNotification] = useState('');
+  const msgRef = useRef();
+
+  const DBref = useRef({
+    SaveToDB() {
+      console.log(JSON.stringify(graph));
+      axios
+        .get('http://localhost:3000/')
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) =>
+          console.log(
+            'ERROR: ' +
+              error.message +
+              '\n' +
+              'Failed to communicate with database\n' +
+              'error name: ' +
+              error.name +
+              'request name: ' +
+              error.request
+          )
+        );
+    },
+  });
 
   function changeNodeData(name, years, notes, id) {
     try {
       graph.setNodeAttribute(id, 'label', name);
       graph.setNodeAttribute(id, 'years', years);
       graph.setNodeAttribute(id, 'notes', notes);
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, label: name };
+          }
+          return node;
+        })
+      );
     } catch {
       console.log('ERROR: failed to retrieve node with that ID');
       console.log('ID used: ' + id);
     }
   }
+  
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph.toJSON()));
 
-  function handleIsNode(data) {
-    if (data === true) {
-      setModalTitle('Add Node');
-      setIsNode(true);
-    } else {
-      setModalTitle('Add Edge');
-      setIsNode(false);
+    // Create the download link
+    let downloadElement = document.createElement("a");
+    downloadElement.download = "map.blurp";
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
+   */
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement("input");
+    uploadElement.type = "file";
+    uploadElement.accept = ".blurp";
+    uploadElement.multiple = false; // Only allow one map to be selected
+
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener("change", (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (confirm("Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.")) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
+  }
+  
+  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
+    try {
+      graph.setEdgeAttribute(id, 'label', category);
+      graph.setEdgeAttribute(id, 'familiarity', familiarity);
+      graph.setEdgeAttribute(id, 'stressCode', stressCode);
+      graph.setEdgeAttribute(id, 'node1ID', node1ID);
+      graph.setEdgeAttribute(id, 'node2ID', node2ID);
+      graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
+    } catch {
+      console.log('ERROR: failed to retrieve edge with that ID');
+      console.log('ID used: ' + id);
     }
   }
-  function handleSubmit() {
-    if (isNode) {
-      const id = uuidv4();
-      graph.addNode(id, {
-        x: event.x,
-        y: event.y,
-        label: name,
-        entity: nodeType,
-        size: size,
-        years: '',
-        notes: '',
-        color: color,
-      });
-      setNodes(nodes.concat({ id: id, label: name }));
+
+  function handleToolbarEvent(data) {
+    if (data === MAP_TOOLS.node) {
+      setModalTitle('Add Node');
+      setMapToolbar(MAP_TOOLS.node);
+    } else if (data === MAP_TOOLS.edge) {
+      setModalTitle('Add Edge');
+      setMapToolbar(MAP_TOOLS.edge);
+    } else if (data === MAP_TOOLS.eraser) {
+      setMapToolbar(MAP_TOOLS.eraser);
     } else {
-      graph.addEdgeWithKey(uuidv4(), node1, node2, { label: relationship, size: size });
+      setMapToolbar(MAP_TOOLS.select);
+    }
+  }
+
+  const edgeColor = (stressCode) => {
+    if (stressCode == 1) return COLORS.BLUE;
+    else if (stressCode == 2) return COLORS.GREEN;
+    else if (stressCode == 3) return COLORS.YELLOW;
+    else if (stressCode == 4) return COLORS.ORANGE;
+    else return COLORS.RED;
+  };
+
+  function handleSubmit() {
+    if (mapToolbar === MAP_TOOLS.node && sigma) {
+      if (name == '') {
+        msgRef.current.showMessage('Need to provide name for the node');
+      } else {
+        let prev_state = sigma.getCamera().getState();
+        if (graph.order < 4) {
+          prev_state.ratio = 3.0;
+        }
+        const id = uuidv4();
+        graph.addNode(id, {
+          x: pos.x,
+          y: pos.y,
+          label: name,
+          entity: nodeType,
+          size: size,
+          years: '',
+          notes: '',
+          color: color,
+        });
+        sigma.getCamera().setState(prev_state);
+        setNodes(nodes.concat({ id: id, label: name }));
+      }
+    } else {
+      if (node1 == '' || node2 == '') {
+        msgRef.current.showMessage('Need to select two nodes to attach an edge to');
+      } else {
+        const edgeExists = () => {
+          for (const x of graph.edges(node1, node2)) {
+            if (x) {
+              return true;
+            }
+          }
+          return false;
+        };
+        if (!edgeExists()) {
+          graph.addEdgeWithKey(uuidv4(), node1, node2, {
+            label: relationship,
+            familiarity: edgeData.familiarity,
+            stressCode: edgeData.stressCode,
+            node1: '',
+            node2: '',
+            size: size,
+            color: edgeColor(edgeData.stressCode),
+          });
+        } else {
+          // setUserNotification('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between those nodes');
+        }
+      }
     }
 
     //closes modal
@@ -78,7 +246,7 @@ const TestPage = () => {
 
   const GraphEvents = () => {
     const registerEvents = useRegisterEvents();
-    // const sigma = useSigma();
+    const sigma = useSigma();
 
     useEffect(() => {
       // Register the events
@@ -88,38 +256,83 @@ const TestPage = () => {
           // Soln for preventing zooming in on a double click found here:
           // https://github.com/jacomyal/sigma.js/issues/1274
           event.preventSigmaDefault();
-          setIsModalOpen(true);
-        }, // node events
-        clickNode: (event) => {
-          let retrieved = graph.getNodeAttributes(event.node);
-          if (retrieved.entity === NODE_TYPE.PERSON) {
-            child.current.changeView(SIDEBAR_VIEW.person);
-          } else if (retrieved.entity === NODE_TYPE.PLACE) {
-            child.current.changeView(SIDEBAR_VIEW.place);
-          } else if (retrieved.entity === NODE_TYPE.IDEA) {
-            child.current.changeView(SIDEBAR_VIEW.idea);
-          }
-          setNode({
-            selected: new NodeData(
-              retrieved.label,
-              retrieved.years,
-              retrieved.notes,
-              retrieved.entity,
-              event.node
-            ),
-          });
         },
-        //Current rightClickNode will delete the node. Change in future
-        rightClickNode: (event) => {
-          //event.node contains node id
-          graph.dropNode(event.node);
-
-          //update nodes
-          setNodes(
-            nodes.filter((node) => {
-              return node.id !== event.node;
-            })
-          );
+        click: (event) => {
+          if (clickTrigger === true) {
+            const grabbed_pos = sigma.viewportToGraph(event);
+            setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
+            if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+              if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+                msgRef.current.showMessage('Not enough nodes to add edges to');
+              } else {
+                setIsModalOpen(true);
+              }
+            }
+          }
+        },
+        clickNode: (event) => {
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.node;
+            graph.dropNode(id);
+            //update nodes
+            setNodes(
+              nodes.filter((node) => {
+                return node.id !== id;
+              })
+            );
+            //reenable the click trigger
+            setClickTrigger(true);
+          } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            let retrieved = graph.getNodeAttributes(event.node);
+            if (retrieved.entity === NODE_TYPE.PERSON) {
+              child.current.changeView(SIDEBAR_VIEW.person);
+            } else if (retrieved.entity === NODE_TYPE.PLACE) {
+              child.current.changeView(SIDEBAR_VIEW.place);
+            } else if (retrieved.entity === NODE_TYPE.IDEA) {
+              child.current.changeView(SIDEBAR_VIEW.idea);
+            }
+            setNode({
+              selected: new NodeData(
+                retrieved.label,
+                retrieved.years,
+                retrieved.notes,
+                retrieved.entity,
+                event.node
+              ),
+            });
+          }
+        },
+        clickEdge: (event) => {
+          if (mapToolbar === MAP_TOOLS.eraser) {
+            const id = event.edge;
+            graph.dropEdge(id);
+          } else {
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            let retrieved = graph.getEdgeAttributes(event.edge);
+            child.current.changeView(SIDEBAR_VIEW.edge);
+            setEdge({
+              selected: new EdgeData(
+                retrieved.label,
+                retrieved.familiarity,
+                retrieved.stressCode,
+                retrieved.node1,
+                retrieved.node2,
+                event.edge
+              ),
+            });
+          }
+        },
+        enterNode: (event) => {
+          //once we enter a node, we do not want to trigger the click event. Only the clickNode.
+          setClickTrigger(false);
+        },
+        leaveNode: (event) => {
+          setClickTrigger(true);
         },
       });
     }, [registerEvents]);
@@ -154,23 +367,11 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <select
-                          type="text"
-                          value={color}
-                          onChange={(e) => setColor(e.target.value)}>
-                          {Object.entries(COLORS).map(([color, value]) => (
-                            <option key={color} value={value}>
-                              {color}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
+                        <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value)}
-                          min={20}
-                          max={120}
+                          onChange={(e) => setSize(e.target.value * 3)}
+                          min={1}
+                          max={10}
                           aria-label="small"
                           valueLabelDisplay="auto"
                         />
@@ -180,7 +381,21 @@ const TestPage = () => {
                         <select
                           type="text"
                           value={nodeType}
-                          onChange={(e) => setNodeType(e.target.value)}>
+                          className="rounded text-center"
+                          onChange={(e) => {
+                            setNodeType(e.target.value);
+                            switch (e.target.value) {
+                              case NODE_TYPE.PERSON:
+                                setColor(COLORS.BROWN);
+                                break;
+                              case NODE_TYPE.PLACE:
+                                setColor(COLORS.GREY);
+                                break;
+                              case NODE_TYPE.IDEA:
+                                setColor(COLORS.OLIVE);
+                                break;
+                            }
+                          }}>
                           {Object.entries(NODE_TYPE).map(([key, value]) => (
                             <option key={key} value={value}>
                               {key}
@@ -196,6 +411,7 @@ const TestPage = () => {
                     <div>
                       <div>
                         <select
+                          className="w-4/5 rounded text-center"
                           value={node1}
                           onChange={(e) => {
                             setNode1(e.target.value);
@@ -214,6 +430,7 @@ const TestPage = () => {
                       <div>
                         <select
                           value={node2}
+                          className="w-4/5 rounded text-center"
                           onChange={(e) => {
                             setNode2(e.target.value);
                           }}>
@@ -233,6 +450,7 @@ const TestPage = () => {
                       <div>
                         <select
                           type="text"
+                          className="w-4/5 rounded text-center"
                           value={relationship}
                           onChange={(e) => setRelationship(e.target.value)}>
                           {Object.entries(RELATIONSHIPS).map(([relationship, value]) => (
@@ -244,13 +462,50 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
+                        <label>Edge Thickness</label>
                         <Slider
                           onChange={(e) => setSize(e.target.value)}
                           min={2}
                           max={10}
                           aria-label="small"
                           valueLabelDisplay="auto"
+                          sx={{ width: '75%' }}
+                          className="mx-3"
                         />
+                      </div>
+                      <br />
+                      <div>
+                        <label>Familiarity</label>
+                        <br />
+                        <Slider
+                          sx={{ width: '75%' }}
+                          aria-label="Small"
+                          name="edgeData.familiarity"
+                          value={edgeData.familiarity}
+                          valueLabelDisplay="auto"
+                          onChange={(e) =>
+                            setEdgeData({ ...edgeData, familiarity: e.target.value })
+                          }
+                          className="mx-3"
+                        />
+                      </div>
+                      <br />
+                      <div>
+                        <label>Stress Level</label>
+                        <br />
+                        <select
+                          name="edgeData.stressCode"
+                          value={edgeData.stressCode}
+                          className="rounded text-center"
+                          onChange={(e) =>
+                            setEdgeData({ ...edgeData, stressCode: e.target.value })
+                          }>
+                          <option value="1">1 - feeling good</option>
+                          <option value="2">2 - feeling fine</option>
+                          <option value="3">3 - feeling anxious</option>
+                          <option value="4">4 - high stress/discomfort</option>
+                          <option value="5">5 - very high stress</option>
+                        </select>
                       </div>
                       <br />
                     </div>
@@ -278,22 +533,37 @@ const TestPage = () => {
       </div>
       <SigmaContainer
         id="blurp-map-container"
-        className="flex w-full justify-center"
+        className={'flex w-full justify-center ' + sigmaCursor}
         graph={graph}
-        settings={{ renderEdgeLabels: true }}>
+        ref={setSigma}
+        settings={{
+          renderEdgeLabels: true,
+          minCameraRatio: 0.5,
+          maxCameraRatio: 3.0,
+          autoScale: false,
+        }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
-        <DataSidebar ref={child} node={node} changeNodeData={changeNodeData} />
+        <DataSidebar
+          ref={child}
+          node={node}
+          edge={edge}
+          changeNodeData={changeNodeData}
+          changeEdgeData={changeEdgeData}
+        />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar />
+        <System_Toolbar ref={DBref} download={downloadMapJson} upload={uploadMapJson} />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleIsNode={handleIsNode} />
+        <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
+      </div>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+        <TempMessage message={userNotification} ref={msgRef} />
       </div>
 
       <div className="absolute inset-y-0 top-0 right-0"></div>
