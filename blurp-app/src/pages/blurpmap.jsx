@@ -375,7 +375,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 4)}
+                          onChange={(e) => setSize(e.target.value * 3)}
                           min={1}
                           max={10}
                           aria-label="small"
@@ -470,7 +470,7 @@ const TestPage = () => {
                       <div>
                         <label>Edge Thickness</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 2.5)}
+                          onChange={(e) => setSize(e.target.value * 2)}
                           min={1}
                           max={5}
                           aria-label="small"
@@ -540,6 +540,9 @@ const TestPage = () => {
       <SigmaContainer
         id="blurp-map-container"
         className={'flex w-full justify-center ' + sigmaCursor}
+        style={{
+          backgroundColor: '#f4f4f5',
+        }}
         graph={graph}
         ref={setSigma}
         settings={{
@@ -548,7 +551,7 @@ const TestPage = () => {
           maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
-        <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
+        <ControlsContainer className="absolute top-5 w-[500px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />

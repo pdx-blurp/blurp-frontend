@@ -1,4 +1,5 @@
 import cogwheel_icon from '../assets/cogwheel.svg';
+import upload_icon from '../assets/temp_upload_icon.png';
 import ellipses_icon from '../assets/ellipses.svg';
 import export_icon from '../assets/export_icon.svg';
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
@@ -73,11 +74,6 @@ const System_Toolbar_State = forwardRef((props, ref) => {
             <img alt="More tools" className="w-[40px]" src={ellipses_icon}></img>
           </button>
         </Tooltip>
-        <Tooltip title="Settings" enterDelay={600} placement="right" arrow>
-          <button className="system-toolbar-button" onClick={handleCogwheelClick}>
-            <img alt="Settings" className="w-[40px]" src={cogwheel_icon}></img>
-          </button>
-        </Tooltip>
         <Tooltip title="Save to file" enterDelay={600} placement="right" arrow>
           <button className="system-toolbar-button">
             <img
@@ -89,7 +85,17 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         </Tooltip>
         <Tooltip title="Load from file" enterDelay={600} placement="right" arrow>
           <button className="system-toolbar-button" onClick={handleImportClick}>
-            <img alt="Import map" className="w-[40px]" src={cogwheel_icon}></img>
+            <img alt="Import map" className="w-[40px]" src={upload_icon}></img>
+          </button>
+        </Tooltip>
+        <Tooltip
+          className="absolute left-0 bottom-0"
+          title="Settings"
+          enterDelay={600}
+          placement="right"
+          arrow>
+          <button className="system-toolbar-button" onClick={handleCogwheelClick}>
+            <img alt="Settings" className="w-[40px]" src={cogwheel_icon}></img>
           </button>
         </Tooltip>
       </div>
