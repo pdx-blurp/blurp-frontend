@@ -13,6 +13,8 @@ import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
+  CAMERA_MIN,
+  CAMERA_MAX,
   COLORS,
   NODE_TYPE,
   SIDEBAR_VIEW,
@@ -205,7 +207,7 @@ const TestPage = () => {
       } else {
         let prev_state = sigma.getCamera().getState();
         if (graph.order < 4) {
-          prev_state.ratio = 3.0;
+          prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -474,9 +476,9 @@ const TestPage = () => {
                       <div>
                         <label>Edge Thickness</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value)}
-                          min={2}
-                          max={10}
+                          onChange={(e) => setSize(e.target.value * 2)}
+                          min={1}
+                          max={5}
                           aria-label="small"
                           valueLabelDisplay="auto"
                           sx={{ width: '75%' }}
@@ -544,15 +546,18 @@ const TestPage = () => {
       <SigmaContainer
         id="blurp-map-container"
         className={'flex w-full justify-center ' + sigmaCursor}
+        style={{
+          backgroundColor: '#f4f4f5',
+        }}
         graph={graph}
         ref={setSigma}
         settings={{
           renderEdgeLabels: true,
-          minCameraRatio: 0.5,
-          maxCameraRatio: 3.0,
+          minCameraRatio: CAMERA_MIN,
+          maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
-        <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
+        <ControlsContainer className="absolute top-5 w-[500px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
