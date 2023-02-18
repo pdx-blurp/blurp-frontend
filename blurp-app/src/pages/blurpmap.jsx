@@ -13,6 +13,8 @@ import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
+  CAMERA_MIN,
+  CAMERA_MAX,
   COLORS,
   NODE_TYPE,
   SIDEBAR_VIEW,
@@ -94,17 +96,18 @@ const TestPage = () => {
       console.log('ID used: ' + id);
     }
   }
-  
+
   /**
    * Triggers the user to download the map JSON as "map.blurp".
    */
   function downloadMapJson() {
     // Get the JSON data string
-    let jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph.toJSON()));
+    let jsonDataString =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
 
     // Create the download link
-    let downloadElement = document.createElement("a");
-    downloadElement.download = "map.blurp";
+    let downloadElement = document.createElement('a');
+    downloadElement.download = 'map.blurp';
     downloadElement.href = jsonDataString;
 
     // Add the download link, click it, then remove it
@@ -118,9 +121,9 @@ const TestPage = () => {
    */
   function uploadMapJson() {
     // Create the upload link
-    let uploadElement = document.createElement("input");
-    uploadElement.type = "file";
-    uploadElement.accept = ".blurp";
+    let uploadElement = document.createElement('input');
+    uploadElement.type = 'file';
+    uploadElement.accept = '.blurp';
     uploadElement.multiple = false; // Only allow one map to be selected
 
     // Add the upload link, click it, then wait for file upload
@@ -128,7 +131,7 @@ const TestPage = () => {
     uploadElement.click();
 
     // Listen for a change on file input (indicates the user confirmed a selection of file)
-    uploadElement.addEventListener("change", (event) => {
+    uploadElement.addEventListener('change', (event) => {
       const uploadedFile = event.target.files[0];
       const reader = new FileReader();
 
@@ -138,7 +141,11 @@ const TestPage = () => {
         let jsonDataString = JSON.parse(contents);
 
         // Ask user to confirm upload
-        if (confirm("Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.")) {
+        if (
+          confirm(
+            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
+          )
+        ) {
           // Replace graph
           graph.clear();
           graph.import(jsonDataString);
@@ -150,7 +157,7 @@ const TestPage = () => {
     // Remove upload element now that we're done
     document.body.removeChild(uploadElement);
   }
-  
+
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
@@ -194,7 +201,7 @@ const TestPage = () => {
       } else {
         let prev_state = sigma.getCamera().getState();
         if (graph.order < 4) {
-          prev_state.ratio = 3.0;
+          prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -368,7 +375,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 3)}
+                          onChange={(e) => setSize(e.target.value * 4)}
                           min={1}
                           max={10}
                           aria-label="small"
@@ -463,9 +470,9 @@ const TestPage = () => {
                       <div>
                         <label>Edge Thickness</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value)}
-                          min={2}
-                          max={10}
+                          onChange={(e) => setSize(e.target.value * 2.5)}
+                          min={1}
+                          max={5}
                           aria-label="small"
                           valueLabelDisplay="auto"
                           sx={{ width: '75%' }}
@@ -537,8 +544,8 @@ const TestPage = () => {
         ref={setSigma}
         settings={{
           renderEdgeLabels: true,
-          minCameraRatio: 0.5,
-          maxCameraRatio: 3.0,
+          minCameraRatio: CAMERA_MIN,
+          maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
         <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">

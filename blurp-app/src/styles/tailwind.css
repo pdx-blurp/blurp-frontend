@@ -24,7 +24,7 @@
   }
 
   .btn-start {
-    @apply my-4 inline-grid h-20 w-96 place-items-center rounded-xl bg-amber-400 hover:bg-yellow-600 text-black hover:text-zinc-200 text-3xl font-bold shadow-md xl:w-64;
+    @apply my-4 inline-grid h-20 w-96 place-items-center rounded-xl bg-amber-400 text-3xl font-bold text-black shadow-md hover:bg-yellow-600 hover:text-zinc-200 xl:w-64;
   }
 
   .main-title {
@@ -36,7 +36,7 @@
   }
 
   .section-title {
-    @apply text-slate-200 py-5 text-5xl;
+    @apply py-5 text-5xl text-slate-200;
   }
 
   .hero-card {
@@ -44,7 +44,7 @@
   }
 
   .sugar-text1 {
-    @apply inline hover:text-indigo-600
+    @apply inline hover:text-indigo-600;
   }
 
   .my-style {
@@ -104,11 +104,11 @@
   }
 
   .system-toolbar {
-    @apply absolute h-[100%] w-[150px] bg-gray-300 transition transition-all ease-in-out;
+    @apply absolute h-[100%] w-[150px] border-gray-400 bg-gray-300 transition transition-all ease-in-out;
   }
 
   .system-toolbar-button {
-    @apply my-[15px] flex h-[40px] justify-center;
+    @apply my-[15px] flex h-[40px] scale-75 justify-center hover:rounded hover:bg-[#8c8c8c];
   }
 
   .confirm-delete-form {
