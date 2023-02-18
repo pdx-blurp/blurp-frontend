@@ -94,17 +94,18 @@ const TestPage = () => {
       console.log('ID used: ' + id);
     }
   }
-  
+
   /**
    * Triggers the user to download the map JSON as "map.blurp".
    */
   function downloadMapJson() {
     // Get the JSON data string
-    let jsonDataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph.toJSON()));
+    let jsonDataString =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
 
     // Create the download link
-    let downloadElement = document.createElement("a");
-    downloadElement.download = "map.blurp";
+    let downloadElement = document.createElement('a');
+    downloadElement.download = 'map.blurp';
     downloadElement.href = jsonDataString;
 
     // Add the download link, click it, then remove it
@@ -118,9 +119,9 @@ const TestPage = () => {
    */
   function uploadMapJson() {
     // Create the upload link
-    let uploadElement = document.createElement("input");
-    uploadElement.type = "file";
-    uploadElement.accept = ".blurp";
+    let uploadElement = document.createElement('input');
+    uploadElement.type = 'file';
+    uploadElement.accept = '.blurp';
     uploadElement.multiple = false; // Only allow one map to be selected
 
     // Add the upload link, click it, then wait for file upload
@@ -128,7 +129,7 @@ const TestPage = () => {
     uploadElement.click();
 
     // Listen for a change on file input (indicates the user confirmed a selection of file)
-    uploadElement.addEventListener("change", (event) => {
+    uploadElement.addEventListener('change', (event) => {
       const uploadedFile = event.target.files[0];
       const reader = new FileReader();
 
@@ -138,10 +139,20 @@ const TestPage = () => {
         let jsonDataString = JSON.parse(contents);
 
         // Ask user to confirm upload
-        if (confirm("Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.")) {
+        if (
+          confirm(
+            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
+          )
+        ) {
           // Replace graph
           graph.clear();
           graph.import(jsonDataString);
+
+          let nodeList = [];
+          graph.forEachNode((current, attr) => {
+            nodeList = nodeList.concat({ id: current, label: attr.label });
+          });
+          setNodes(nodeList);
         }
       };
       reader.readAsText(uploadedFile);
@@ -150,7 +161,7 @@ const TestPage = () => {
     // Remove upload element now that we're done
     document.body.removeChild(uploadElement);
   }
-  
+
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
