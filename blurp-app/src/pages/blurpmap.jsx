@@ -116,6 +116,7 @@ const TestPage = () => {
           mapID: mapID,
         })
         .then((response) => {
+          graph.clear();
           let nodeList = [];
           response.data.forEach((data) => {
             data.nodes.forEach((node) => {
@@ -237,7 +238,7 @@ const TestPage = () => {
         })
       );
 
-      axios.patch('http://localhost:3000/map/node/update', {
+      axios.patch(BACKEND_URL + '/map/node/update', {
         nodeID: id,
         mapID: mapID,
         changes: {
@@ -250,18 +251,92 @@ const TestPage = () => {
       /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
       if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        console.log(
+          'Error: Invalid update request, status:' +
+            error.response.status +
+            '\n' +
+            error.response.headers
+        );
       } else if (error.request) {
-        console.log("Error: Backend didn't respond to request sent.");
-        console.log(error.request);
+        console.log('Error: The server failed to respond to the update request\n' + error.message);
       } else {
-        console.log('ERROR: failed to retrieve node with that ID');
-        console.log('ID used: ' + id);
-        console.log(error.message);
+        console.log(
+          'Error: Some error has occured\n' +
+            'Node ID:' +
+            id +
+            '\n' +
+            'error message:\n' +
+            error.message
+        );
       }
     }
+  }
+
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
+
+    // Create the download link
+    let downloadElement = document.createElement('a');
+    downloadElement.download = 'map.blurp';
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
+   */
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement('input');
+    uploadElement.type = 'file';
+    uploadElement.accept = '.blurp';
+    uploadElement.multiple = false; // Only allow one map to be selected
+
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener('change', (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (
+          confirm(
+            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
+          )
+        ) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+
+          let nodeList = [];
+          graph.forEachNode((current, attr) => {
+            nodeList = nodeList.concat({ id: current, label: attr.label });
+          });
+          setNodes(nodeList);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
   }
 
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
@@ -273,35 +348,33 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
-      console.log(id);
-
-      axios
-        .patch('http://localhost:3000/map/relationship/update', {
-          relationshipID: id,
-          mapID: mapID,
-          changes: {
-            relationshipType: {
-              type: category,
-              familiarity: familiarity,
-              stressCode: stressCode,
-            },
+      axios.patch(BACKEND_URL + '/map/relationship/update', {
+        relationshipID: id,
+        mapID: mapID,
+        changes: {
+          relationshipType: {
+            type: category,
+            familiarity: familiarity,
+            stressCode: stressCode,
           },
-        })
-        .catch((error) => console.log(error));
+        },
+      });
     } catch (error) {
       /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
       if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        console.log(
+          'Error: Invalid Update Request, status:' +
+            error.response.status +
+            '\n' +
+            error.response.headers
+        );
       } else if (error.request) {
-        console.log("Error: Backend didn't respond to request sent.");
-        console.log(error.request);
+        console.log('Error: The server failed to respond to the update request\n' + error.message);
       } else {
-        console.log('ERROR: failed to retrieve edge with that ID');
-        console.log('ID used: ' + id);
-        console.log(error.message);
+        console.log(
+          'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
+        );
       }
     }
   }
