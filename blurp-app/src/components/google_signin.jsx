@@ -71,7 +71,7 @@ function GoogleLoginButton (props) {
       document.removeEventListener('mousedown', handleClickOutside, true);
     }
   }, [closePopout]);
-
+  
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
     if(profile && profile != 'null') {
@@ -86,7 +86,7 @@ function GoogleLoginButton (props) {
   const onLoginFailure = (error) => {
     console.log("Google sign-in failed.");
   }
-
+  
   // When the profile is clicked, switch the popout.
   // If expanded, collapse, and vice versa.
   function handle_profile_click () {
@@ -103,13 +103,13 @@ function GoogleLoginButton (props) {
   function closePopout () {
     setPopoutVisible(false);
   }
-
+  
   // Expand the popout that appears when user clicks on
   // their profile picture
   function expandPopout () {
     setPopoutVisible(true);
   }
-
+  
   const login = useGoogleLogin({
     onSuccess: codeResponse => onLoginSuccess(codeResponse),
     onError: error => onLoginFailure(error)
@@ -122,25 +122,29 @@ function GoogleLoginButton (props) {
     setProfile(null);
     cookies.remove('googleLoginUser');
   }
+
+  function redirectToSignIn() {
+    window.location.href = 'http://localhost:3000/login/google';
+  }
   
   function signInButton () {
     return (
       <>
-        <li onClick={() => login()} className='btn-navbar sign-in-btn'>Sign In</li>
+        <li onClick={() => redirectToSignIn()} className='btn-navbar sign-in-btn'>Sign In</li>
       </>
     );
   }
-
+  
   function userProfile () {
 
     let popoutVisibility = 'invisible';
     if(popoutVisible)
-      popoutVisibility = '';
+    popoutVisibility = '';
 
     let imageUrl = guestPic;
     if(profile && profile.picture)
       imageUrl = profile.picture;
-
+      
     return (
       <>
         <li className="cursor-pointer">
