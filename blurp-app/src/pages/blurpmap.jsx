@@ -144,6 +144,7 @@ const TestPage = () => {
           mapID: mapID,
         })
         .then((response) => {
+          graph.clear();
           let nodeList = [];
           response.data.forEach((data) => {
             data.nodes.forEach((node) => {
@@ -270,37 +271,42 @@ const TestPage = () => {
         })
       );
 
-      axios.patch(BACKEND_URL + '/map/node/update', {
-        nodeID: id,
-        mapID: mapID,
-        changes: {
-          nodeName: name,
-          age: years,
-          description: notes,
-        },
-      });
+      axios
+        .patch(BACKEND_URL + '/map/node/update', {
+          nodeID: id,
+          mapID: mapID,
+          changes: {
+            nodeName: name,
+            age: years,
+            description: notes,
+          },
+        })
+        .catch((error) => {
+          /* followed the link below for handling errors involving axios
+            https://stackabuse.com/handling-errors-with-axios/ */
+          if (error.response) {
+            console.log(
+              'Error: Invalid update request, status:' +
+                error.response.status +
+                '\n' +
+                error.response.headers
+            );
+          } else if (error.request) {
+            console.log(
+              'Error: The server failed to respond to the update request\n' + error.message
+            );
+            msgRef.current.showMessage('Changes not saved, server not responding');
+          }
+        });
     } catch (error) {
-      /* followed the link below for handling errors involving axios
-         https://stackabuse.com/handling-errors-with-axios/ */
-      if (error.response) {
-        console.log(
-          'Error: Invalid update request, status:' +
-            error.response.status +
-            '\n' +
-            error.response.headers
-        );
-      } else if (error.request) {
-        console.log('Error: The server failed to respond to the update request\n' + error.message);
-      } else {
-        console.log(
-          'Error: Some error has occured\n' +
-            'Node ID:' +
-            id +
-            '\n' +
-            'error message:\n' +
-            error.message
-        );
-      }
+      console.log(
+        'Error: Some error has occured\n' +
+          'Node ID:' +
+          id +
+          '\n' +
+          'error message:\n' +
+          error.message
+      );
     }
   }
 
@@ -380,34 +386,40 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
-      axios.patch(BACKEND_URL + '/map/relationship/update', {
-        relationshipID: id,
-        mapID: mapID,
-        changes: {
-          relationshipType: {
-            type: category,
-            familiarity: familiarity,
-            stressCode: stressCode,
+      axios
+        .patch(BACKEND_URL + '/map/relationship/update', {
+          relationshipID: id,
+          mapID: mapID,
+          changes: {
+            relationshipType: {
+              type: category,
+              familiarity: familiarity,
+              stressCode: stressCode,
+            },
           },
-        },
-      });
-    } catch (error) {
-      /* followed the link below for handling errors involving axios
+        })
+        .catch((error) => {
+          /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
-      if (error.response) {
-        console.log(
-          'Error: Invalid Update Request, status:' +
-            error.response.status +
-            '\n' +
-            error.response.headers
-        );
-      } else if (error.request) {
-        console.log('Error: The server failed to respond to the update request\n' + error.message);
-      } else {
-        console.log(
-          'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
-        );
-      }
+          if (error.response) {
+            console.log(
+              'Error: Invalid Update Request, status:' +
+                error.response.status +
+                '\n' +
+                error.response.headers
+            );
+          } else if (error.request) {
+            console.log(
+              'Error: The server failed to respond to the update request\n' + error.message
+            );
+            msgRef.current.showMessage('Changes not saved, server not responding');
+          } else {
+          }
+        });
+    } catch (error) {
+      console.log(
+        'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
+      );
     }
   }
 
