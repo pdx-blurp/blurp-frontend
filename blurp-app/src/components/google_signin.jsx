@@ -9,32 +9,19 @@ function GoogleLoginButton (props) {
 
   // What to render in place of the sign-in button
   const [renderedContent, setRenderedContent] = useState(signInButton());
-  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [popoutVisible, setPopoutVisible] = useState(false);
   const cookies = new Cookies();
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
 
-  // Load cookies
-  if(!user && cookies.get('googleLoginUser')){
-    setUser(cookies.get('googleLoginUser'));
-  }
-
-  // Update cookies when user/profile change
-  useEffect(() => {
-    if(user && user != 'null')
-      cookies.set('googleLoginUser', user, {path: '/'});
-    else
-      cookies.remove('googleLoginUser');
-  }, [user, profile]);
-
-  // If the user changes, update the profile
-  useEffect(() => {
-    if(user && user != 'null') {
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+  // Use token to retrieve profile data
+  function retrieveProfile () {
+    if(cookies.get('a_t'))
+    {
+      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${cookies.get('a_t')}`, {
         headers: {
-          Authorization: `Basic ${user.access_token}`,
+          Authorization: `Basic ${cookies.get('a_t')}`,
           Accept: 'application/json'
         }
       }).then((res) => {
@@ -44,7 +31,8 @@ function GoogleLoginButton (props) {
     else {
       setProfile(null);
     }
-  }, [user]);
+  }
+  retrieveProfile();
 
   // If the profile changes (logged in, logged out, image change, etc),
   // then we should change what is rendered
@@ -78,14 +66,6 @@ function GoogleLoginButton (props) {
       setRenderedContent(userProfile());
     }
   }, [popoutVisible])
-
-  function onLoginSuccess(googleUser) {
-    setUser(googleUser);
-  }
-  
-  const onLoginFailure = (error) => {
-    console.log("Google sign-in failed.");
-  }
   
   // When the profile is clicked, switch the popout.
   // If expanded, collapse, and vice versa.
@@ -110,17 +90,16 @@ function GoogleLoginButton (props) {
     setPopoutVisible(true);
   }
   
-  const login = useGoogleLogin({
-    onSuccess: codeResponse => onLoginSuccess(codeResponse),
-    onError: error => onLoginFailure(error)
-  });
+  // const login = useGoogleLogin({
+  //   onSuccess: codeResponse => onLoginSuccess(codeResponse),
+  //   onError: error => onLoginFailure(error)
+  // });
 
   // When the user clicks logout
   function logout () {
     googleLogout();
-    setUser(null);
     setProfile(null);
-    cookies.remove('googleLoginUser');
+    cookies.remove('a_t');
   }
 
   function redirectToSignIn() {
