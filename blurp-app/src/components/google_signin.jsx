@@ -11,28 +11,35 @@ function GoogleLoginButton (props) {
   const [renderedContent, setRenderedContent] = useState(signInButton());
   const [profile, setProfile] = useState(null);
   const [popoutVisible, setPopoutVisible] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
   const cookies = new Cookies();
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
 
-  // Use token to retrieve profile data
-  function retrieveProfile () {
-    if(cookies.get('a_t'))
+    // If we detect new access token value in cookie, change it
+    if(cookies.get('a_t') != accessToken)
     {
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${cookies.get('a_t')}`, {
-        headers: {
-          Authorization: `Basic ${cookies.get('a_t')}`,
-          Accept: 'application/json'
-        }
-      }).then((res) => {
-        setProfile(res.data);
-      }).catch((err) => console.log(err));
+      setAccessToken(cookies.get('a_t'));
     }
-    else {
-      setProfile(null);
+
+    useEffect(() => {
+    {
+      console.log('here');
+      if(accessToken && accessToken != 'null') {
+        axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
+          headers: {
+            Authorization: `Basic ${accessToken}`,
+            Accept: 'application/json'
+          }
+        }).then((res) => {
+          setProfile(res.data);
+        }).catch((err) => console.log(err));
+      }
+      else {
+        setProfile(null);
+      }
     }
-  }
-  retrieveProfile();
+  }, [accessToken]);
 
   // If the profile changes (logged in, logged out, image change, etc),
   // then we should change what is rendered
