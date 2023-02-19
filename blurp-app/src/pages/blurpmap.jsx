@@ -13,6 +13,9 @@ import axios from 'axios';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
+  BACKEND_URL,
+  CAMERA_MIN,
+  CAMERA_MAX,
   COLORS,
   NODE_TYPE,
   SIDEBAR_VIEW,
@@ -62,7 +65,6 @@ const TestPage = () => {
     SaveToDB() {
       graph.forEachNode((current, attr) => {
         if (current) {
-          console.log(current);
           axios
             .post('http://localhost:3000/map/node/create', {
               userID: userID,
@@ -80,11 +82,21 @@ const TestPage = () => {
                 },
               },
             })
-            .then((response) => {
-              console.log(response);
-            })
             .catch((error) => {
-              console.log(error);
+              if (error.response) {
+                console.log(
+                  'Error: Invalid post request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the post request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
             });
         }
       });
@@ -107,18 +119,28 @@ const TestPage = () => {
                 },
               },
             })
-            .then((response) => {
-              console.log(response);
-            })
             .catch((error) => {
-              console.log(error);
+              if (error.response) {
+                console.log(
+                  'Error: Invalid post request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the post request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
             });
         }
       });
     },
     LoadFromDB() {
       axios
-        .post('http://localhost:3000/map/get', {
+        .post(BACKEND_URL + '/map/get', {
           mapID: mapID,
         })
         .then((response) => {
@@ -157,7 +179,18 @@ const TestPage = () => {
           setNodes(nodeList);
         })
         .catch((error) => {
-          console.log(error);
+          if (error.response) {
+            console.log(
+              'Error: Invalid get request, status:' +
+                error.response.status +
+                '\n' +
+                error.response.headers
+            );
+          } else if (error.request) {
+            console.log('Error: The server failed to respond to the get request\n' + error.message);
+          } else {
+            console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+          }
         });
     },
   });
@@ -237,7 +270,7 @@ const TestPage = () => {
         })
       );
 
-      axios.patch('http://localhost:3000/map/node/update', {
+      axios.patch(BACKEND_URL + '/map/node/update', {
         nodeID: id,
         mapID: mapID,
         changes: {
@@ -250,18 +283,92 @@ const TestPage = () => {
       /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
       if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        console.log(
+          'Error: Invalid update request, status:' +
+            error.response.status +
+            '\n' +
+            error.response.headers
+        );
       } else if (error.request) {
-        console.log("Error: Backend didn't respond to request sent.");
-        console.log(error.request);
+        console.log('Error: The server failed to respond to the update request\n' + error.message);
       } else {
-        console.log('ERROR: failed to retrieve node with that ID');
-        console.log('ID used: ' + id);
-        console.log(error.message);
+        console.log(
+          'Error: Some error has occured\n' +
+            'Node ID:' +
+            id +
+            '\n' +
+            'error message:\n' +
+            error.message
+        );
       }
     }
+  }
+
+  /**
+   * Triggers the user to download the map JSON as "map.blurp".
+   */
+  function downloadMapJson() {
+    // Get the JSON data string
+    let jsonDataString =
+      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
+
+    // Create the download link
+    let downloadElement = document.createElement('a');
+    downloadElement.download = 'map.blurp';
+    downloadElement.href = jsonDataString;
+
+    // Add the download link, click it, then remove it
+    document.body.appendChild(downloadElement);
+    downloadElement.click();
+    document.body.removeChild(downloadElement);
+  }
+
+  /**
+   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
+   */
+  function uploadMapJson() {
+    // Create the upload link
+    let uploadElement = document.createElement('input');
+    uploadElement.type = 'file';
+    uploadElement.accept = '.blurp';
+    uploadElement.multiple = false; // Only allow one map to be selected
+
+    // Add the upload link, click it, then wait for file upload
+    document.body.appendChild(uploadElement);
+    uploadElement.click();
+
+    // Listen for a change on file input (indicates the user confirmed a selection of file)
+    uploadElement.addEventListener('change', (event) => {
+      const uploadedFile = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        // Convert to JSON
+        const contents = event.target.result;
+        let jsonDataString = JSON.parse(contents);
+
+        // Ask user to confirm upload
+        if (
+          confirm(
+            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
+          )
+        ) {
+          // Replace graph
+          graph.clear();
+          graph.import(jsonDataString);
+
+          let nodeList = [];
+          graph.forEachNode((current, attr) => {
+            nodeList = nodeList.concat({ id: current, label: attr.label });
+          });
+          setNodes(nodeList);
+        }
+      };
+      reader.readAsText(uploadedFile);
+    });
+
+    // Remove upload element now that we're done
+    document.body.removeChild(uploadElement);
   }
 
   function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
@@ -273,35 +380,33 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
-      console.log(id);
-
-      axios
-        .patch('http://localhost:3000/map/relationship/update', {
-          relationshipID: id,
-          mapID: mapID,
-          changes: {
-            relationshipType: {
-              type: category,
-              familiarity: familiarity,
-              stressCode: stressCode,
-            },
+      axios.patch(BACKEND_URL + '/map/relationship/update', {
+        relationshipID: id,
+        mapID: mapID,
+        changes: {
+          relationshipType: {
+            type: category,
+            familiarity: familiarity,
+            stressCode: stressCode,
           },
-        })
-        .catch((error) => console.log(error));
+        },
+      });
     } catch (error) {
       /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
       if (error.response) {
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+        console.log(
+          'Error: Invalid Update Request, status:' +
+            error.response.status +
+            '\n' +
+            error.response.headers
+        );
       } else if (error.request) {
-        console.log("Error: Backend didn't respond to request sent.");
-        console.log(error.request);
+        console.log('Error: The server failed to respond to the update request\n' + error.message);
       } else {
-        console.log('ERROR: failed to retrieve edge with that ID');
-        console.log('ID used: ' + id);
-        console.log(error.message);
+        console.log(
+          'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
+        );
       }
     }
   }
@@ -335,7 +440,7 @@ const TestPage = () => {
       } else {
         let prev_state = sigma.getCamera().getState();
         if (graph.order < 4) {
-          prev_state.ratio = 3.0;
+          prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -351,7 +456,7 @@ const TestPage = () => {
         sigma.getCamera().setState(prev_state);
         setNodes(nodes.concat({ id: id, label: name }));
         axios
-          .post('http://localhost:3000/map/node/create', {
+          .post(BACKEND_URL + '/map/node/create', {
             userID: userID,
             mapID: mapID,
             nodeinfo: {
@@ -367,12 +472,21 @@ const TestPage = () => {
               },
             },
           })
-          .then((response) => {
-            console.log(response);
-          })
           .catch((error) => {
-            console.log('An error has occured with creating a node on the server side');
-            console.log(error);
+            if (error.response) {
+              console.log(
+                'Error: Invalid post request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the post request\n' + error.message
+              );
+            } else {
+              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+            }
           });
       }
     } else {
@@ -399,22 +513,39 @@ const TestPage = () => {
             color: edgeColor(edgeData.stressCode),
           });
 
-          axios.post('http://localhost:3000/map/relationship/create', {
-            mapID: mapID,
-            relationshipinfo: {
-              relationshipID: id,
-              nodePair: {
-                nodeOne: node1,
-                nodeTwo: node2,
+          axios
+            .post(BACKEND_URL + '/map/relationship/create', {
+              mapID: mapID,
+              relationshipinfo: {
+                relationshipID: id,
+                nodePair: {
+                  nodeOne: node1,
+                  nodeTwo: node2,
+                },
+                description: 'unused',
+                relationshipType: {
+                  type: relationship,
+                  familiarity: edgeData.familiarity,
+                  stressCode: edgeData.stressCode,
+                },
               },
-              description: 'unused',
-              relationshipType: {
-                type: relationship,
-                familiarity: edgeData.familiarity,
-                stressCode: edgeData.stressCode,
-              },
-            },
-          });
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(
+                  'Error: Invalid post request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the post request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
+            });
         } else {
           // setUserNotification('Edge already exists between those nodes');
           msgRef.current.showMessage('Edge already exists between those nodes');
@@ -469,23 +600,58 @@ const TestPage = () => {
             graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
               if (source == id || target == id) {
                 axios
-                  .delete('http://localhost:3000/map/relationship/delete', {
+                  .delete(BACKEND_URL + '/map/relationship/delete', {
                     data: {
                       mapID: mapID,
                       relationshipID: current,
                     },
                   })
                   .catch((error) => {
-                    console.log(error);
+                    if (error.response) {
+                      console.log(
+                        'Error: Invalid delete request, status:' +
+                          error.response.status +
+                          '\n' +
+                          error.response.headers
+                      );
+                    } else if (error.request) {
+                      console.log(
+                        'Error: The server failed to respond to the delete request\n' +
+                          error.message
+                      );
+                    } else {
+                      console.log(
+                        'Error: Some error has occured\n' + 'error message:\n' + error.message
+                      );
+                    }
                   });
               }
             });
-            axios.delete('http://localhost:3000/map/node/delete', {
-              data: {
-                mapID: mapID,
-                nodeID: id,
-              },
-            });
+            axios
+              .delete(BACKEND_URL + '/map/node/delete', {
+                data: {
+                  mapID: mapID,
+                  nodeID: id,
+                },
+              })
+              .catch((error) => {
+                if (error.response) {
+                  console.log(
+                    'Error: Invalid delete request, status:' +
+                      error.response.status +
+                      '\n' +
+                      error.response.headers
+                  );
+                } else if (error.request) {
+                  console.log(
+                    'Error: The server failed to respond to the delete request\n' + error.message
+                  );
+                } else {
+                  console.log(
+                    'Error: Some error has occured\n' + 'error message:\n' + error.message
+                  );
+                }
+              });
 
             //reenable the click trigger
             setClickTrigger(true);
@@ -518,14 +684,29 @@ const TestPage = () => {
             graph.dropEdge(id);
 
             axios
-              .delete('http://localhost:3000/map/relationship/delete', {
+              .delete(BACKEND_URL + '/map/relationship/delete', {
                 data: {
                   mapID: mapID,
                   relationshipID: id,
                 },
               })
               .catch((error) => {
-                console.log(error);
+                if (error.response) {
+                  console.log(
+                    'Error: Invalid delete request, status:' +
+                      error.response.status +
+                      '\n' +
+                      error.response.headers
+                  );
+                } else if (error.request) {
+                  console.log(
+                    'Error: The server failed to respond to the delete request\n' + error.message
+                  );
+                } else {
+                  console.log(
+                    'Error: Some error has occured\n' + 'error message:\n' + error.message
+                  );
+                }
               });
           } else {
             // Done to clear data and avoid reopening old selections
@@ -682,9 +863,9 @@ const TestPage = () => {
                       <div>
                         <label>Edge Thickness</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value)}
-                          min={2}
-                          max={10}
+                          onChange={(e) => setSize(e.target.value * 2)}
+                          min={1}
+                          max={5}
                           aria-label="small"
                           valueLabelDisplay="auto"
                           sx={{ width: '75%' }}
@@ -752,15 +933,18 @@ const TestPage = () => {
       <SigmaContainer
         id="blurp-map-container"
         className={'flex w-full justify-center ' + sigmaCursor}
+        style={{
+          backgroundColor: '#f4f4f5',
+        }}
         graph={graph}
         ref={setSigma}
         settings={{
           renderEdgeLabels: true,
-          minCameraRatio: 0.5,
-          maxCameraRatio: 3.0,
+          minCameraRatio: CAMERA_MIN,
+          maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
-        <ControlsContainer className="absolute top-5 w-[400px]" position="top-center">
+        <ControlsContainer className="absolute top-5 w-[500px]" position="top-center">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />

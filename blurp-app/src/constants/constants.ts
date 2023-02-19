@@ -1,3 +1,8 @@
+export const CAMERA_MIN = 0.5;
+export const CAMERA_MAX = 2.0;
+
+export const BACKEND_URL = 'http://localhost:3000';
+
 export enum COLORS {
   // node colors
   BROWN = '#836953',
