@@ -30,6 +30,7 @@ import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
+import MapModal from '../components/select_map_modal';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -58,141 +59,154 @@ const TestPage = () => {
   const msgRef = useRef();
 
   // Temporary db userID/mapID for testing
-  const userID = 'bb9e434a-7bb9-493a-80b6-abafd0210de3';
-  const mapID = '71328e4f-15b6-4189-99a5-dca424b1fea8';
+  const [profile, setProfile] = useState({
+    profileSet: false,
+    userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    mapID: '71328e4f-15b6-4189-99a5-dca424b1fea8',
+  });
 
   const DBref = useRef({
     SaveToDB() {
-      graph.forEachNode((current, attr) => {
-        if (current) {
-          axios
-            .post('http://localhost:3000/map/node/create', {
-              userID: userID,
-              mapID: mapID,
-              nodeinfo: {
-                nodeName: attr.label,
-                nodeID: current,
-                color: attr.color,
-                age: attr.years,
-                type: attr.entity.toLowerCase(),
-                description: attr.notes,
-                pos: {
-                  x: attr.x,
-                  y: attr.y,
+      if (profile.profileSet) {
+        graph.forEachNode((current, attr) => {
+          if (current) {
+            axios
+              .post('http://localhost:3000/map/node/create', {
+                userID: profile.userID,
+                mapID: profile.mapID,
+                nodeinfo: {
+                  nodeName: attr.label,
+                  nodeID: current,
+                  color: attr.color,
+                  age: attr.years,
+                  type: attr.entity.toLowerCase(),
+                  description: attr.notes,
+                  pos: {
+                    x: attr.x,
+                    y: attr.y,
+                  },
                 },
-              },
-            })
-            .catch((error) => {
-              if (error.response) {
-                console.log(
-                  'Error: Invalid post request, status:' +
-                    error.response.status +
-                    '\n' +
-                    error.response.headers
-                );
-              } else if (error.request) {
-                console.log(
-                  'Error: The server failed to respond to the post request\n' + error.message
-                );
-              } else {
-                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
-              }
-            });
-        }
-      });
-      graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
-        if (current) {
-          axios
-            .post('http://localhost:3000/map/relationship/create', {
-              mapID: mapID,
-              relationshipinfo: {
-                relationshipID: current,
-                nodePair: {
-                  nodeOne: source,
-                  nodeTwo: target,
-                },
-                description: 'unused',
-                relationshipType: {
-                  type: attr.label,
-                  familiarity: attr.familiarity,
-                  stressCode: attr.stressCode,
-                },
-              },
-            })
-            .catch((error) => {
-              if (error.response) {
-                console.log(
-                  'Error: Invalid post request, status:' +
-                    error.response.status +
-                    '\n' +
-                    error.response.headers
-                );
-              } else if (error.request) {
-                console.log(
-                  'Error: The server failed to respond to the post request\n' + error.message
-                );
-              } else {
-                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
-              }
-            });
-        }
-      });
-    },
-    LoadFromDB() {
-      axios
-        .post(BACKEND_URL + '/map/get', {
-          mapID: mapID,
-        })
-        .then((response) => {
-          graph.clear();
-          let nodeList = [];
-          response.data.forEach((data) => {
-            data.nodes.forEach((node) => {
-              graph.addNode(node.nodeID, {
-                x: node.pos.x,
-                y: node.pos.y,
-                label: node.nodeName,
-                entity: node.type.toUpperCase(),
-                size: 30,
-                years: node.age,
-                notes: node.description,
-                color: node.color,
-              });
-              nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
-            });
-            data.relationships.forEach((edge) => {
-              graph.addEdgeWithKey(
-                edge.relationshipID,
-                edge.nodePair.nodeOne,
-                edge.nodePair.nodeTwo,
-                {
-                  label: edge.relationshipType.type,
-                  familiarity: edge.relationshipType.familiarity,
-                  stressCode: edge.relationshipType.stressCode,
-                  node1: '',
-                  node2: '',
-                  size: 5,
-                  color: edgeColor(edge.relationshipType.stressCode),
+              })
+              .catch((error) => {
+                if (error.response) {
+                  console.log(
+                    'Error: Invalid post request, status:' +
+                      error.response.status +
+                      '\n' +
+                      error.response.headers
+                  );
+                } else if (error.request) {
+                  console.log(
+                    'Error: The server failed to respond to the post request\n' + error.message
+                  );
+                } else {
+                  console.log(
+                    'Error: Some error has occured\n' + 'error message:\n' + error.message
+                  );
                 }
-              );
-            });
-          });
-          setNodes(nodeList);
-        })
-        .catch((error) => {
-          if (error.response) {
-            console.log(
-              'Error: Invalid get request, status:' +
-                error.response.status +
-                '\n' +
-                error.response.headers
-            );
-          } else if (error.request) {
-            console.log('Error: The server failed to respond to the get request\n' + error.message);
-          } else {
-            console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              });
           }
         });
+        graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
+          if (current) {
+            axios
+              .post('http://localhost:3000/map/relationship/create', {
+                mapID: profile.mapID,
+                relationshipinfo: {
+                  relationshipID: current,
+                  nodePair: {
+                    nodeOne: source,
+                    nodeTwo: target,
+                  },
+                  description: 'unused',
+                  relationshipType: {
+                    type: attr.label,
+                    familiarity: attr.familiarity,
+                    stressCode: attr.stressCode,
+                  },
+                },
+              })
+              .catch((error) => {
+                if (error.response) {
+                  console.log(
+                    'Error: Invalid post request, status:' +
+                      error.response.status +
+                      '\n' +
+                      error.response.headers
+                  );
+                } else if (error.request) {
+                  console.log(
+                    'Error: The server failed to respond to the post request\n' + error.message
+                  );
+                } else {
+                  console.log(
+                    'Error: Some error has occured\n' + 'error message:\n' + error.message
+                  );
+                }
+              });
+          }
+        });
+      }
+    },
+    LoadFromDB() {
+      if (profile.profileSet) {
+        axios
+          .post(BACKEND_URL + '/map/get', {
+            mapID: profile.mapID,
+          })
+          .then((response) => {
+            graph.clear();
+            let nodeList = [];
+            response.data.forEach((data) => {
+              data.nodes.forEach((node) => {
+                graph.addNode(node.nodeID, {
+                  x: node.pos.x,
+                  y: node.pos.y,
+                  label: node.nodeName,
+                  entity: node.type.toUpperCase(),
+                  size: 30,
+                  years: node.age,
+                  notes: node.description,
+                  color: node.color,
+                });
+                nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
+              });
+              data.relationships.forEach((edge) => {
+                graph.addEdgeWithKey(
+                  edge.relationshipID,
+                  edge.nodePair.nodeOne,
+                  edge.nodePair.nodeTwo,
+                  {
+                    label: edge.relationshipType.type,
+                    familiarity: edge.relationshipType.familiarity,
+                    stressCode: edge.relationshipType.stressCode,
+                    node1: '',
+                    node2: '',
+                    size: 5,
+                    color: edgeColor(edge.relationshipType.stressCode),
+                  }
+                );
+              });
+            });
+            setNodes(nodeList);
+          })
+          .catch((error) => {
+            if (error.response) {
+              console.log(
+                'Error: Invalid get request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the get request\n' + error.message
+              );
+            } else {
+              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+            }
+          });
+      }
     },
   });
 
@@ -270,34 +284,35 @@ const TestPage = () => {
           return node;
         })
       );
-
-      axios
-        .patch(BACKEND_URL + '/map/node/update', {
-          nodeID: id,
-          mapID: mapID,
-          changes: {
-            nodeName: name,
-            age: years,
-            description: notes,
-          },
-        })
-        .catch((error) => {
-          /* followed the link below for handling errors involving axios
+      if (profile.profileSet) {
+        axios
+          .patch(BACKEND_URL + '/map/node/update', {
+            nodeID: id,
+            mapID: profile.mapID,
+            changes: {
+              nodeName: name,
+              age: years,
+              description: notes,
+            },
+          })
+          .catch((error) => {
+            /* followed the link below for handling errors involving axios
             https://stackabuse.com/handling-errors-with-axios/ */
-          if (error.response) {
-            console.log(
-              'Error: Invalid update request, status:' +
-                error.response.status +
-                '\n' +
-                error.response.headers
-            );
-          } else if (error.request) {
-            console.log(
-              'Error: The server failed to respond to the update request\n' + error.message
-            );
-            msgRef.current.showMessage('Changes not saved, server not responding');
-          }
-        });
+            if (error.response) {
+              console.log(
+                'Error: Invalid update request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the update request\n' + error.message
+              );
+              msgRef.current.showMessage('Changes not saved, server not responding');
+            }
+          });
+      }
     } catch (error) {
       console.log(
         'Error: Some error has occured\n' +
@@ -386,36 +401,38 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
 
-      axios
-        .patch(BACKEND_URL + '/map/relationship/update', {
-          relationshipID: id,
-          mapID: mapID,
-          changes: {
-            relationshipType: {
-              type: category,
-              familiarity: familiarity,
-              stressCode: stressCode,
+      if (profile.profileSet) {
+        axios
+          .patch(BACKEND_URL + '/map/relationship/update', {
+            relationshipID: id,
+            mapID: profile.mapID,
+            changes: {
+              relationshipType: {
+                type: category,
+                familiarity: familiarity,
+                stressCode: stressCode,
+              },
             },
-          },
-        })
-        .catch((error) => {
-          /* followed the link below for handling errors involving axios
+          })
+          .catch((error) => {
+            /* followed the link below for handling errors involving axios
          https://stackabuse.com/handling-errors-with-axios/ */
-          if (error.response) {
-            console.log(
-              'Error: Invalid Update Request, status:' +
-                error.response.status +
-                '\n' +
-                error.response.headers
-            );
-          } else if (error.request) {
-            console.log(
-              'Error: The server failed to respond to the update request\n' + error.message
-            );
-            msgRef.current.showMessage('Changes not saved, server not responding');
-          } else {
-          }
-        });
+            if (error.response) {
+              console.log(
+                'Error: Invalid Update Request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the update request\n' + error.message
+              );
+              msgRef.current.showMessage('Changes not saved, server not responding');
+            } else {
+            }
+          });
+      }
     } catch (error) {
       console.log(
         'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
@@ -467,39 +484,41 @@ const TestPage = () => {
         });
         sigma.getCamera().setState(prev_state);
         setNodes(nodes.concat({ id: id, label: name }));
-        axios
-          .post(BACKEND_URL + '/map/node/create', {
-            userID: userID,
-            mapID: mapID,
-            nodeinfo: {
-              nodeName: name,
-              nodeID: id,
-              color: color,
-              age: 0,
-              type: nodeType.toLowerCase(),
-              description: '',
-              pos: {
-                x: pos.x,
-                y: pos.y,
+        if (profile.profileSet) {
+          axios
+            .post(BACKEND_URL + '/map/node/create', {
+              userID: profile.userID,
+              mapID: profile.mapID,
+              nodeinfo: {
+                nodeName: name,
+                nodeID: id,
+                color: color,
+                age: 0,
+                type: nodeType.toLowerCase(),
+                description: '',
+                pos: {
+                  x: pos.x,
+                  y: pos.y,
+                },
               },
-            },
-          })
-          .catch((error) => {
-            if (error.response) {
-              console.log(
-                'Error: Invalid post request, status:' +
-                  error.response.status +
-                  '\n' +
-                  error.response.headers
-              );
-            } else if (error.request) {
-              console.log(
-                'Error: The server failed to respond to the post request\n' + error.message
-              );
-            } else {
-              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
-            }
-          });
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(
+                  'Error: Invalid post request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the post request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
+            });
+        }
       }
     } else {
       if (node1 == '' || node2 == '') {
@@ -525,39 +544,43 @@ const TestPage = () => {
             color: edgeColor(edgeData.stressCode),
           });
 
-          axios
-            .post(BACKEND_URL + '/map/relationship/create', {
-              mapID: mapID,
-              relationshipinfo: {
-                relationshipID: id,
-                nodePair: {
-                  nodeOne: node1,
-                  nodeTwo: node2,
+          if (profile.profileSet) {
+            axios
+              .post(BACKEND_URL + '/map/relationship/create', {
+                mapID: mapID,
+                relationshipinfo: {
+                  relationshipID: id,
+                  nodePair: {
+                    nodeOne: node1,
+                    nodeTwo: node2,
+                  },
+                  description: 'unused',
+                  relationshipType: {
+                    type: relationship,
+                    familiarity: edgeData.familiarity,
+                    stressCode: edgeData.stressCode,
+                  },
                 },
-                description: 'unused',
-                relationshipType: {
-                  type: relationship,
-                  familiarity: edgeData.familiarity,
-                  stressCode: edgeData.stressCode,
-                },
-              },
-            })
-            .catch((error) => {
-              if (error.response) {
-                console.log(
-                  'Error: Invalid post request, status:' +
-                    error.response.status +
-                    '\n' +
-                    error.response.headers
-                );
-              } else if (error.request) {
-                console.log(
-                  'Error: The server failed to respond to the post request\n' + error.message
-                );
-              } else {
-                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
-              }
-            });
+              })
+              .catch((error) => {
+                if (error.response) {
+                  console.log(
+                    'Error: Invalid post request, status:' +
+                      error.response.status +
+                      '\n' +
+                      error.response.headers
+                  );
+                } else if (error.request) {
+                  console.log(
+                    'Error: The server failed to respond to the post request\n' + error.message
+                  );
+                } else {
+                  console.log(
+                    'Error: Some error has occured\n' + 'error message:\n' + error.message
+                  );
+                }
+              });
+          }
         } else {
           // setUserNotification('Edge already exists between those nodes');
           msgRef.current.showMessage('Edge already exists between those nodes');
@@ -605,66 +628,67 @@ const TestPage = () => {
                 return node.id !== id;
               })
             );
-            // loop through the edges and delete each one connecting
-            // to the deleted node
-            // could rewrite this to filter based on source and target by
-            // using the filterEdges iterator
-            graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
-              if (source == id || target == id) {
-                axios
-                  .delete(BACKEND_URL + '/map/relationship/delete', {
-                    data: {
-                      mapID: mapID,
-                      relationshipID: current,
-                    },
-                  })
-                  .catch((error) => {
-                    if (error.response) {
-                      console.log(
-                        'Error: Invalid delete request, status:' +
-                          error.response.status +
-                          '\n' +
-                          error.response.headers
-                      );
-                    } else if (error.request) {
-                      console.log(
-                        'Error: The server failed to respond to the delete request\n' +
-                          error.message
-                      );
-                    } else {
-                      console.log(
-                        'Error: Some error has occured\n' + 'error message:\n' + error.message
-                      );
-                    }
-                  });
-              }
-            });
-            axios
-              .delete(BACKEND_URL + '/map/node/delete', {
-                data: {
-                  mapID: mapID,
-                  nodeID: id,
-                },
-              })
-              .catch((error) => {
-                if (error.response) {
-                  console.log(
-                    'Error: Invalid delete request, status:' +
-                      error.response.status +
-                      '\n' +
-                      error.response.headers
-                  );
-                } else if (error.request) {
-                  console.log(
-                    'Error: The server failed to respond to the delete request\n' + error.message
-                  );
-                } else {
-                  console.log(
-                    'Error: Some error has occured\n' + 'error message:\n' + error.message
-                  );
+            if (profile.profileSet) {
+              // loop through the edges and delete each one connecting
+              // to the deleted node
+              // could rewrite this to filter based on source and target by
+              // using the filterEdges iterator
+              graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
+                if (source == id || target == id) {
+                  axios
+                    .delete(BACKEND_URL + '/map/relationship/delete', {
+                      data: {
+                        mapID: profile.mapID,
+                        relationshipID: current,
+                      },
+                    })
+                    .catch((error) => {
+                      if (error.response) {
+                        console.log(
+                          'Error: Invalid delete request, status:' +
+                            error.response.status +
+                            '\n' +
+                            error.response.headers
+                        );
+                      } else if (error.request) {
+                        console.log(
+                          'Error: The server failed to respond to the delete request\n' +
+                            error.message
+                        );
+                      } else {
+                        console.log(
+                          'Error: Some error has occured\n' + 'error message:\n' + error.message
+                        );
+                      }
+                    });
                 }
               });
-
+              axios
+                .delete(BACKEND_URL + '/map/node/delete', {
+                  data: {
+                    mapID: profile.mapID,
+                    nodeID: id,
+                  },
+                })
+                .catch((error) => {
+                  if (error.response) {
+                    console.log(
+                      'Error: Invalid delete request, status:' +
+                        error.response.status +
+                        '\n' +
+                        error.response.headers
+                    );
+                  } else if (error.request) {
+                    console.log(
+                      'Error: The server failed to respond to the delete request\n' + error.message
+                    );
+                  } else {
+                    console.log(
+                      'Error: Some error has occured\n' + 'error message:\n' + error.message
+                    );
+                  }
+                });
+            }
             //reenable the click trigger
             setClickTrigger(true);
           } else {
@@ -694,32 +718,33 @@ const TestPage = () => {
           if (mapToolbar === MAP_TOOLS.eraser) {
             const id = event.edge;
             graph.dropEdge(id);
-
-            axios
-              .delete(BACKEND_URL + '/map/relationship/delete', {
-                data: {
-                  mapID: mapID,
-                  relationshipID: id,
-                },
-              })
-              .catch((error) => {
-                if (error.response) {
-                  console.log(
-                    'Error: Invalid delete request, status:' +
-                      error.response.status +
-                      '\n' +
-                      error.response.headers
-                  );
-                } else if (error.request) {
-                  console.log(
-                    'Error: The server failed to respond to the delete request\n' + error.message
-                  );
-                } else {
-                  console.log(
-                    'Error: Some error has occured\n' + 'error message:\n' + error.message
-                  );
-                }
-              });
+            if (profile.profileSet) {
+              axios
+                .delete(BACKEND_URL + '/map/relationship/delete', {
+                  data: {
+                    mapID: mapID,
+                    relationshipID: id,
+                  },
+                })
+                .catch((error) => {
+                  if (error.response) {
+                    console.log(
+                      'Error: Invalid delete request, status:' +
+                        error.response.status +
+                        '\n' +
+                        error.response.headers
+                    );
+                  } else if (error.request) {
+                    console.log(
+                      'Error: The server failed to respond to the delete request\n' + error.message
+                    );
+                  } else {
+                    console.log(
+                      'Error: Some error has occured\n' + 'error message:\n' + error.message
+                    );
+                  }
+                });
+            }
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -981,6 +1006,9 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
+      </div>
+      <div>
+        <MapModal />
       </div>
     </div>
   );
