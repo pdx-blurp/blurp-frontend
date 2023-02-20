@@ -71,13 +71,14 @@ const TestPage = () => {
         graph.forEachNode((current, attr) => {
           if (current) {
             axios
-              .post('http://localhost:3000/map/node/create', {
+              .post(BACKEND_URL + '/map/node/create', {
                 userID: profile.userID,
                 mapID: profile.mapID,
                 nodeinfo: {
                   nodeName: attr.label,
                   nodeID: current,
                   color: attr.color,
+                  size: attr.size,
                   age: attr.years,
                   type: attr.entity.toLowerCase(),
                   description: attr.notes,
@@ -110,7 +111,7 @@ const TestPage = () => {
         graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
           if (current) {
             axios
-              .post('http://localhost:3000/map/relationship/create', {
+              .post(BACKEND_URL + '/map/relationship/create', {
                 mapID: profile.mapID,
                 relationshipinfo: {
                   relationshipID: current,
@@ -123,6 +124,7 @@ const TestPage = () => {
                     type: attr.label,
                     familiarity: attr.familiarity,
                     stressCode: attr.stressCode,
+                    size: attr.size,
                   },
                 },
               })
@@ -164,7 +166,7 @@ const TestPage = () => {
                   y: node.pos.y,
                   label: node.nodeName,
                   entity: node.type.toUpperCase(),
-                  size: 30,
+                  size: node.size,
                   years: node.age,
                   notes: node.description,
                   color: node.color,
@@ -182,7 +184,7 @@ const TestPage = () => {
                     stressCode: edge.relationshipType.stressCode,
                     node1: '',
                     node2: '',
-                    size: 5,
+                    size: edge.relationshipType.size,
                     color: edgeColor(edge.relationshipType.stressCode),
                   }
                 );
@@ -493,6 +495,7 @@ const TestPage = () => {
                 nodeName: name,
                 nodeID: id,
                 color: color,
+                size: size,
                 age: 0,
                 type: nodeType.toLowerCase(),
                 description: '',
@@ -547,7 +550,7 @@ const TestPage = () => {
           if (profile.profileSet) {
             axios
               .post(BACKEND_URL + '/map/relationship/create', {
-                mapID: mapID,
+                mapID: profile.mapID,
                 relationshipinfo: {
                   relationshipID: id,
                   nodePair: {
@@ -559,6 +562,7 @@ const TestPage = () => {
                     type: relationship,
                     familiarity: edgeData.familiarity,
                     stressCode: edgeData.stressCode,
+                    size: size,
                   },
                 },
               })
@@ -722,7 +726,7 @@ const TestPage = () => {
               axios
                 .delete(BACKEND_URL + '/map/relationship/delete', {
                   data: {
-                    mapID: mapID,
+                    mapID: profile.mapID,
                     relationshipID: id,
                   },
                 })
