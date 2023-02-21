@@ -53,6 +53,9 @@ const TestPage = () => {
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
   const child = useRef();
+  const instance = axios.create({
+    timeout: 1000,
+  });
 
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
@@ -70,7 +73,7 @@ const TestPage = () => {
       if (profile.profileSet) {
         graph.forEachNode((current, attr) => {
           if (current) {
-            axios
+            instance
               .post(BACKEND_URL + '/map/node/create', {
                 userID: profile.userID,
                 mapID: profile.mapID,
@@ -110,7 +113,7 @@ const TestPage = () => {
         });
         graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
           if (current) {
-            axios
+            instance
               .post(BACKEND_URL + '/map/relationship/create', {
                 mapID: profile.mapID,
                 relationshipinfo: {
@@ -152,7 +155,7 @@ const TestPage = () => {
     },
     LoadFromDB() {
       if (profile.profileSet) {
-        axios
+        instance
           .post(BACKEND_URL + '/map/get', {
             mapID: profile.mapID,
           })
@@ -200,10 +203,12 @@ const TestPage = () => {
                   '\n' +
                   error.response.headers
               );
+              msgRef.current.showMessage('Failed to load from cloud, bad request');
             } else if (error.request) {
               console.log(
                 'Error: The server failed to respond to the get request\n' + error.message
               );
+              msgRef.current.showMessage('Failed to load from cloud, server not responding');
             } else {
               console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
             }
@@ -211,67 +216,6 @@ const TestPage = () => {
       }
     },
   });
-
-  /**
-   * Triggers the user to download the map JSON as "map.blurp".
-   */
-  function downloadMapJson() {
-    // Get the JSON data string
-    let jsonDataString =
-      'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
-
-    // Create the download link
-    let downloadElement = document.createElement('a');
-    downloadElement.download = 'map.blurp';
-    downloadElement.href = jsonDataString;
-
-    // Add the download link, click it, then remove it
-    document.body.appendChild(downloadElement);
-    downloadElement.click();
-    document.body.removeChild(downloadElement);
-  }
-
-  /**
-   * Triggers the user to upload the map JSON as a *.blurp file, which may replace the existing graph.
-   */
-  function uploadMapJson() {
-    // Create the upload link
-    let uploadElement = document.createElement('input');
-    uploadElement.type = 'file';
-    uploadElement.accept = '.blurp';
-    uploadElement.multiple = false; // Only allow one map to be selected
-
-    // Add the upload link, click it, then wait for file upload
-    document.body.appendChild(uploadElement);
-    uploadElement.click();
-
-    // Listen for a change on file input (indicates the user confirmed a selection of file)
-    uploadElement.addEventListener('change', (event) => {
-      const uploadedFile = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        // Convert to JSON
-        const contents = event.target.result;
-        let jsonDataString = JSON.parse(contents);
-
-        // Ask user to confirm upload
-        if (
-          confirm(
-            'Uploading a blurp map will replace the current map on-screen. Are you sure you want to continue?\nYou may want to cancel and export the current map first.'
-          )
-        ) {
-          // Replace graph
-          graph.clear();
-          graph.import(jsonDataString);
-        }
-      };
-      reader.readAsText(uploadedFile);
-    });
-
-    // Remove upload element now that we're done
-    document.body.removeChild(uploadElement);
-  }
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -287,7 +231,7 @@ const TestPage = () => {
         })
       );
       if (profile.profileSet) {
-        axios
+        instance
           .patch(BACKEND_URL + '/map/node/update', {
             nodeID: id,
             mapID: profile.mapID,
@@ -307,6 +251,7 @@ const TestPage = () => {
                   '\n' +
                   error.response.headers
               );
+              msgRef.current.showMessage('Changes not saved, bad request');
             } else if (error.request) {
               console.log(
                 'Error: The server failed to respond to the update request\n' + error.message
@@ -323,6 +268,55 @@ const TestPage = () => {
           '\n' +
           'error message:\n' +
           error.message
+      );
+    }
+  }
+
+  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
+    try {
+      graph.setEdgeAttribute(id, 'label', category);
+      graph.setEdgeAttribute(id, 'familiarity', familiarity);
+      graph.setEdgeAttribute(id, 'stressCode', stressCode);
+      graph.setEdgeAttribute(id, 'node1ID', node1ID);
+      graph.setEdgeAttribute(id, 'node2ID', node2ID);
+      graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
+
+      if (profile.profileSet) {
+        instance
+          .patch(BACKEND_URL + '/map/relationship/update', {
+            relationshipID: id,
+            mapID: profile.mapID,
+            changes: {
+              relationshipType: {
+                type: category,
+                familiarity: familiarity,
+                stressCode: stressCode,
+              },
+            },
+          })
+          .catch((error) => {
+            /* followed the link below for handling errors involving axios
+         https://stackabuse.com/handling-errors-with-axios/ */
+            if (error.response) {
+              console.log(
+                'Error: Invalid Update Request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+              msgRef.current.showMessage('Changes not saved, bad request');
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the update request\n' + error.message
+              );
+              msgRef.current.showMessage('Changes not saved, server not responding');
+            } else {
+            }
+          });
+      }
+    } catch (error) {
+      console.log(
+        'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
       );
     }
   }
@@ -394,54 +388,6 @@ const TestPage = () => {
     document.body.removeChild(uploadElement);
   }
 
-  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
-    try {
-      graph.setEdgeAttribute(id, 'label', category);
-      graph.setEdgeAttribute(id, 'familiarity', familiarity);
-      graph.setEdgeAttribute(id, 'stressCode', stressCode);
-      graph.setEdgeAttribute(id, 'node1ID', node1ID);
-      graph.setEdgeAttribute(id, 'node2ID', node2ID);
-      graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
-
-      if (profile.profileSet) {
-        axios
-          .patch(BACKEND_URL + '/map/relationship/update', {
-            relationshipID: id,
-            mapID: profile.mapID,
-            changes: {
-              relationshipType: {
-                type: category,
-                familiarity: familiarity,
-                stressCode: stressCode,
-              },
-            },
-          })
-          .catch((error) => {
-            /* followed the link below for handling errors involving axios
-         https://stackabuse.com/handling-errors-with-axios/ */
-            if (error.response) {
-              console.log(
-                'Error: Invalid Update Request, status:' +
-                  error.response.status +
-                  '\n' +
-                  error.response.headers
-              );
-            } else if (error.request) {
-              console.log(
-                'Error: The server failed to respond to the update request\n' + error.message
-              );
-              msgRef.current.showMessage('Changes not saved, server not responding');
-            } else {
-            }
-          });
-      }
-    } catch (error) {
-      console.log(
-        'Error: Some error has occured\n' + 'Edge id: ' + id + 'error message:\n' + error.message
-      );
-    }
-  }
-
   function handleToolbarEvent(data) {
     if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
@@ -487,7 +433,7 @@ const TestPage = () => {
         sigma.getCamera().setState(prev_state);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
-          axios
+          instance
             .post(BACKEND_URL + '/map/node/create', {
               userID: profile.userID,
               mapID: profile.mapID,
@@ -513,10 +459,12 @@ const TestPage = () => {
                     '\n' +
                     error.response.headers
                 );
+                msgRef.current.showMessage('Node not created in cloud, bad request');
               } else if (error.request) {
                 console.log(
                   'Error: The server failed to respond to the post request\n' + error.message
                 );
+                msgRef.current.showMessage('Node not created in cloud, server not responding');
               } else {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
@@ -548,7 +496,7 @@ const TestPage = () => {
           });
 
           if (profile.profileSet) {
-            axios
+            instance
               .post(BACKEND_URL + '/map/relationship/create', {
                 mapID: profile.mapID,
                 relationshipinfo: {
@@ -574,10 +522,12 @@ const TestPage = () => {
                       '\n' +
                       error.response.headers
                   );
+                  msgRef.current.showMessage('Edge not created in cloud, bad request');
                 } else if (error.request) {
                   console.log(
                     'Error: The server failed to respond to the post request\n' + error.message
                   );
+                  msgRef.current.showMessage('Edge not created in cloud, server not responding');
                 } else {
                   console.log(
                     'Error: Some error has occured\n' + 'error message:\n' + error.message
@@ -639,7 +589,7 @@ const TestPage = () => {
               // using the filterEdges iterator
               graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
                 if (source == id || target == id) {
-                  axios
+                  instance
                     .delete(BACKEND_URL + '/map/relationship/delete', {
                       data: {
                         mapID: profile.mapID,
@@ -654,10 +604,14 @@ const TestPage = () => {
                             '\n' +
                             error.response.headers
                         );
+                        msgRef.current.showMessage('Failed to delete node in cloud, bad request');
                       } else if (error.request) {
                         console.log(
                           'Error: The server failed to respond to the delete request\n' +
                             error.message
+                        );
+                        msgRef.current.showMessage(
+                          'Failed to delete node in cloud, server not responding'
                         );
                       } else {
                         console.log(
@@ -667,7 +621,7 @@ const TestPage = () => {
                     });
                 }
               });
-              axios
+              instance
                 .delete(BACKEND_URL + '/map/node/delete', {
                   data: {
                     mapID: profile.mapID,
@@ -682,9 +636,13 @@ const TestPage = () => {
                         '\n' +
                         error.response.headers
                     );
+                    msgRef.current.showMessage('Failed to delete node in cloud, bad request');
                   } else if (error.request) {
                     console.log(
                       'Error: The server failed to respond to the delete request\n' + error.message
+                    );
+                    msgRef.current.showMessage(
+                      'Failed to delete node in cloud, server not responding'
                     );
                   } else {
                     console.log(
@@ -723,7 +681,7 @@ const TestPage = () => {
             const id = event.edge;
             graph.dropEdge(id);
             if (profile.profileSet) {
-              axios
+              instance
                 .delete(BACKEND_URL + '/map/relationship/delete', {
                   data: {
                     mapID: profile.mapID,
@@ -738,9 +696,13 @@ const TestPage = () => {
                         '\n' +
                         error.response.headers
                     );
+                    msgRef.current.showMessage('Failed to delete node in cloud, bad request');
                   } else if (error.request) {
                     console.log(
                       'Error: The server failed to respond to the delete request\n' + error.message
+                    );
+                    msgRef.current.showMessage(
+                      'Failed to delete node in cloud, server not responding'
                     );
                   } else {
                     console.log(
