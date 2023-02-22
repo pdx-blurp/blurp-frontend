@@ -30,7 +30,7 @@ import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
-import MapModal from '../components/select_map_modal';
+import LoadMapModal from '../components/select_map_modal';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -63,7 +63,7 @@ const TestPage = () => {
 
   // Temporary db userID/mapID for testing
   const [profile, setProfile] = useState({
-    profileSet: false,
+    profileSet: true,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
     mapID: '71328e4f-15b6-4189-99a5-dca424b1fea8',
   });
@@ -82,7 +82,7 @@ const TestPage = () => {
                   nodeID: current,
                   color: attr.color,
                   size: attr.size,
-                  age: attr.years,
+                  age: attr.years === '' ? 0 : attr.years,
                   type: attr.entity.toLowerCase(),
                   description: attr.notes,
                   pos: {
@@ -170,7 +170,7 @@ const TestPage = () => {
                   label: node.nodeName,
                   entity: node.type.toUpperCase(),
                   size: node.size,
-                  years: node.age,
+                  years: node.age === 0 ? '' : node.age,
                   notes: node.description,
                   color: node.color,
                 });
@@ -310,7 +310,6 @@ const TestPage = () => {
                 'Error: The server failed to respond to the update request\n' + error.message
               );
               msgRef.current.showMessage('Changes not saved, server not responding');
-            } else {
             }
           });
       }
@@ -974,7 +973,7 @@ const TestPage = () => {
         <ConfirmDeleteForm />
       </div>
       <div>
-        <MapModal />
+        <LoadMapModal />
       </div>
     </div>
   );

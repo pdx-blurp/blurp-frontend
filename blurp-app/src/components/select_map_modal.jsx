@@ -22,7 +22,7 @@ const style = {
   p: 4,
 };
 
-const MapModal = () => {
+const LoadMapModal = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -42,4 +42,4 @@ const MapModal = () => {
   );
 };
 
-export default MapModal;
+export default LoadMapModal;
