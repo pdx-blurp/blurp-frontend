@@ -973,7 +973,7 @@ const TestPage = () => {
         <ConfirmDeleteForm />
       </div>
       <div>
-        <LoadMapModal />
+        <LoadMapModal user={profile.userID} />
       </div>
     </div>
   );

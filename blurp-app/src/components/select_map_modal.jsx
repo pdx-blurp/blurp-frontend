@@ -1,7 +1,9 @@
 import { React, useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
+import axios from 'axios';
 import List from '@mui/material/List';
+import { BACKEND_URL } from '../constants/constants';
 
 /*
 Temporary, pulled the modal from an example here:
@@ -22,10 +24,27 @@ const style = {
   p: 4,
 };
 
-const LoadMapModal = () => {
+const LoadMapModal = (user) => {
   const [open, setOpen] = useState(false);
+  const [maps, setMaps] = useState(null);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const getMaps = () => {
+    console.log(user.user);
+    const id = user.user;
+    axios
+      .post(BACKEND_URL + '/map', {
+        userID: id,
+      })
+      .then((response) => {
+        console.log(response);
+        return response.data[0].mapID;
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   return (
     <>
@@ -36,6 +55,7 @@ const LoadMapModal = () => {
         aria-describedby="modal-modal-description">
         <Box sx={style}>
           <h2>Text</h2>
+          {/* <p>{getMaps(user)}</p> */}
         </Box>
       </Modal>
     </>
