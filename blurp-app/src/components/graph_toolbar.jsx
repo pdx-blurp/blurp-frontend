@@ -14,17 +14,10 @@ function GraphToolbar({ handleIsNode }) {
     <>
       <div className="right-0 my-[90px] h-full h-[500px] w-[40px] justify-center rounded-l-lg border-[2px] border-gray-400 bg-gray-300 p-0">
         <button onClick={handleNodeSelection}>
-<<<<<<< HEAD
-          <img className="h-[40px] w-[40px]" src={node_image}></img>
+          <img alt="Node tool" className="h-[40px] w-[40px]" src={node_image}></img>
         </button>
         <button onClick={handleEdgeSelection}>
-          <img className="h-[40px] w-[40px]" src={edge_image}></img>
-=======
-          <img alt="Node tool" className="w-[40px] h-[40px]" src={node_image}></img>
-        </button>
-        <button onClick={handleEdgeSelection}>
-          <img alt="Edge tool" className="w-[40px] h-[40px]" src={edge_image}></img>
->>>>>>> test
+          <img alt="Edge tool" className="h-[40px] w-[40px]" src={edge_image}></img>
         </button>
       </div>
     </>

@@ -8,11 +8,11 @@ const filters = [
     id: 'category',
     name: 'Categories',
     options: [
-      { value: 'blue', label: 'Blue Stress Level', checked: false },
-      { value: 'green', label: 'Green Stress Level', checked: false },
-      { value: 'yellow', label: 'Yellow Stress Level', checked: false },
-      { value: 'orange', label: 'Orange Stress Level', checked: false },
-      { value: 'red', label: 'Red Stress Level', checked: false },
+      { value: '1', label: 'Blue Stress Level', checked: false },
+      { value: '2', label: 'Green Stress Level', checked: false },
+      { value: '3', label: 'Yellow Stress Level', checked: false },
+      { value: '4', label: 'Orange Stress Level', checked: false },
+      { value: '5', label: 'Red Stress Level', checked: false },
     ],
   },
 ];
@@ -90,7 +90,6 @@ function Category() {
                                     defaultChecked={option.checked}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
-
                                   <label
                                     htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
                                     className="ml-3 min-w-0 flex-1 text-gray-500">
