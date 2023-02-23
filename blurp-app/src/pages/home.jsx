@@ -3,25 +3,22 @@ import BrandName from '../assets/blurp_full_logo_white.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
-import Cookies from 'universal-cookie';
+import { useCookies } from 'react-cookie';
 
 const Home = () => {
 
-  const cookies = new Cookies();
+  const [cookies, setCookie,  removeCookie] = useCookies();
 
-  function updateAccessToken() {
-    // Check if there's url arguments for the token
-    const queryParams = new URLSearchParams(window.location.search);
-    const accessToken = queryParams.get('access_token');
-    if(accessToken) {
-      cookies.set('a_t', accessToken, {path: '/'});
-      window.history.replaceState(null, null, '/');
-    }
-  }
-  updateAccessToken();
-  if (cookies.get('a_t')) {
-    console.log(cookies.get('a_t'));
-  }
+  // function updateSessionID() {
+  //   // Check if there's url arguments for the token
+  //   const queryParams = new URLSearchParams(window.location.search);
+  //   let sid = queryParams.get('sid');
+  //   if(sid) {
+  //     // setCookie('connect.sid', null);
+  //     window.history.replaceState(null, null, '/');
+  //   }
+  // }
+  // updateSessionID();
 
   return (
     <div className="landing-background">
