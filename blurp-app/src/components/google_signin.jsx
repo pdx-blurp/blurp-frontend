@@ -3,55 +3,69 @@ import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import guestPic from '../assets/guest_profile_pic.svg';
 import x_button from '../assets/x_button.svg';
 import axios from 'axios';
-import Cookies from 'universal-cookie';
+import { useCookies } from 'react-cookie';
+import { StepConnector } from '@mui/material';
 
 function GoogleLoginButton (props) {
 
+  const [cookies, setCookie,  removeCookie] = useCookies();
+
   // What to render in place of the sign-in button
   const [renderedContent, setRenderedContent] = useState(signInButton());
-  const [profile, setProfile] = useState(null);
   const [popoutVisible, setPopoutVisible] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
-  const cookies = new Cookies();
+  const [loggedIn, setLoggedIn] = useState(false);
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
+  
+  const [profilePic, setProfilePic] = useState(null);
+  
+  async function isLoggedIn() {
+    let result = false;
+    await fetch('http://localhost:3000/login/isloggedin', {credentials: 'include'})
+      .then((res) => res.json())
+      .then(res => {
+        if(res == 'true') result = true;
+      });
+    console.log('logged in 2:', result);
+    setLoggedIn(result);
+    return result;
+  }
 
-    // If we detect new access token value in cookie, change it
-    if(cookies.get('a_t') != accessToken)
-    {
-      setAccessToken(cookies.get('a_t'));
+  async function fetchProfilePic() {
+    let result;
+    await fetch('http://localhost:3000/userdata/profilepic', {credentials: 'include'})
+      .then((res) => res.json())
+      .then(res => {
+        result = res;
+      });
+    console.log('result:', result);
+    setProfilePic(result);
+    return result;
+  }
+
+  async function updateUserLogin() {
+    setLoggedIn(await isLoggedIn());
+    if(loggedIn) {
+      fetchProfilePic();
     }
-
-    useEffect(() => {
-    {
-      console.log('here');
-      if(accessToken && accessToken != 'null') {
-        axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
-          headers: {
-            Authorization: `Basic ${accessToken}`,
-            Accept: 'application/json'
-          }
-        }).then((res) => {
-          setProfile(res.data);
-        }).catch((err) => console.log(err));
-      }
-      else {
-        setProfile(null);
-      }
+    else {
+      setProfilePic(null);
     }
-  }, [accessToken]);
-
-  // If the profile changes (logged in, logged out, image change, etc),
-  // then we should change what is rendered
+  }
+  
   useEffect(() => {
-    if(profile && profile != 'null') {
-      setPopoutVisible(false);
+    updateUserLogin();
+  }, [loggedIn]);
+
+  useEffect(() => {
+    if(loggedIn) {
+      console.log('hereee', profilePic)
       setRenderedContent(userProfile());
     }
     else {
-      setRenderedContent(signInButton);
+      setRenderedContent(signInButton());
     }
-  }, [profile]);
+  }, [profilePic]);
 
   // Collapse popout if user clicks outside
   useEffect(() => {
@@ -69,9 +83,7 @@ function GoogleLoginButton (props) {
   
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
-    if(profile && profile != 'null') {
-      setRenderedContent(userProfile());
-    }
+    setRenderedContent(userProfile());
   }, [popoutVisible])
   
   // When the profile is clicked, switch the popout.
@@ -104,9 +116,7 @@ function GoogleLoginButton (props) {
 
   // When the user clicks logout
   function logout () {
-    googleLogout();
-    setProfile(null);
-    cookies.remove('a_t');
+    setLoggedIn(false);
   }
 
   function redirectToSignIn() {
@@ -128,8 +138,9 @@ function GoogleLoginButton (props) {
     popoutVisibility = '';
 
     let imageUrl = guestPic;
-    if(profile && profile.picture)
-      imageUrl = profile.picture;
+    if(profilePic && profilePic != 'error') {
+      imageUrl = profilePic;
+    }
       
     return (
       <>
