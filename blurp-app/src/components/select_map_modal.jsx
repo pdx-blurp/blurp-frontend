@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from 'react';
+import { React, useEffect, useState, forwardRef } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import axios from 'axios';
@@ -27,8 +27,8 @@ const style = {
   p: 4,
 };
 
-const getMaps = (user) => {
-  const id = user.user;
+const getMaps = (profile) => {
+  const id = profile.profile.userID;
   let list = [];
   axios
     .post(BACKEND_URL + '/map', {
@@ -36,7 +36,6 @@ const getMaps = (user) => {
     })
     .then((response) => {
       response.data.forEach((current) => {
-        console.log(current.mapID);
         list.push(current.mapID);
       });
     })
@@ -46,9 +45,48 @@ const getMaps = (user) => {
 
   return list;
 };
-const LoadMapModal = (user) => {
+
+const createNewMap = (props, mapName) => {
+  const id = props.profile.userID;
+  axios
+    .post(BACKEND_URL + '/map/create', {
+      userID: id,
+    })
+    .then((response) => {
+      props.setProfile({
+        ...props.profile,
+        mapID: response.data,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  return null;
+};
+
+const deleteMap = (profile, mapID) => {
+  const userID = profile.userID;
+  axios
+    .delete(BACKEND_URL + '/map/delete', {
+      data: {
+        mapID: mapID,
+        userID: userID,
+      },
+    })
+    .then((response) => {
+      console.log('map deleted');
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+const LoadMapModal = forwardRef((props, ref) => {
   const [open, setOpen] = useState(true);
-  const [maps, setMaps] = useState(() => getMaps(user));
+  const [maps, setMaps] = useState(() => getMaps(props));
+  const [mapName, setMapName] = useState('');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -67,21 +105,73 @@ const LoadMapModal = (user) => {
                 key={value}
                 disableGutters
                 secondaryAction={
-                  <IconButton
-                    aria-label="comment"
-                    value={value}
-                    onClick={(e) => console.log(e.target.value)}>
-                    O
-                  </IconButton>
+                  <>
+                    <IconButton
+                      aria-label="comment"
+                      value={value}
+                      onClick={(e) => {
+                        props.setProfile({
+                          ...props.profile,
+                          mapID: e.target.value,
+                        });
+                        ref.current.LoadFromDB(e.target.value);
+                        handleClose();
+                      }}>
+                      O
+                    </IconButton>
+                    <IconButton
+                      aria-label="comment"
+                      value={value}
+                      onClick={(e) => {
+                        deleteMap(props.profile, e.target.value);
+                        let tempMaps = maps;
+                        const index = tempMaps.find((x) => x === e.target.value);
+                        tempMaps.splice(index, 1);
+                        setMaps(tempMaps);
+                      }}>
+                      X
+                    </IconButton>
+                  </>
                 }>
                 {value}
               </ListItem>
             ))}
           </List>
+          <form>
+            <input
+              type="text"
+              name="mapName"
+              placeholder="Enter the name of a new map"
+              className="textbox-sidebar"
+              value={mapName}
+              onChange={(e) => setMapName(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn-sidebar"
+              onClick={() => {
+                createNewMap(props, mapName);
+                handleClose();
+              }}>
+              Create new map
+            </button>
+            <button
+              type="button"
+              className="btn-sidebar"
+              onClick={() => {
+                props.setProfile({
+                  ...props.profile,
+                  profileSet: false,
+                });
+                handleClose();
+              }}>
+              Start a local session
+            </button>
+          </form>
         </Box>
       </Modal>
     </>
   );
-};
+});
 
 export default LoadMapModal;
