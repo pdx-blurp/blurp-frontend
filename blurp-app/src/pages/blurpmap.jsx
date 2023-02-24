@@ -415,7 +415,7 @@ const TestPage = () => {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
         let prev_state = sigma.getCamera().getState();
-        if (graph.order < 4) {
+        if (graph.order() < 4) {
           prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();

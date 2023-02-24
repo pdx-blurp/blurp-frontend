@@ -1,7 +1,12 @@
 export const CAMERA_MIN = 0.5;
 export const CAMERA_MAX = 2.0;
 
-export const BACKEND_URL = 'http://localhost:3000';
+/* This is a vite related thing, it specifically needs the
+   import.meta prefix for env variables to be usable
+   https://github.com/vitejs/vite/issues/1973
+   https://vitejs.dev/guide/env-and-mode.html
+*/
+export const BACKEND_URL = import.meta.env.VITE_LOCAL_DEV;
 
 export enum COLORS {
   // node colors
