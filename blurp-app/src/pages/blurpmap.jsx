@@ -53,9 +53,16 @@ const TestPage = () => {
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
   const msgRef = useRef();
-  function helloWorld() {
-    console.log('hello');
+  function filter() {
     //graph
+    /*
+    graph.forEachNode((node, attributes) => {
+      console.log(node, attributes);
+    });
+*/
+    for (const { edge, attributes } of graph.edgeEntries()) {
+      console.log(edge, attributes.stressCode);
+    }
   }
   const DBref = useRef({
     SaveToDB() {
@@ -569,7 +576,7 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
-        <Category filter={helloWorld} />
+        <Category filter={filter} />
       </div>
 
       <div className="absolute inset-y-1/2 inset-x-1/2">

@@ -17,9 +17,24 @@ const filters = [
   },
 ];
 
-function Category() {
+function Category(props) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [checkedState, setCheckedState] = useState(
+    new Array(filters[0].options.length).fill(false)
+  );
 
+  const handleChange = (position) => {
+    console.log('position', position, 'checkedState', checkedState);
+    const updatedCheckedState = checkedState.map((item, index) => {
+      if (index === position) {
+        return !item;
+      } else {
+        return item;
+      }
+    });
+
+    setCheckedState(updatedCheckedState);
+  };
   return (
     <div>
       {/* Mobile filter dialog */}
@@ -87,7 +102,8 @@ function Category() {
                                     name={`${section.id}[]`}
                                     defaultValue={option.value}
                                     type="checkbox"
-                                    defaultChecked={option.checked}
+                                    checked={checkedState[optionIdx]}
+                                    onChange={() => handleChange(optionIdx)}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
                                   <label
