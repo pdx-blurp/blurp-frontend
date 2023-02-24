@@ -3,23 +3,9 @@ import BrandName from '../assets/blurp_full_logo_white.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
-import { useCookies } from 'react-cookie';
 
 const Home = () => {
-
-  const [cookies, setCookie,  removeCookie] = useCookies();
-
-  // function updateSessionID() {
-  //   // Check if there's url arguments for the token
-  //   const queryParams = new URLSearchParams(window.location.search);
-  //   let sid = queryParams.get('sid');
-  //   if(sid) {
-  //     // setCookie('connect.sid', null);
-  //     window.history.replaceState(null, null, '/');
-  //   }
-  // }
-  // updateSessionID();
-
+  
   return (
     <div className="landing-background">
       <NavbarProp />
@@ -69,7 +55,7 @@ const Home = () => {
             </p>
           </div>
         </div>
-        {/* <Spline className="order-first xl:order-last xl:scale-[0.9] lg:scale-[0.88] md:scale-[0.72] scale-[0.55]" scene={SplineModel} /> */}
+        <Spline className="order-first xl:order-last xl:scale-[0.9] lg:scale-[0.88] md:scale-[0.72] scale-[0.55]" scene={SplineModel} />
       </div>
       <footer className="text-center text-white">Made with <div className="inline text-red-500">love</div> in 2022 by PDX Blurp</footer>
     </div>

@@ -9,63 +9,24 @@ import { StepConnector } from '@mui/material';
 function GoogleLoginButton (props) {
 
   const [cookies, setCookie,  removeCookie] = useCookies();
-
-  // What to render in place of the sign-in button
   const [renderedContent, setRenderedContent] = useState(signInButton());
   const [popoutVisible, setPopoutVisible] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
+  const [rerenderVar, setRerenderVar] = useState(false);
+  let loggedIn = false;
+  let profilePicUrl = null;
   
-  const [profilePic, setProfilePic] = useState(null);
-  
-  async function isLoggedIn() {
-    let result = false;
-    await fetch('http://localhost:3000/login/isloggedin', {credentials: 'include'})
-      .then((res) => res.json())
-      .then(res => {
-        if(res == 'true') result = true;
-      });
-    console.log('logged in 2:', result);
-    setLoggedIn(result);
-    return result;
+  // If there's a connect.sid cookie and the user is logged in,
+  // then load the page as though the user is logged in.
+  if(cookies['connect.sid'] && cookies['loggedIn'] == 'true') {
+    loggedIn = true;
+    profilePicUrl = cookies['profilePicUrl'];
   }
 
-  async function fetchProfilePic() {
-    let result;
-    await fetch('http://localhost:3000/userdata/profilepic', {credentials: 'include'})
-      .then((res) => res.json())
-      .then(res => {
-        result = res;
-      });
-    console.log('result:', result);
-    setProfilePic(result);
-    return result;
+  function rerender() {
+    setRerenderVar(!rerenderVar);
   }
-
-  async function updateUserLogin() {
-    setLoggedIn(await isLoggedIn());
-    if(loggedIn) {
-      fetchProfilePic();
-    }
-    else {
-      setProfilePic(null);
-    }
-  }
-  
-  useEffect(() => {
-    updateUserLogin();
-  }, [loggedIn]);
-
-  useEffect(() => {
-    if(loggedIn) {
-      console.log('hereee', profilePic)
-      setRenderedContent(userProfile());
-    }
-    else {
-      setRenderedContent(signInButton());
-    }
-  }, [profilePic]);
 
   // Collapse popout if user clicks outside
   useEffect(() => {
@@ -83,7 +44,12 @@ function GoogleLoginButton (props) {
   
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
-    setRenderedContent(userProfile());
+    if(loggedIn) {
+      setRenderedContent(userProfile());
+    }
+    else {
+      setRenderedContent(signInButton());
+    }
   }, [popoutVisible])
   
   // When the profile is clicked, switch the popout.
@@ -102,31 +68,23 @@ function GoogleLoginButton (props) {
   function closePopout () {
     setPopoutVisible(false);
   }
-  
-  // Expand the popout that appears when user clicks on
-  // their profile picture
-  function expandPopout () {
-    setPopoutVisible(true);
-  }
-  
-  // const login = useGoogleLogin({
-  //   onSuccess: codeResponse => onLoginSuccess(codeResponse),
-  //   onError: error => onLoginFailure(error)
-  // });
 
   // When the user clicks logout
-  function logout () {
-    setLoggedIn(false);
+  async function logout () {
+    await fetch('http://localhost:3000/login/google/logout', {credentials: 'include'});
+    console.log('logged outt');
+    setRenderedContent(signInButton());
   }
 
-  function redirectToSignIn() {
+  function signIn() {
+    // Redirect to sign in
     window.location.href = 'http://localhost:3000/login/google';
   }
   
   function signInButton () {
     return (
       <>
-        <li onClick={() => redirectToSignIn()} className='btn-navbar sign-in-btn'>Sign In</li>
+        <li onClick={() => signIn()} className='btn-navbar sign-in-btn'>Sign In</li>
       </>
     );
   }
@@ -135,17 +93,12 @@ function GoogleLoginButton (props) {
 
     let popoutVisibility = 'invisible';
     if(popoutVisible)
-    popoutVisibility = '';
-
-    let imageUrl = guestPic;
-    if(profilePic && profilePic != 'error') {
-      imageUrl = profilePic;
-    }
+      popoutVisibility = '';
       
     return (
       <>
         <li className="cursor-pointer">
-          <img className="w-9 h-9 rounded-full" src={imageUrl} onClick={handle_profile_click} ref={profile_pic_ref}/>
+          <img className="w-9 h-9 rounded-full" src={profilePicUrl} onClick={handle_profile_click} ref={profile_pic_ref}/>
         </li>
         <div className={'absolute flex items-center mt-[120px] w-[180px] h-[60px] bg-gray-900/75 ' + popoutVisibility}  ref={expanded_div_ref}>
           <div className={'btn-navbar sign-in-btn inline-block align-middle'} onClick={logout}>
