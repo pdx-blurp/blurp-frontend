@@ -151,11 +151,11 @@ const TestPage = () => {
         });
       }
     },
-    LoadFromDB() {
+    LoadFromDB(mapID) {
       if (profile.profileSet) {
         instance
           .post(BACKEND_URL + '/map/get', {
-            mapID: profile.mapID,
+            mapID: mapID,
           })
           .then((response) => {
             graph.clear();
@@ -521,7 +521,7 @@ const TestPage = () => {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
         let prev_state = sigma.getCamera().getState();
-        if (graph.order() < 4) {
+        if (graph.order < 4) {
           prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();
@@ -1007,7 +1007,7 @@ const TestPage = () => {
         <ConfirmDeleteForm />
       </div>
       <div>
-        <LoadMapModal user={profile.userID} />
+        <LoadMapModal profile={profile} setProfile={setProfile} ref={DBref} />
       </div>
     </div>
   );
