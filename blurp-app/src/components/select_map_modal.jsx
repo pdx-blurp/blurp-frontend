@@ -15,18 +15,6 @@ https://codesandbox.io/s/nw2r1e?file=/demo.tsx:221-423
 
 */
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
 const getMaps = (profile) => {
   const id = profile.profile.userID;
   let list = [];
@@ -97,18 +85,19 @@ const LoadMapModal = forwardRef((props, ref) => {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description">
-        <Box sx={style}>
-          <h2>Text</h2>
-          <List sx={{ width: '100%' }}>
+        <Box className="load-map-modal">
+          <h1 className="text-center text-2xl text-black">Maps on your account</h1>
+          <List className="max-h-96 w-full overflow-auto">
             {maps.map((value) => (
               <ListItem
                 key={value}
                 disableGutters
+                className="my-3 rounded-lg bg-gray-50"
                 secondaryAction={
-                  <>
-                    <IconButton
-                      aria-label="comment"
+                  <div className="h-full">
+                    <button
                       value={value}
+                      className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
                         props.setProfile({
                           ...props.profile,
@@ -117,11 +106,11 @@ const LoadMapModal = forwardRef((props, ref) => {
                         ref.current.LoadFromDB(e.target.value);
                         handleClose();
                       }}>
-                      O
-                    </IconButton>
-                    <IconButton
-                      aria-label="comment"
+                      Select
+                    </button>
+                    <button
                       value={value}
+                      className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
                       onClick={(e) => {
                         deleteMap(props.profile, e.target.value);
                         let tempMaps = maps;
@@ -129,44 +118,51 @@ const LoadMapModal = forwardRef((props, ref) => {
                         tempMaps.splice(index, 1);
                         setMaps(tempMaps);
                       }}>
-                      X
-                    </IconButton>
-                  </>
+                      Delete
+                    </button>
+                  </div>
                 }>
-                {value}
+                <div className="mx-2">{value}</div>
               </ListItem>
             ))}
           </List>
           <form>
-            <input
-              type="text"
-              name="mapName"
-              placeholder="Enter the name of a new map"
-              className="textbox-sidebar"
-              value={mapName}
-              onChange={(e) => setMapName(e.target.value)}
-            />
-            <button
-              type="button"
-              className="btn-sidebar"
-              onClick={() => {
-                createNewMap(props, mapName);
-                handleClose();
-              }}>
-              Create new map
-            </button>
-            <button
-              type="button"
-              className="btn-sidebar"
-              onClick={() => {
-                props.setProfile({
-                  ...props.profile,
-                  profileSet: false,
-                });
-                handleClose();
-              }}>
-              Start a local session
-            </button>
+            <div>
+              <input
+                type="text"
+                name="mapName"
+                placeholder="Enter the name of a new map"
+                className="my-2 h-10 w-9/12 rounded-lg p-2"
+                value={mapName}
+                onChange={(e) => setMapName(e.target.value)}
+              />
+              <button
+                type="button"
+                className="load-map-button float-right my-2 h-10 w-1/5"
+                onClick={() => {
+                  createNewMap(props, mapName);
+                  handleClose();
+                }}>
+                Create new map
+              </button>
+            </div>
+            <div>
+              <p>
+                Or, you could:
+                <button
+                  type="button"
+                  className="load-map-button m-2 h-10 w-1/4"
+                  onClick={() => {
+                    props.setProfile({
+                      ...props.profile,
+                      profileSet: false,
+                    });
+                    handleClose();
+                  }}>
+                  Start a local session
+                </button>
+              </p>
+            </div>
           </form>
         </Box>
       </Modal>
@@ -175,3 +171,4 @@ const LoadMapModal = forwardRef((props, ref) => {
 });
 
 export default LoadMapModal;
+1;

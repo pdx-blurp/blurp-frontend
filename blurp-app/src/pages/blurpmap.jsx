@@ -65,7 +65,7 @@ const TestPage = () => {
   const [profile, setProfile] = useState({
     profileSet: true,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
-    mapID: '71328e4f-15b6-4189-99a5-dca424b1fea8',
+    mapID: '',
   });
 
   const DBref = useRef({
