@@ -67,8 +67,18 @@ const TestPage = () => {
     mapID: '',
   });
 
+  const changeProfile = (user, map, isSet) => {
+    console.log(user, map, isSet);
+    setProfile({
+      profileSet: isSet,
+      userID: user,
+      mapID: map,
+    });
+  };
+
   const DBref = useRef({
     SaveToDB() {
+      console.log(profile.mapID);
       if (profile.profileSet) {
         graph.forEachNode((current, attr) => {
           if (current) {
@@ -1007,7 +1017,7 @@ const TestPage = () => {
         <ConfirmDeleteForm />
       </div>
       <div>
-        <LoadMapModal profile={profile} setProfile={setProfile} ref={DBref} />
+        <LoadMapModal profile={profile} changeProfile={changeProfile} ref={DBref} />
       </div>
     </div>
   );

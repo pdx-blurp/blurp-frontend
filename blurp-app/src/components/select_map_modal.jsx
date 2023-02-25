@@ -23,14 +23,16 @@ const getMaps = (profile) => {
       userID: id,
     })
     .then((response) => {
+      console.log(response);
       response.data.forEach((current) => {
-        list.push(current.mapID);
+        list.push([current.mapID, current.title]);
       });
     })
     .catch((error) => {
       console.log(error.message);
     });
 
+  console.log(list);
   return list;
 };
 
@@ -39,12 +41,10 @@ const createNewMap = (props, mapName) => {
   axios
     .post(BACKEND_URL + '/map/create', {
       userID: id,
+      title: mapName,
     })
     .then((response) => {
-      props.setProfile({
-        ...props.profile,
-        mapID: response.data,
-      });
+      props.changeProfile(props.profile.userID, response.data, props.profile.profileSet);
     })
     .catch((error) => {
       console.log(error);
@@ -90,26 +90,28 @@ const LoadMapModal = forwardRef((props, ref) => {
           <List className="max-h-96 w-full overflow-auto">
             {maps.map((value) => (
               <ListItem
-                key={value}
+                key={value[0]}
                 disableGutters
                 className="my-3 rounded-lg bg-gray-50"
                 secondaryAction={
                   <div className="h-full">
                     <button
-                      value={value}
+                      value={value[0]}
                       className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
-                        props.setProfile({
-                          ...props.profile,
-                          mapID: e.target.value,
-                        });
+                        props.changeProfile(
+                          props.profile.userID,
+                          e.target.value,
+                          props.profile.profileSet
+                        );
+
                         ref.current.LoadFromDB(e.target.value);
                         handleClose();
                       }}>
                       Select
                     </button>
                     <button
-                      value={value}
+                      value={value[0]}
                       className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
                       onClick={(e) => {
                         deleteMap(props.profile, e.target.value);
@@ -122,7 +124,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                     </button>
                   </div>
                 }>
-                <div className="mx-2">{value}</div>
+                <div className="mx-2">{value[1]}</div>
               </ListItem>
             ))}
           </List>
@@ -153,10 +155,8 @@ const LoadMapModal = forwardRef((props, ref) => {
                   type="button"
                   className="load-map-button m-2 h-10 w-1/4"
                   onClick={() => {
-                    props.setProfile({
-                      ...props.profile,
-                      profileSet: false,
-                    });
+                    props.changeProfile(profile.userID, profile.mapID, false);
+
                     handleClose();
                   }}>
                   Start a local session
