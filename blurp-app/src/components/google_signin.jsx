@@ -6,6 +6,9 @@ import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { StepConnector } from '@mui/material';
 
+// Redirect after logging in
+const redirectAfterLogin = 'http://localhost:5173';
+
 function GoogleLoginButton (props) {
 
   const [cookies, setCookie,  removeCookie] = useCookies();
@@ -19,10 +22,11 @@ function GoogleLoginButton (props) {
   
   // If there's a connect.sid cookie and the user is logged in,
   // then load the page as though the user is logged in.
-  if(cookies['connect.sid'] && cookies['loggedIn'] == 'true') {
+  if(cookies['loggedIntoGoogle'] == 'true') {
     loggedIn = true;
     profilePicUrl = cookies['profilePicUrl'];
   }
+  document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
 
   function rerender() {
     setRerenderVar(!rerenderVar);
