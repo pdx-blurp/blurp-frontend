@@ -26,7 +26,6 @@ function GoogleLoginButton (props) {
     loggedIn = true;
     profilePicUrl = cookies['profilePicUrl'];
   }
-  document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
 
   function rerender() {
     setRerenderVar(!rerenderVar);
@@ -75,12 +74,22 @@ function GoogleLoginButton (props) {
 
   // When the user clicks logout
   async function logout () {
-    await fetch('http://localhost:3000/login/google/logout', {credentials: 'include'});
-    console.log('logged outt');
-    setRenderedContent(signInButton());
+    fetch('http://localhost:3000/login/google/logout', {credentials: 'include'})
+      .then(res => res.json())
+      .then((res) => {
+        if(res == 'success') {
+          console.log('Logout success.');
+          setRenderedContent(signInButton());
+        }
+      })
+      .catch((err) => {
+        console.log('Logout failed.');
+      });
   }
 
   function signIn() {
+    // Set cookie to where to redirect to
+    document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
     // Redirect to sign in
     window.location.href = 'http://localhost:3000/login/google';
   }
