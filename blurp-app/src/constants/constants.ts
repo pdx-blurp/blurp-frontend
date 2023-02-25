@@ -44,6 +44,7 @@ export enum SIGMA_CURSOR {
   NODE = 'cursor-node',
   EDGE = 'cursor-edge',
   ERASER = 'cursor-eraser',
+  CATEGORY = 'cursor-category'
 }
 
 /* 

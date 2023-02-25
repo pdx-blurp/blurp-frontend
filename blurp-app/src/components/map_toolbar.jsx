@@ -6,6 +6,7 @@ import eraser_icon from '../assets/eraser_icon.svg';
 import select_icon from '../assets/select_icon.svg';
 import Category from './category';
 import Tooltip from '@mui/material/Tooltip';
+import { FunnelIcon } from '@heroicons/react/20/solid';
 
 function MapToolbar(props) {
   const UNSELECTED_ICON_CLASSNAME = 'graph-toolbar-icon';
@@ -54,7 +55,9 @@ function MapToolbar(props) {
     setEraserClass(SELECTED_ICON_CLASSNAME);
   }
   function handleCategorySelection() {
+    props.handleToolbarEvent(MAP_TOOLS.category);
     clearIconSelection();
+    props.setSigmaCursor(SIGMA_CURSOR.CATEGORY);
     setSelected(MAP_TOOLS.category);
     setCategoryClass(SELECTED_ICON_CLASSNAME);
   }
@@ -80,6 +83,11 @@ function MapToolbar(props) {
           <Tooltip title="Eraser" enterDelay={700} placement="left" arrow>
             <button className="graph-toolbar-btn" onClick={() => handleEraserSelection()}>
               <img alt="Eraser" className={eraserClass} src={eraser_icon}></img>
+            </button>
+          </Tooltip>
+          <Tooltip title="Category" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleCategorySelection()}>
+              <FunnelIcon className={categoryClass} aria-hidden="true" />
             </button>
           </Tooltip>
         </div>

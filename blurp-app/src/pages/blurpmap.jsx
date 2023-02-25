@@ -55,14 +55,15 @@ const TestPage = () => {
   const msgRef = useRef();
   function filter() {
     //graph
-    /*
+
     graph.forEachNode((node, attributes) => {
       console.log(node, attributes);
     });
-*/
+
     for (const { edge, attributes } of graph.edgeEntries()) {
       console.log(edge, attributes.stressCode);
     }
+    return;
   }
   const DBref = useRef({
     SaveToDB() {
@@ -190,6 +191,9 @@ const TestPage = () => {
       setMapToolbar(MAP_TOOLS.edge);
     } else if (data === MAP_TOOLS.eraser) {
       MAP_TOOLS.eraser;
+    } else if (data === MAP_TOOLS.category) {
+      setModalTitle('Category');
+      setMapToolbar(MAP_TOOLS.category);
     } else {
       setMapToolbar(MAP_TOOLS.select);
     }
@@ -348,6 +352,12 @@ const TestPage = () => {
         },
         leaveNode: (event) => {
           setClickTrigger(true);
+        },
+        clickCategory: (event) => {
+          if (mapToolbar === MAP_TOOLS.category) {
+            console.log('category is clicked');
+          }
+          console.log('category is clicked');
         },
       });
     }, [registerEvents]);
@@ -526,6 +536,11 @@ const TestPage = () => {
                     </div>
                   </div>
                 )}
+                {modalTitle === 'Category' && (
+                  <div className="absolute inset-y-0 top-0 right-0">
+                    <Category filter={filter} currentGraph={graph} updateGraph={setGraph} />
+                  </div>
+                )}
                 {/*footer*/}
                 <div className="flex items-center justify-end rounded-b border-t border-solid border-slate-200 p-6">
                   <button
@@ -576,7 +591,6 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
-        <Category filter={filter} />
       </div>
 
       <div className="absolute inset-y-1/2 inset-x-1/2">

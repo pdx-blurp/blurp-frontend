@@ -24,7 +24,6 @@ function Category(props) {
   );
 
   const handleChange = (position) => {
-    console.log('position', position, 'checkedState', checkedState);
     const updatedCheckedState = checkedState.map((item, index) => {
       if (index === position) {
         return !item;
@@ -103,7 +102,9 @@ function Category(props) {
                                     defaultValue={option.value}
                                     type="checkbox"
                                     checked={checkedState[optionIdx]}
-                                    onChange={() => handleChange(optionIdx)}
+                                    onChange={() => {
+                                      handleChange(optionIdx);
+                                    }}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
                                   <label
@@ -113,6 +114,15 @@ function Category(props) {
                                   </label>
                                 </div>
                               ))}
+
+                              {
+                                //sets the filters.options checked to true when checked or false when uncheked
+                                checkedState.forEach((val, index) => {
+                                  filters[0].options[index].checked = val;
+                                })
+                              }
+
+                              {console.log(filters[0].options)}
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -134,7 +144,7 @@ function Category(props) {
               className="text-gray-500 hover:text-gray-800 sm:ml-1 lg:hidden"
               onClick={() => setMobileFiltersOpen(true)}>
               <span className="sr-only">Filters</span>
-              <FunnelIcon className="h-5 w-5" aria-hidden="true" />
+              {<FunnelIcon className="h-5 w-5" aria-hidden="true" />}
             </button>
           </div>
         </div>
