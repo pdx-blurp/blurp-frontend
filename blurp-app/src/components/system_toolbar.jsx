@@ -51,6 +51,10 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     alert("Export clicked.");
   }
 
+  function handleModalToggle() {
+    props.changeModal(true);
+  }
+
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
@@ -60,6 +64,9 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         </button>
         <button onClick={() => console.log('Not implemented')} className="btn-test">
           Load from Cloud
+        </button>
+        <button onClick={handleModalToggle} className="btn-test">
+          Load another map
         </button>
       </div>
 
@@ -95,8 +102,15 @@ const System_Toolbar = forwardRef((props, ref) => {
 
   return (
     <>
-    <System_Toolbar_State ref={ref} expanded={expanded}
-      toggle_toolbar={switchToolbar} onClickOutside={collapseToolbar} show/>
+      <System_Toolbar_State
+        ref={ref}
+        download={props.download}
+        upload={props.upload}
+        expanded={expanded}
+        toggle_toolbar={switchToolbar}
+        onClickOutside={collapseToolbar}
+        show
+      />
     </>
   );
 });

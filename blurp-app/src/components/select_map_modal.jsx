@@ -16,10 +16,9 @@ https://codesandbox.io/s/nw2r1e?file=/demo.tsx:221-423
 */
 
 const LoadMapModal = forwardRef((props, ref) => {
-  const [open, setOpen] = useState(true);
   const [maps, setMaps] = useState(() => getMaps(props.profile));
   const [mapName, setMapName] = useState('');
-  const handleClose = () => setOpen(false);
+  const handleClose = () => props.changeModal(false);
 
   const createNewMap = (props, mapName) => {
     const id = props.profile.userID;
@@ -49,12 +48,8 @@ const LoadMapModal = forwardRef((props, ref) => {
       })
       .then((response) => {
         console.log('map deleted');
-        console.log(response);
-        const delMap = maps.findIndex((current) => current[0] === mapID);
-        console.log(maps);
         setMaps(
           maps.filter((current) => {
-            console.log(current);
             return current[0] != mapID;
           })
         );
@@ -67,7 +62,7 @@ const LoadMapModal = forwardRef((props, ref) => {
   return (
     <>
       <Modal
-        open={open}
+        open={props.modal.open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description">
@@ -140,8 +135,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                   type="button"
                   className="load-map-button m-2 h-10 w-1/4"
                   onClick={() => {
-                    props.changeProfile(profile.userID, profile.mapID, false);
-
+                    props.changeProfile(props.profile.userID, props.profile.mapID, false);
                     handleClose();
                   }}>
                   Start a local session
