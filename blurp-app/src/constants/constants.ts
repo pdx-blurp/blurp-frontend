@@ -1,5 +1,5 @@
 export const CAMERA_MIN = 0.5;
-export const CAMERA_MAX = 2.0;
+export const CAMERA_MAX = 3.0;
 
 /* This is a vite related thing, it specifically needs the
    import.meta prefix for env variables to be usable

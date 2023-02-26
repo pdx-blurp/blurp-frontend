@@ -71,8 +71,13 @@ const TestPage = () => {
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
-    maps: getMaps(profile),
   });
+
+  const changeModal = (state) => {
+    setLoadMapModal({
+      open: state,
+    });
+  };
 
   const changeProfile = (user, map, isSet) => {
     console.log(user, map, isSet);
@@ -577,6 +582,7 @@ const TestPage = () => {
         click: (event) => {
           if (clickTrigger === true) {
             const grabbed_pos = sigma.viewportToGraph(event);
+            console.log(grabbed_pos);
             setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
             if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
               if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
@@ -977,7 +983,13 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 left-0">
-        <System_Toolbar ref={DBref} download={downloadMapJson} upload={uploadMapJson} />
+        <System_Toolbar
+          ref={DBref}
+          modal={loadMapModal}
+          changeModal={changeModal}
+          download={downloadMapJson}
+          upload={uploadMapJson}
+        />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
@@ -992,6 +1004,7 @@ const TestPage = () => {
         <LoadMapModal
           profile={profile}
           modal={loadMapModal}
+          changeModal={changeModal}
           changeProfile={changeProfile}
           ref={DBref}
         />

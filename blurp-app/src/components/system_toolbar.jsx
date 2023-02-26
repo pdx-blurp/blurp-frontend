@@ -57,6 +57,10 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     props.download();
   }
 
+  function handleModalToggle() {
+    props.changeModal(true);
+  }
+
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
@@ -68,6 +72,9 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         </button>
         <button onClick={ref.current.LoadFromDB} className="btn-test">
           Load from Cloud
+        </button>
+        <button onClick={handleModalToggle} className="btn-test">
+          Load another map
         </button>
       </div>
       <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
@@ -126,6 +133,8 @@ const System_Toolbar = forwardRef((props, ref) => {
     <>
       <System_Toolbar_State
         ref={ref}
+        modal={props.modal}
+        changeModal={props.changeModal}
         download={props.download}
         upload={props.upload}
         expanded={expanded}
