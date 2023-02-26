@@ -1,4 +1,4 @@
-import { React, useEffect, useState, forwardRef } from 'react';
+import { React, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import axios from 'axios';
@@ -7,76 +7,62 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import { BACKEND_URL } from '../constants/constants';
+import getMaps from '../utils/utils';
 
 /*
-Temporary, pulled the modal from an example here:
+Pulled the modal from an example here:
 https://mui.com/material-ui/react-modal/#api
 https://codesandbox.io/s/nw2r1e?file=/demo.tsx:221-423
-
 */
-
-const getMaps = (profile) => {
-  const id = profile.profile.userID;
-  let list = [];
-  axios
-    .post(BACKEND_URL + '/map', {
-      userID: id,
-    })
-    .then((response) => {
-      console.log(response);
-      response.data.forEach((current) => {
-        list.push([current.mapID, current.title]);
-      });
-    })
-    .catch((error) => {
-      console.log(error.message);
-    });
-
-  console.log(list);
-  return list;
-};
-
-const createNewMap = (props, mapName) => {
-  const id = props.profile.userID;
-  axios
-    .post(BACKEND_URL + '/map/create', {
-      userID: id,
-      title: mapName,
-    })
-    .then((response) => {
-      props.changeProfile(props.profile.userID, response.data, props.profile.profileSet);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-  return null;
-};
-
-const deleteMap = (profile, mapID) => {
-  const userID = profile.userID;
-  axios
-    .delete(BACKEND_URL + '/map/delete', {
-      data: {
-        mapID: mapID,
-        userID: userID,
-      },
-    })
-    .then((response) => {
-      console.log('map deleted');
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
 
 const LoadMapModal = forwardRef((props, ref) => {
   const [open, setOpen] = useState(true);
-  const [maps, setMaps] = useState(() => getMaps(props));
+  const [maps, setMaps] = useState(() => getMaps(props.profile));
   const [mapName, setMapName] = useState('');
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const createNewMap = (props, mapName) => {
+    const id = props.profile.userID;
+    axios
+      .post(BACKEND_URL + '/map/create', {
+        userID: id,
+        title: mapName,
+      })
+      .then((response) => {
+        props.changeProfile(props.profile.userID, response.data, props.profile.profileSet);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    return null;
+  };
+
+  const deleteMap = (profile, mapID) => {
+    const userID = profile.userID;
+    axios
+      .delete(BACKEND_URL + '/map/delete', {
+        data: {
+          mapID: mapID,
+          userID: userID,
+        },
+      })
+      .then((response) => {
+        console.log('map deleted');
+        console.log(response);
+        const delMap = maps.findIndex((current) => current[0] === mapID);
+        console.log(maps);
+        setMaps(
+          maps.filter((current) => {
+            console.log(current);
+            return current[0] != mapID;
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -87,11 +73,14 @@ const LoadMapModal = forwardRef((props, ref) => {
         aria-describedby="modal-modal-description">
         <Box className="load-map-modal">
           <h1 className="text-center text-2xl text-black">Maps on your account</h1>
-          <List className="max-h-96 w-full overflow-auto">
+          <List
+            sx={{ margin: '12px 0 12px 0' }}
+            className="grid max-h-96 w-full grid-cols-1 justify-items-center overflow-auto rounded-lg bg-neutral-400">
             {maps.map((value) => (
               <ListItem
                 key={value[0]}
                 disableGutters
+                sx={{ width: '98%' }}
                 className="my-3 rounded-lg bg-gray-50"
                 secondaryAction={
                   <div className="h-full">
@@ -115,10 +104,6 @@ const LoadMapModal = forwardRef((props, ref) => {
                       className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
                       onClick={(e) => {
                         deleteMap(props.profile, e.target.value);
-                        let tempMaps = maps;
-                        const index = tempMaps.find((x) => x === e.target.value);
-                        tempMaps.splice(index, 1);
-                        setMaps(tempMaps);
                       }}>
                       Delete
                     </button>

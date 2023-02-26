@@ -30,6 +30,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
+import getMaps from '../utils/utils';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -65,6 +66,11 @@ const TestPage = () => {
     profileSet: false,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
     mapID: '',
+  });
+
+  const [loadMapModal, setLoadMapModal] = useState({
+    open: true,
+    maps: getMaps(profile),
   });
 
   const changeProfile = (user, map, isSet) => {
@@ -1017,7 +1023,12 @@ const TestPage = () => {
         <ConfirmDeleteForm />
       </div>
       <div>
-        <LoadMapModal profile={profile} changeProfile={changeProfile} ref={DBref} />
+        <LoadMapModal
+          profile={profile}
+          modal={loadMapModal}
+          changeProfile={changeProfile}
+          ref={DBref}
+        />
       </div>
     </div>
   );
