@@ -9,7 +9,6 @@ const getMaps = (profile) => {
       userID: id,
     })
     .then((response) => {
-      console.log(response);
       response.data.forEach((current) => {
         list.push([current.mapID, current.title]);
       });
@@ -18,7 +17,6 @@ const getMaps = (profile) => {
       console.log(error.message);
     });
 
-  console.log(list);
   return list;
 };
 
