@@ -458,68 +458,6 @@ const TestPage = () => {
                             ))}
                         </select>
                       </div>
-                      <br />
-                      <div>
-                        <select
-                          type="text"
-                          className="w-4/5 rounded text-center"
-                          value={relationship}
-                          onChange={(e) => setRelationship(e.target.value)}>
-                          {Object.entries(RELATIONSHIPS).map(([relationship, value]) => (
-                            <option key={relationship} value={value}>
-                              {relationship}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <label>Edge Thickness</label>
-                        <Slider
-                          onChange={(e) => setSize(e.target.value * 2)}
-                          min={1}
-                          max={5}
-                          aria-label="small"
-                          valueLabelDisplay="auto"
-                          sx={{ width: '75%' }}
-                          className="mx-3"
-                        />
-                      </div>
-                      <br />
-                      <div>
-                        <label>Familiarity</label>
-                        <br />
-                        <Slider
-                          sx={{ width: '75%' }}
-                          aria-label="Small"
-                          name="edgeData.familiarity"
-                          value={edgeData.familiarity}
-                          valueLabelDisplay="auto"
-                          onChange={(e) =>
-                            setEdgeData({ ...edgeData, familiarity: e.target.value })
-                          }
-                          className="mx-3"
-                        />
-                      </div>
-                      <br />
-                      <div>
-                        <label>Stress Level</label>
-                        <br />
-                        <select
-                          name="edgeData.stressCode"
-                          value={edgeData.stressCode}
-                          className="rounded text-center"
-                          onChange={(e) =>
-                            setEdgeData({ ...edgeData, stressCode: e.target.value })
-                          }>
-                          <option value="1">1 - feeling good</option>
-                          <option value="2">2 - feeling fine</option>
-                          <option value="3">3 - feeling anxious</option>
-                          <option value="4">4 - high stress/discomfort</option>
-                          <option value="5">5 - very high stress</option>
-                        </select>
-                      </div>
-                      <br />
                     </div>
                   </div>
                 )}
