@@ -1,4 +1,4 @@
-import { React, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import { React, useEffect, useState, forwardRef, useMemo } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import axios from 'axios';
@@ -16,8 +16,13 @@ https://codesandbox.io/s/nw2r1e?file=/demo.tsx:221-423
 */
 
 const LoadMapModal = forwardRef((props, ref) => {
-  const [maps, setMaps] = useState(() => getMaps(props.profile));
+  const [maps, setMaps] = useState([]);
   const [mapName, setMapName] = useState('');
+
+  useEffect(() => {
+    setMaps(getMaps(props.profile));
+  }, [props.modal]);
+
   const handleClose = (reason) => {
     // Prevents the user from clicking the outside of the modal on start
     if (!reason || (reason && props.profile.mapID != '')) {
@@ -146,6 +151,8 @@ const LoadMapModal = forwardRef((props, ref) => {
       case MODAL_VIEW.SAVING:
         return (
           <>
+            <h1 className="text-center text-2xl text-black">Save to your account</h1>
+            <br />
             <form>
               <input
                 type="text"
