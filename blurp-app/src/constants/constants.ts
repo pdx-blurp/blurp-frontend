@@ -41,6 +41,11 @@ export enum SIDEBAR_VIEW {
   edge = 'edge',
 }
 
+export enum MODAL_VIEW {
+  START = 'START',
+  SAVING = 'SAVING',
+}
+
 export enum MAP_TOOLS {
   node = 'node',
   edge = 'edge',

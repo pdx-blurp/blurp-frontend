@@ -4,6 +4,8 @@ import ellipses_icon from '../assets/ellipses.svg';
 import export_icon from '../assets/export_icon.svg';
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import Tooltip from '@mui/material/Tooltip';
+import { MODAL_VIEW } from '../constants/constants';
+import getMaps from '../utils/utils';
 
 const System_Toolbar_State = forwardRef((props, ref) => {
   // Set the className based on whether the toolbar is expanded
@@ -58,23 +60,25 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   }
 
   function handleModalToggle() {
-    props.changeModal(true);
+    props.changeModal(true, getMaps(props.profile), MODAL_VIEW.START);
+  }
+
+  function handleModalSaveToggle() {
+    if (!props.profile.profileSet) {
+      props.changeModal(true, getMaps(props.profile), MODAL_VIEW.SAVING);
+    } else {
+      props.msgs.current.showMessage('Map already saved in DB');
+    }
   }
 
   return (
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
-        {/* Decided to temporarily bring back save to cloud, as it may be 
-            useful for people who load in maps from file and want to save it
-            to their account */}
-        <button onClick={ref.current.SaveToDB} className="btn-test">
-          Save to Cloud
-        </button>
-        <button onClick={ref.current.LoadFromDB} className="btn-test">
-          Load from Cloud
-        </button>
         <button onClick={handleModalToggle} className="btn-test">
           Load another map
+        </button>
+        <button onClick={handleModalSaveToggle} className="btn-test">
+          Save to Account
         </button>
       </div>
       <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
@@ -133,7 +137,9 @@ const System_Toolbar = forwardRef((props, ref) => {
     <>
       <System_Toolbar_State
         ref={ref}
+        msgs={props.msgs}
         modal={props.modal}
+        profile={props.profile}
         changeModal={props.changeModal}
         download={props.download}
         upload={props.upload}

@@ -19,6 +19,7 @@ import {
   COLORS,
   NODE_TYPE,
   SIDEBAR_VIEW,
+  MODAL_VIEW,
   RELATIONSHIPS,
   STRESS_CODE,
   SIGMA_CURSOR,
@@ -71,16 +72,18 @@ const TestPage = () => {
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
+    view: MODAL_VIEW.START,
   });
 
-  const changeModal = (state) => {
+  const changeModal = (state, maps, view) => {
     setLoadMapModal({
       open: state,
+      maps: maps,
+      view: view,
     });
   };
 
   const changeProfile = (user, map, isSet) => {
-    console.log(user, map, isSet);
     setProfile({
       profileSet: isSet,
       userID: user,
@@ -89,15 +92,14 @@ const TestPage = () => {
   };
 
   const DBref = useRef({
-    SaveToDB() {
-      console.log(profile.mapID);
-      if (profile.profileSet) {
+    SaveToDB(mapID) {
+      if (profile.profileSet && graph.order > 0) {
         graph.forEachNode((current, attr) => {
           if (current) {
             instance
               .post(BACKEND_URL + '/map/node/create', {
                 userID: profile.userID,
-                mapID: profile.mapID,
+                mapID: mapID,
                 nodeinfo: {
                   nodeName: attr.label,
                   nodeID: current,
@@ -136,7 +138,7 @@ const TestPage = () => {
           if (current) {
             instance
               .post(BACKEND_URL + '/map/relationship/create', {
-                mapID: profile.mapID,
+                mapID: mapID,
                 relationshipinfo: {
                   relationshipID: current,
                   nodePair: {
@@ -394,6 +396,8 @@ const TestPage = () => {
           graph.clear();
           graph.import(jsonDataString);
 
+          changeProfile(profile.userID, '', false);
+
           let nodeList = [];
           graph.forEachNode((current, attr) => {
             nodeList = nodeList.concat({ id: current, label: attr.label });
@@ -582,7 +586,6 @@ const TestPage = () => {
         click: (event) => {
           if (clickTrigger === true) {
             const grabbed_pos = sigma.viewportToGraph(event);
-            console.log(grabbed_pos);
             setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
             if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
               if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
@@ -985,7 +988,9 @@ const TestPage = () => {
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar
           ref={DBref}
+          msgs={msgRef}
           modal={loadMapModal}
+          profile={profile}
           changeModal={changeModal}
           download={downloadMapJson}
           upload={uploadMapJson}
