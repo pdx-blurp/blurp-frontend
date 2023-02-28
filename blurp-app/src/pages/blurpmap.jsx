@@ -61,6 +61,8 @@ const TestPage = () => {
 
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
+  const [isSidebarOn, setIsSidebarOn] = useState(false);
+  const [mapTitle, setMapTitle] = useState("");
   const msgRef = useRef();
 
   // Temporary db userID/mapID for testing
@@ -353,7 +355,7 @@ const TestPage = () => {
 
     // Create the download link
     let downloadElement = document.createElement('a');
-    downloadElement.download = 'map.blurp';
+    downloadElement.download = `${mapTitle.trim()}.blurp`;
     downloadElement.href = jsonDataString;
 
     // Add the download link, click it, then remove it
@@ -475,6 +477,9 @@ const TestPage = () => {
                 },
               },
             })
+            .then((response) => {
+              msgRef.current.showMessage(mapToolbar + ' was successfully created');
+            })
             .catch((error) => {
               if (error.response) {
                 console.log(
@@ -493,6 +498,8 @@ const TestPage = () => {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
             });
+        } else {
+          msgRef.current.showMessage(mapToolbar + ' was successfully created');
         }
       }
     } else {
@@ -518,7 +525,6 @@ const TestPage = () => {
             size: size,
             color: edgeColor(edgeData.stressCode),
           });
-
           if (profile.profileSet) {
             instance
               .post(BACKEND_URL + '/map/relationship/create', {
@@ -537,6 +543,9 @@ const TestPage = () => {
                     size: size,
                   },
                 },
+              })
+              .then((response) => {
+                msgRef.current.showMessage(mapToolbar + ' was successfully created');
               })
               .catch((error) => {
                 if (error.response) {
@@ -558,6 +567,8 @@ const TestPage = () => {
                   );
                 }
               });
+          } else {
+            msgRef.current.showMessage(mapToolbar + ' was successfully created');
           }
         } else {
           // setUserNotification('Edge already exists between those nodes');
@@ -585,13 +596,18 @@ const TestPage = () => {
         },
         click: (event) => {
           if (clickTrigger === true) {
-            const grabbed_pos = sigma.viewportToGraph(event);
-            setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-            if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-              if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-                msgRef.current.showMessage('Not enough nodes to add edges to');
-              } else {
-                setIsModalOpen(true);
+            if (isSidebarOn) {
+              setIsSidebarOn(false);
+            } 
+            else {
+              const grabbed_pos = sigma.viewportToGraph(event);
+              setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
+              if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+                if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+                  msgRef.current.showMessage('Not enough nodes to add edges to');
+                } else {
+                  setIsModalOpen(true);
+                }
               }
             }
           }
@@ -698,6 +714,7 @@ const TestPage = () => {
                 event.node
               ),
             });
+            setIsSidebarOn(true);
           }
         },
         clickEdge: (event) => {
@@ -751,6 +768,7 @@ const TestPage = () => {
                 event.edge
               ),
             });
+            setIsSidebarOn(true);
           }
         },
         enterNode: (event) => {
@@ -760,6 +778,12 @@ const TestPage = () => {
         leaveNode: (event) => {
           setClickTrigger(true);
         },
+        enterEdge: (event) => {
+          setClickTrigger(false);
+        },
+        leaveEdge: (event) => {
+          setClickTrigger(true);
+        }
       });
     }, [registerEvents]);
 
@@ -971,7 +995,13 @@ const TestPage = () => {
           maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
-        <ControlsContainer className="absolute top-5 w-[500px]" position="top-center">
+        <div className="mapTitle ">
+          <label htmlFor="mapTitle" className=" text-sm font-medium text-gray-900 sr-only dark:text-white">Map Title</label>
+          <div className="relative w-96" >
+              <input type="mapTitle" id="mapTitle" className=" w-full p-4 pl-10 text-sm text-gray-900 border rounded-lg bg-gray-300 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Map Title" required onChange={(e) => setMapTitle(e.target.value)}/>
+          </div>
+        </div>
+        <ControlsContainer className="absolute top-5 w-[500px] mt-6" position="top-right">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
