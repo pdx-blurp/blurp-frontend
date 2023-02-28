@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGoogleLogin, googleLogout } from '@react-oauth/google';
-import guestPic from '../assets/guest_profile_pic.svg';
 import x_button from '../assets/x_button.svg';
-import axios from 'axios';
 import { useCookies } from 'react-cookie';
-import { StepConnector } from '@mui/material';
 
 // Redirect after logging in
 const redirectAfterLogin = 'http://localhost:5173';
@@ -16,19 +12,12 @@ function GoogleLoginButton (props) {
   const [popoutVisible, setPopoutVisible] = useState(false);
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
-  const [rerenderVar, setRerenderVar] = useState(false);
-  let loggedIn = false;
   let profilePicUrl = null;
   
   // If there's a connect.sid cookie and the user is logged in,
   // then load the page as though the user is logged in.
-  if(cookies['loggedIntoGoogle'] == 'true') {
-    loggedIn = true;
+  if (cookies['loggedIntoGoogle'] == 'true') {
     profilePicUrl = cookies['profilePicUrl'];
-  }
-
-  function rerender() {
-    setRerenderVar(!rerenderVar);
   }
 
   // Collapse popout if user clicks outside
@@ -47,7 +36,8 @@ function GoogleLoginButton (props) {
   
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
-    if(loggedIn) {
+    // If the user is logged in, render logged-in page
+    if(cookies['loggedIntoGoogle'] == 'true') {
       setRenderedContent(userProfile());
     }
     else {
@@ -74,10 +64,10 @@ function GoogleLoginButton (props) {
 
   // When the user clicks logout
   async function logout () {
-    fetch('http://localhost:3000/login/google/logout', {credentials: 'include'})
+    fetch('http://localhost:3000/login/google/logout', { credentials: 'include' })
       .then(res => res.json())
       .then((res) => {
-        if(res == 'success') {
+        if (res == 'success') {
           console.log('Logout success.');
           setRenderedContent(signInButton());
         }
@@ -111,7 +101,7 @@ function GoogleLoginButton (props) {
     return (
       <>
         <li className="cursor-pointer">
-          <img className="w-9 h-9 rounded-full" src={profilePicUrl} onClick={handle_profile_click} ref={profile_pic_ref}/>
+          <img className="w-9 h-9 rounded-full" src={profilePicUrl} referrerPolicy='no-referrer' onClick={handle_profile_click} ref={profile_pic_ref}/>
         </li>
         <div className={'absolute flex items-center mt-[120px] w-[180px] h-[60px] bg-gray-900/75 ' + popoutVisibility}  ref={expanded_div_ref}>
           <div className={'btn-navbar sign-in-btn inline-block align-middle'} onClick={logout}>
