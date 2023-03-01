@@ -461,6 +461,8 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
+        // Resetting size to the min value;
+        setSize(Math.log(2) * 25);
         camera.setState(prevState);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
@@ -823,7 +825,11 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 3)}
+                          defaultValue={1}
+                          onChange={(e) => {
+                            setSize(Math.log(e.target.value + 1) * 25);
+                          }}
+                          marks
                           min={1}
                           max={10}
                           aria-label="small"
