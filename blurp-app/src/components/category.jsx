@@ -18,10 +18,11 @@ const filters = [
 ];
 
 function Category(props) {
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [checkedState, setCheckedState] = useState(
     new Array(filters[0].options.length).fill(false)
   );
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [graph, setGraph] = useState(props.currentGraph);
 
   const handleChange = (position) => {
     const updatedCheckedState = checkedState.map((item, index) => {
@@ -34,6 +35,50 @@ function Category(props) {
 
     setCheckedState(updatedCheckedState);
   };
+
+  const filterGraph = () => {
+    graph.forEachNode((node, attributes) => {
+      console.log('here', node, attributes);
+    });
+    for (const { edge, attributes } of graph.edgeEntries()) {
+      console.log('edgekey', edge, attributes.stressCode);
+    }
+
+    setCheckedFilter();
+    checkedState.forEach((val, index) => {
+      if (filters[0].options[index].checked === true) {
+        console.log(
+          'Value',
+          filters[0].options[index].value,
+          'Color',
+          filters[0].options[index].label
+        );
+      }
+    });
+    let nodesArr = graph.filterNodes((node, attributes) => {
+      if (node !== '5c410bec-ec14-403c-8fb5-748362911c0b') {
+        return node;
+      }
+    });
+
+    let edges = graph.filterInEdges((edge, attribute, sources, target) => {
+      if (edge !== 'e0d9a226-73b5-4395-a9f3-b60abf00a48c') {
+        console.log('attrubute', attribute, 'source', sources, 'target', target);
+        //drop target node
+        graph.dropNode(sources);
+        return edge;
+      }
+    });
+
+    console.log('edge', edges);
+  };
+
+  const setCheckedFilter = () => {
+    checkedState.forEach((val, index) => {
+      filters[0].options[index].checked = val;
+    });
+  };
+
   return (
     <div>
       {/* Mobile filter dialog */}
@@ -105,6 +150,8 @@ function Category(props) {
                                     onChange={() => {
                                       handleChange(optionIdx);
                                     }}
+                                    //defaultChecked={option.checked}
+                                    // onClick={props.catFilter}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
                                   <label
@@ -117,12 +164,8 @@ function Category(props) {
 
                               {
                                 //sets the filters.options checked to true when checked or false when uncheked
-                                checkedState.forEach((val, index) => {
-                                  filters[0].options[index].checked = val;
-                                })
+                                filterGraph()
                               }
-
-                              {console.log(filters[0].options)}
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -144,7 +187,7 @@ function Category(props) {
               className="text-gray-500 hover:text-gray-800 sm:ml-1 lg:hidden"
               onClick={() => setMobileFiltersOpen(true)}>
               <span className="sr-only">Filters</span>
-              {<FunnelIcon className="h-5 w-5" aria-hidden="true" />}
+              <FunnelIcon className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </div>

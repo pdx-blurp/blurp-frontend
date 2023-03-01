@@ -48,23 +48,21 @@ const TestPage = () => {
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
+
   const child = useRef();
   const [clickTrigger, setClickTrigger] = useState(true);
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
-  const msgRef = useRef();
-  function filter() {
-    //graph
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-    graph.forEachNode((node, attributes) => {
-      console.log(node, attributes);
+  const msgRef = useRef();
+  const filterCategory = () => {
+    let arr = graph.filterNodes((node, attributes) => {
+      node !== 'c4794de1-70ff-4a4a-a65b-e69eb2ca7f21';
     });
 
-    for (const { edge, attributes } of graph.edgeEntries()) {
-      console.log(edge, attributes.stressCode);
-    }
-    return;
-  }
+    console.log('arr', arr);
+  };
   const DBref = useRef({
     SaveToDB() {
       console.log(JSON.stringify(graph));
@@ -355,9 +353,8 @@ const TestPage = () => {
         },
         clickCategory: (event) => {
           if (mapToolbar === MAP_TOOLS.category) {
-            console.log('category is clicked');
+            console.log(event);
           }
-          console.log('category is clicked');
         },
       });
     }, [registerEvents]);
@@ -536,11 +533,17 @@ const TestPage = () => {
                     </div>
                   </div>
                 )}
-                {modalTitle === 'Category' && (
+                {/*modalTitle === 'Category' && (
                   <div className="absolute inset-y-0 top-0 right-0">
-                    <Category filter={filter} currentGraph={graph} updateGraph={setGraph} />
+                    <Category
+                      filter={filter}
+                      currentGraph={graph}
+                      updateGraph={setGraph}
+                      mobFilter={mobileFiltersOpen}
+                      setMobFilter={setMobileFiltersOpen}
+                    />
                   </div>
-                )}
+                )*/}
                 {/*footer*/}
                 <div className="flex items-center justify-end rounded-b border-t border-solid border-slate-200 p-6">
                   <button
@@ -591,6 +594,7 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
+        <Category filtersCat={filterCategory} currentGraph={graph} updateGraph={setGraph} />
       </div>
 
       <div className="absolute inset-y-1/2 inset-x-1/2">
