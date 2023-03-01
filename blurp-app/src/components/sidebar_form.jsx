@@ -70,16 +70,6 @@ const SidebarForm = forwardRef((props, ref) => {
     }
   };
 
-  const display = () => {
-    console.log('name: ' + node.name);
-    console.log('years: ' + node.years);
-    console.log('notes: ' + node.notes);
-    console.log('type: ' + node.type);
-    console.log('relation: ' + edge.relation);
-    console.log('familiarity: ' + edge.familiarity);
-    console.log('stressCode: ' + edge.stressCode);
-  };
-
   const handleSubmit = (e) => {
     if (view == SIDEBAR_VIEW.edge) {
       props.changeEdgeData(

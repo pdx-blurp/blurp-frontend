@@ -103,6 +103,14 @@
     @apply bg-slate-900;
   }
 
+  .load-map-modal {
+    @apply absolute top-1/2 left-1/2 w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-xl border-2 border-solid border-gray-400 bg-gray-300 p-8 shadow-2xl;
+  }
+
+  .load-map-button {
+    @apply bg-fuchsia-750 my-2 rounded-lg p-2 font-bold text-white hover:bg-fuchsia-900;
+  }
+
   .system-toolbar {
     @apply absolute h-[100%] w-[150px] border-gray-400 bg-gray-300 transition transition-all ease-in-out;
   }
@@ -127,5 +135,9 @@
 
   .obj-deleted-msg {
     @apply pointer-events-none absolute right-[-90px] top-[100px] flex h-[40px] w-[200px] items-center justify-center rounded-lg border border-black bg-[#f4f466] text-center transition transition-all duration-300 ease-in-out;
+  }
+
+  .mapTitle { 
+    @apply w-full fixed top-0 flex justify-center mt-6
   }
 }
