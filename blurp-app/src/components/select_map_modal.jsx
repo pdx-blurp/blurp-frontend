@@ -24,10 +24,11 @@ const LoadMapModal = forwardRef((props, ref) => {
   }, [props.modal]);
 
   const handleClose = (reason) => {
-    // Prevents the user from clicking the outside of the modal on start
+    /* // Prevents the user from clicking the outside of the modal on start
     if (!reason || (reason && props.profile.mapID != '')) {
       props.changeModal(false, [], MODAL_VIEW.START);
-    }
+    } */
+    props.changeModal(false, [], MODAL_VIEW.START);
   };
 
   const createNewMap = (props, mapName) => {

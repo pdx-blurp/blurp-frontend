@@ -62,7 +62,7 @@ const TestPage = () => {
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
   const [isSidebarOn, setIsSidebarOn] = useState(false);
-  const [mapTitle, setMapTitle] = useState("");
+  const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
 
   // Temporary db userID/mapID for testing
@@ -442,9 +442,6 @@ const TestPage = () => {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
         let prev_state = sigma.getCamera().getState();
-        if (graph.order < 4) {
-          prev_state.ratio = CAMERA_MAX;
-        }
         const id = uuidv4();
         graph.addNode(id, {
           x: pos.x,
@@ -456,7 +453,9 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
-        sigma.getCamera().setState(prev_state);
+        // sigma.getCamera().setState(prev_state);
+        console.log(prev_state);
+        sigma.getCamera().animate({ x: prev_state.x, y: prev_state.y }, { duration: 10 });
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
@@ -598,8 +597,7 @@ const TestPage = () => {
           if (clickTrigger === true) {
             if (isSidebarOn) {
               setIsSidebarOn(false);
-            } 
-            else {
+            } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
               if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
@@ -783,7 +781,7 @@ const TestPage = () => {
         },
         leaveEdge: (event) => {
           setClickTrigger(true);
-        }
+        },
       });
     }, [registerEvents]);
 
@@ -996,12 +994,23 @@ const TestPage = () => {
           autoScale: false,
         }}>
         <div className="mapTitle ">
-          <label htmlFor="mapTitle" className=" text-sm font-medium text-gray-900 sr-only dark:text-white">Map Title</label>
-          <div className="relative w-96" >
-              <input type="mapTitle" id="mapTitle" className=" w-full p-4 pl-10 text-sm text-gray-900 border rounded-lg bg-gray-300 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Map Title" required onChange={(e) => setMapTitle(e.target.value)}/>
+          <label
+            htmlFor="mapTitle"
+            className=" sr-only text-sm font-medium text-gray-900 dark:text-white">
+            Map Title
+          </label>
+          <div className="relative w-96">
+            <input
+              type="mapTitle"
+              id="mapTitle"
+              className=" w-full rounded-lg border bg-gray-300 p-4 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Map Title"
+              required
+              onChange={(e) => setMapTitle(e.target.value)}
+            />
           </div>
         </div>
-        <ControlsContainer className="absolute top-5 w-[500px] mt-6" position="top-right">
+        <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
