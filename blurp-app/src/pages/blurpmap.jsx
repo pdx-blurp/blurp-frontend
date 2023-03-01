@@ -441,7 +441,15 @@ const TestPage = () => {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        let prev_state = sigma.getCamera().getState();
+        let camera = sigma.getCamera();
+        let prevState = camera.previousState;
+        if (graph.order < 4) {
+          if(prevState.ratio > CAMERA_MAX - 1) {
+            prevState.ratio = CAMERA_MAX;
+          } else {
+            prevState.ratio += 1.0;
+          }
+        }
         const id = uuidv4();
         graph.addNode(id, {
           x: pos.x,
@@ -453,9 +461,7 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
-        // sigma.getCamera().setState(prev_state);
-        console.log(prev_state);
-        sigma.getCamera().animate({ x: prev_state.x, y: prev_state.y }, { duration: 10 });
+        camera.setState(prevState);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance

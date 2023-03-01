@@ -2,7 +2,6 @@ import axios from 'axios';
 import { BACKEND_URL } from '../constants/constants';
 
 const getMaps = (profile) => {
-  console.log(BACKEND_URL);
   const id = profile.userID;
   let list = [];
   axios
