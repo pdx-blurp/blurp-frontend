@@ -14,6 +14,14 @@ class TempMessage extends React.Component {
     };
   }
 
+  // Caller may want to have message appear on load. When loaded,
+  // call showMessage to display the message.
+  componentDidMount() {
+    if (this.props.message && this.props.message != '') {
+      this.showMessage(this.props.message);
+    }
+  }
+
   showMessage = (new_msg) => {
     // Read props to see what to display and for how long
     this.setState({
