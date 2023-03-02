@@ -32,7 +32,6 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
-import getMaps from '../utils/utils';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -77,10 +76,9 @@ const TestPage = () => {
     view: MODAL_VIEW.START,
   });
 
-  const changeModal = (state, maps, view) => {
+  const changeModal = (state, view) => {
     setLoadMapModal({
       open: state,
-      maps: maps,
       view: view,
     });
   };
@@ -444,7 +442,7 @@ const TestPage = () => {
         let camera = sigma.getCamera();
         let prevState = camera.previousState;
         if (graph.order < 4) {
-          if(prevState.ratio > CAMERA_MAX - 1) {
+          if (prevState.ratio > CAMERA_MAX - 1) {
             prevState.ratio = CAMERA_MAX;
           } else {
             prevState.ratio += 1.0;
@@ -1022,10 +1020,10 @@ const TestPage = () => {
             />
           </div>
         </div>
+        <GraphEvents />
         <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
           <SearchControl />
         </ControlsContainer>
-        <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
         <DataSidebar
