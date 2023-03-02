@@ -81,7 +81,7 @@ function GoogleLoginButton (props) {
     // Set cookie to where to redirect to
     document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
     // Redirect to sign in
-    window.location.href = 'blurp-app.herokuapp.com/login/google';
+    window.location.href = 'https://blurp-app.herokuapp.com/login/google';
   }
   
   function signInButton () {
