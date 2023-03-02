@@ -37,40 +37,19 @@ function Category(props) {
   };
 
   const filterGraph = () => {
-    graph.forEachNode((node, attributes) => {
-      console.log('here', node, attributes);
-    });
-    for (const { edge, attributes } of graph.edgeEntries()) {
-      console.log('edgekey', edge, attributes.stressCode);
-    }
-
     setCheckedFilter();
     checkedState.forEach((val, index) => {
       if (filters[0].options[index].checked === true) {
-        console.log(
-          'Value',
-          filters[0].options[index].value,
-          'Color',
-          filters[0].options[index].label
-        );
+        graph.filterInEdges((edge, attribute, sources, target) => {
+          if (filters[0].options[index].value === attribute.stressCode.toString()) {
+            if (edge) {
+              graph.dropNode(sources);
+              return edge;
+            }
+          }
+        });
       }
     });
-    let nodesArr = graph.filterNodes((node, attributes) => {
-      if (node !== '5c410bec-ec14-403c-8fb5-748362911c0b') {
-        return node;
-      }
-    });
-
-    let edges = graph.filterInEdges((edge, attribute, sources, target) => {
-      if (edge !== 'e0d9a226-73b5-4395-a9f3-b60abf00a48c') {
-        console.log('attrubute', attribute, 'source', sources, 'target', target);
-        //drop target node
-        graph.dropNode(sources);
-        return edge;
-      }
-    });
-
-    console.log('edge', edges);
   };
 
   const setCheckedFilter = () => {
