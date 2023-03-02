@@ -3,7 +3,7 @@ import x_button from '../assets/x_button.svg';
 import { useCookies } from 'react-cookie';
 
 // Redirect after logging in
-const redirectAfterLogin = 'http://localhost:5173';
+const redirectAfterLogin = 'https://blurp-pdx.netlify.app/';
 
 function GoogleLoginButton (props) {
 
@@ -64,7 +64,7 @@ function GoogleLoginButton (props) {
 
   // When the user clicks logout
   async function logout () {
-    fetch('http://localhost:3000/login/google/logout', { credentials: 'include' })
+    fetch('blurp-app.herokuapp.com/login/google/logout', { credentials: 'include' })
       .then(res => res.json())
       .then((res) => {
         if (res == 'success') {
@@ -81,7 +81,7 @@ function GoogleLoginButton (props) {
     // Set cookie to where to redirect to
     document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
     // Redirect to sign in
-    window.location.href = 'http://localhost:3000/login/google';
+    window.location.href = 'blurp-app.herokuapp.com/login/google';
   }
   
   function signInButton () {
