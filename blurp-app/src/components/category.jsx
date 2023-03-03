@@ -40,18 +40,39 @@ function Category(props) {
     setCheckedFilter();
     checkedState.forEach((val, index) => {
       if (filters[0].options[index].checked === true) {
-        graph.filterInEdges((edge, attribute, sources, target) => {
+        graph.forEachEdge((edge, attribute, sources, target) => {
           if (filters[0].options[index].value === attribute.stressCode.toString()) {
-            graph.dropEdge(edge);
-            try {
-              if (graph.degree(sources) === 0) {
-                graph.dropNode(sources);
-              }
-              if (graph.degree(target) === 0) {
-                graph.dropNode(target);
-              }
-            } catch (e) {
-              console.log(e);
+            graph.setEdgeAttribute(edge, 'hidden', true);
+
+            const sourceEdges = hadEdges(sources);
+            const targetEdges = hadEdges(target);
+
+            if (sourceEdges) {
+              graph.setNodeAttribute(sources, 'hidden', true);
+            }
+
+            if (targetEdges) {
+              graph.setNodeAttribute(target, 'hidden', true);
+            }
+          }
+          return edge;
+        });
+      } else if (filters[0].options[index].checked === false) {
+        graph.forEachEdge((edge, attribute, sources, target) => {
+          if (filters[0].options[index].value === attribute.stressCode.toString()) {
+            if (graph.getNodeAttribute(sources, 'hidden', true) === true) {
+              graph.setNodeAttribute(sources, 'hidden', false);
+            }
+            if (graph.getNodeAttribute(target, 'hidden', true) === true) {
+              graph.setNodeAttribute(target, 'hidden', false);
+            }
+            if (graph.getEdgeAttribute(edge, 'hidden') === true) {
+              graph.updateEdgeAttributes(edge, (attr) => {
+                return {
+                  ...attr,
+                  hidden: false,
+                };
+              });
             }
           }
         });
@@ -65,6 +86,16 @@ function Category(props) {
     });
   };
 
+  const hadEdges = (node) => {
+    const sourceEdges = graph.edges(node).every((id, index) => {
+      if (graph.getEdgeAttribute(id, 'hidden') === true) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    return sourceEdges;
+  };
   return (
     <div>
       {/* Mobile filter dialog */}
