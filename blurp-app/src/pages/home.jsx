@@ -3,8 +3,20 @@ import BrandName from '../assets/blurp_full_logo_white.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
+import TempMessage from '../components/temp_msg_display';
+import { useRef } from 'react';
+import { useCookies } from 'react-cookie';
 
 const Home = () => {
+  const welcomeMsgRef = useRef(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
+  // If there's a userName, the user is logged in. Welcome msg:
+  let msgToDisplayOnLoad = '';
+  if (cookies['userName']) {
+    msgToDisplayOnLoad = "Hello, " + cookies['userName'];
+  }
+  
   return (
     <div className="landing-background">
       <NavbarProp />
@@ -55,6 +67,9 @@ const Home = () => {
           </div>
         </div>
         <Spline className="order-first xl:order-last xl:scale-[0.9] lg:scale-[0.88] md:scale-[0.72] scale-[0.55]" scene={SplineModel} />
+      </div>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+	      <TempMessage ref={welcomeMsgRef} message={msgToDisplayOnLoad} duration={1000}/>
       </div>
       <footer className="text-center text-white">Made with <div className="inline text-red-500">love</div> in 2022 by PDX Blurp</footer>
     </div>

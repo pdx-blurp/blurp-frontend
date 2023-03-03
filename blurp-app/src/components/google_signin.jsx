@@ -1,62 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGoogleLogin, googleLogout } from '@react-oauth/google';
-import guestPic from '../assets/guest_profile_pic.svg';
 import x_button from '../assets/x_button.svg';
-import axios from 'axios';
-import Cookies from 'universal-cookie';
+import { useCookies } from 'react-cookie';
+
+// Redirect after logging in
+const redirectAfterLogin = 'https://blurp-pdx.netlify.app/';
 
 function GoogleLoginButton (props) {
 
-  // What to render in place of the sign-in button
+  const [cookies, setCookie,  removeCookie] = useCookies();
   const [renderedContent, setRenderedContent] = useState(signInButton());
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
   const [popoutVisible, setPopoutVisible] = useState(false);
-  const cookies = new Cookies();
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
-
-  // Load cookies
-  if(!user && cookies.get('googleLoginUser')){
-    setUser(cookies.get('googleLoginUser'));
+  let profilePicUrl = null;
+  
+  // If there's a connect.sid cookie and the user is logged in,
+  // then load the page as though the user is logged in.
+  if (cookies['loggedIntoGoogle'] == 'true') {
+    profilePicUrl = cookies['profilePicUrl'];
   }
-
-  // Update cookies when user/profile change
-  useEffect(() => {
-    if(user && user != 'null')
-      cookies.set('googleLoginUser', user, {path: '/'});
-    else
-      cookies.remove('googleLoginUser');
-  }, [user, profile]);
-
-  // If the user changes, update the profile
-  useEffect(() => {
-    if(user && user != 'null') {
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-        headers: {
-          Authorization: `Basic ${user.access_token}`,
-          Accept: 'application/json'
-        }
-      }).then((res) => {
-        setProfile(res.data);
-      }).catch((err) => console.log(err));
-    }
-    else {
-      setProfile(null);
-    }
-  }, [user]);
-
-  // If the profile changes (logged in, logged out, image change, etc),
-  // then we should change what is rendered
-  useEffect(() => {
-    if(profile && profile != 'null') {
-      setPopoutVisible(false);
-      setRenderedContent(userProfile());
-    }
-    else {
-      setRenderedContent(signInButton);
-    }
-  }, [profile]);
 
   // Collapse popout if user clicks outside
   useEffect(() => {
@@ -71,22 +33,18 @@ function GoogleLoginButton (props) {
       document.removeEventListener('mousedown', handleClickOutside, true);
     }
   }, [closePopout]);
-
+  
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
-    if(profile && profile != 'null') {
+    // If the user is logged in, render logged-in page
+    if(cookies['loggedIntoGoogle'] == 'true') {
       setRenderedContent(userProfile());
     }
+    else {
+      setRenderedContent(signInButton());
+    }
   }, [popoutVisible])
-
-  function onLoginSuccess(googleUser) {
-    setUser(googleUser);
-  }
   
-  const onLoginFailure = (error) => {
-    console.log("Google sign-in failed.");
-  }
-
   // When the profile is clicked, switch the popout.
   // If expanded, collapse, and vice versa.
   function handle_profile_click () {
@@ -104,47 +62,46 @@ function GoogleLoginButton (props) {
     setPopoutVisible(false);
   }
 
-  // Expand the popout that appears when user clicks on
-  // their profile picture
-  function expandPopout () {
-    setPopoutVisible(true);
+  // When the user clicks logout
+  async function logout () {
+    fetch('blurp-app.herokuapp.com/login/google/logout', { credentials: 'include' })
+      .then(res => res.json())
+      .then((res) => {
+        if (res == 'success') {
+          console.log('Logout success.');
+          setRenderedContent(signInButton());
+        }
+      })
+      .catch((err) => {
+        console.log('Logout failed.');
+      });
   }
 
-  const login = useGoogleLogin({
-    onSuccess: codeResponse => onLoginSuccess(codeResponse),
-    onError: error => onLoginFailure(error)
-  });
-
-  // When the user clicks logout
-  function logout () {
-    googleLogout();
-    setUser(null);
-    setProfile(null);
-    cookies.remove('googleLoginUser');
+  function signIn() {
+    // Set cookie to where to redirect to
+    document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
+    // Redirect to sign in
+    window.location.href = 'blurp-app.herokuapp.com/login/google';
   }
   
   function signInButton () {
     return (
       <>
-        <li onClick={() => login()} className='btn-navbar sign-in-btn'>Sign In</li>
+        <li onClick={() => signIn()} className='btn-navbar sign-in-btn'>Sign In</li>
       </>
     );
   }
-
+  
   function userProfile () {
 
     let popoutVisibility = 'invisible';
     if(popoutVisible)
       popoutVisibility = '';
-
-    let imageUrl = guestPic;
-    if(profile && profile.picture)
-      imageUrl = profile.picture;
-
+      
     return (
       <>
         <li className="cursor-pointer">
-          <img className="w-9 h-9 rounded-full" src={imageUrl} onClick={handle_profile_click} ref={profile_pic_ref}/>
+          <img className="w-9 h-9 rounded-full" src={profilePicUrl} referrerPolicy='no-referrer' onClick={handle_profile_click} ref={profile_pic_ref}/>
         </li>
         <div className={'absolute flex items-center mt-[120px] w-[180px] h-[60px] bg-gray-900/75 ' + popoutVisibility}  ref={expanded_div_ref}>
           <div className={'btn-navbar sign-in-btn inline-block align-middle'} onClick={logout}>
