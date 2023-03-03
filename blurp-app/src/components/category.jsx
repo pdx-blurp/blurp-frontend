@@ -42,9 +42,16 @@ function Category(props) {
       if (filters[0].options[index].checked === true) {
         graph.filterInEdges((edge, attribute, sources, target) => {
           if (filters[0].options[index].value === attribute.stressCode.toString()) {
-            if (edge) {
-              graph.dropNode(sources);
-              return edge;
+            graph.dropEdge(edge);
+            try {
+              if (graph.degree(sources) === 0) {
+                graph.dropNode(sources);
+              }
+              if (graph.degree(target) === 0) {
+                graph.dropNode(target);
+              }
+            } catch (e) {
+              console.log(e);
             }
           }
         });
