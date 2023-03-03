@@ -38,7 +38,7 @@ const TestPage = () => {
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
-  const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
+  const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[5]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
   const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
