@@ -108,7 +108,7 @@
   }
 
   .load-map-button {
-    @apply bg-fuchsia-750 my-2 rounded-lg p-2 font-bold text-white hover:bg-fuchsia-900;
+    @apply bg-fuchsia-750 my-2 rounded-lg p-2 font-bold text-white hover:bg-fuchsia-900 text-sm;
   }
 
   .system-toolbar {

@@ -10,6 +10,7 @@ import {
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -32,7 +33,6 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
-import getMaps from '../utils/utils';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -55,6 +55,7 @@ const TestPage = () => {
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
   const child = useRef();
+  // const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
     timeout: 1000,
   });
@@ -62,25 +63,41 @@ const TestPage = () => {
   // Used for the message box that pops up and notifys users of errors
   const [userNotification, setUserNotification] = useState('');
   const [isSidebarOn, setIsSidebarOn] = useState(false);
-  const [mapTitle, setMapTitle] = useState("");
+  const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
 
   // Temporary db userID/mapID for testing
   const [profile, setProfile] = useState({
     profileSet: true,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    // userID: '',
     mapID: '',
   });
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
     view: MODAL_VIEW.START,
+    // When cookies are implemented, this will be default
+    // view: MODAL_VIEW.NOTLOGGEDIN,
   });
 
-  const changeModal = (state, maps, view) => {
+  /* useEffect(() => {
+    if (cookies.userID) {
+      setProfile({
+        ...profile,
+        userID: cookies.userID,
+      });
+
+      setLoadMapModal({
+        ...loadMapModal,
+        view: MODAL_VIEW.START,
+      });
+    }
+  }, [cookies]); */
+
+  const changeModal = (state, view) => {
     setLoadMapModal({
       open: state,
-      maps: maps,
       view: view,
     });
   };
@@ -441,9 +458,14 @@ const TestPage = () => {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        let prev_state = sigma.getCamera().getState();
+        let camera = sigma.getCamera();
+        let prevState = camera.previousState;
         if (graph.order < 4) {
-          prev_state.ratio = CAMERA_MAX;
+          if (prevState.ratio > CAMERA_MAX - 1) {
+            prevState.ratio = CAMERA_MAX;
+          } else {
+            prevState.ratio += 1.0;
+          }
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -456,7 +478,7 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
-        sigma.getCamera().setState(prev_state);
+        setSize(Math.log(2) * 30);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
@@ -598,8 +620,7 @@ const TestPage = () => {
           if (clickTrigger === true) {
             if (isSidebarOn) {
               setIsSidebarOn(false);
-            } 
-            else {
+            } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
               if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
@@ -783,7 +804,7 @@ const TestPage = () => {
         },
         leaveEdge: (event) => {
           setClickTrigger(true);
-        }
+        },
       });
     }, [registerEvents]);
 
@@ -819,7 +840,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 3)}
+                          onChange={(e) => setSize(Math.log(e.target.value + 1) * 30)}
                           min={1}
                           max={10}
                           aria-label="small"
@@ -996,12 +1017,23 @@ const TestPage = () => {
           autoScale: false,
         }}>
         <div className="mapTitle ">
-          <label htmlFor="mapTitle" className=" text-sm font-medium text-gray-900 sr-only dark:text-white">Map Title</label>
-          <div className="relative w-96" >
-              <input type="mapTitle" id="mapTitle" className=" w-full p-4 pl-10 text-sm text-gray-900 border rounded-lg bg-gray-300 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Map Title" required onChange={(e) => setMapTitle(e.target.value)}/>
+          <label
+            htmlFor="mapTitle"
+            className=" sr-only text-sm font-medium text-gray-900 dark:text-white">
+            Map Title
+          </label>
+          <div className="relative w-96">
+            <input
+              type="mapTitle"
+              id="mapTitle"
+              className=" w-full rounded-lg border bg-gray-300 p-4 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Map Title"
+              required
+              onChange={(e) => setMapTitle(e.target.value)}
+            />
           </div>
         </div>
-        <ControlsContainer className="absolute top-5 w-[500px] mt-6" position="top-right">
+        <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
@@ -1039,6 +1071,7 @@ const TestPage = () => {
         <LoadMapModal
           profile={profile}
           modal={loadMapModal}
+          // cookies={cookies}
           changeModal={changeModal}
           changeProfile={changeProfile}
           ref={DBref}
