@@ -47,7 +47,7 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   if (!props.show) return null;
 
   function handleCogwheelClick() {
-    alert('Cogwheel clicked.');
+    alert('[WIP] Personal Account Settings');
   }
 
   function handleImportClick() {
@@ -59,7 +59,7 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   }
 
   function handleModalToggle() {
-    props.changeModal(true, MODAL_VIEW.START);
+    props.changeModal(true, props.modal.view);
   }
 
   function handleModalSaveToggle() {

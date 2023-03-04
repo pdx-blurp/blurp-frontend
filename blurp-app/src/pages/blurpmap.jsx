@@ -77,6 +77,8 @@ const TestPage = () => {
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
     view: MODAL_VIEW.START,
+    // When cookies are implemented, this will be default
+    // view: MODAL_VIEW.NOTLOGGEDIN,
   });
 
   /* useEffect(() => {
@@ -93,10 +95,9 @@ const TestPage = () => {
     }
   }, [cookies]); */
 
-  const changeModal = (state, maps, view) => {
+  const changeModal = (state, view) => {
     setLoadMapModal({
       open: state,
-      maps: maps,
       view: view,
     });
   };
@@ -457,9 +458,14 @@ const TestPage = () => {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        let prev_state = sigma.getCamera().getState();
+        let camera = sigma.getCamera();
+        let prevState = camera.previousState;
         if (graph.order < 4) {
-          prev_state.ratio = CAMERA_MAX;
+          if (prevState.ratio > CAMERA_MAX - 1) {
+            prevState.ratio = CAMERA_MAX;
+          } else {
+            prevState.ratio += 1.0;
+          }
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -472,7 +478,7 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
-        sigma.getCamera().setState(prev_state);
+        setSize(Math.log(2) * 30);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
@@ -834,7 +840,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 3)}
+                          onChange={(e) => setSize(Math.log(e.target.value + 1) * 30)}
                           min={1}
                           max={10}
                           aria-label="small"

@@ -89,15 +89,15 @@ const LoadMapModal = forwardRef((props, ref) => {
           setLoading(false);
         });
     }
-  }, []);
-  // }, [props.profile]);
+    // }, []);
+  }, [props.profile]);
 
   const handleClose = (reason) => {
     /* // Prevents the user from clicking the outside of the modal on start
     if (!reason || (reason && props.profile.mapID != '')) {
       props.changeModal(false, [], MODAL_VIEW.START);
     } */
-    props.changeModal(false, [], MODAL_VIEW.START);
+    props.changeModal(false, props.modal.view);
   };
 
   const createNewMap = (props, mapName) => {
@@ -117,7 +117,7 @@ const LoadMapModal = forwardRef((props, ref) => {
       });
   };
 
-  const deleteMap = (profile, mapID) => {
+  const deleteMap = (profile, mapID, maps) => {
     const userID = profile.userID;
     axios
       .delete(BACKEND_URL + '/map/delete', {
@@ -135,6 +135,7 @@ const LoadMapModal = forwardRef((props, ref) => {
         );
       })
       .catch((error) => {
+        // Improve error handling here
         console.log(error);
       });
   };
@@ -143,9 +144,11 @@ const LoadMapModal = forwardRef((props, ref) => {
     if (!isLoading) {
       return <>{maps}</>;
     } else {
-      <>
-        <h1>Loading...</h1>
-      </>;
+      return (
+        <>
+          <h1>Loading...</h1>
+        </>
+      );
     }
   };
 
