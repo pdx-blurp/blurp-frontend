@@ -10,6 +10,7 @@ import {
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -54,6 +55,7 @@ const TestPage = () => {
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
   const child = useRef();
+  // const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
     timeout: 1000,
   });
@@ -68,6 +70,7 @@ const TestPage = () => {
   const [profile, setProfile] = useState({
     profileSet: true,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    // userID: '',
     mapID: '',
   });
 
@@ -76,9 +79,24 @@ const TestPage = () => {
     view: MODAL_VIEW.START,
   });
 
-  const changeModal = (state, view) => {
+  /* useEffect(() => {
+    if (cookies.userID) {
+      setProfile({
+        ...profile,
+        userID: cookies.userID,
+      });
+
+      setLoadMapModal({
+        ...loadMapModal,
+        view: MODAL_VIEW.START,
+      });
+    }
+  }, [cookies]); */
+
+  const changeModal = (state, maps, view) => {
     setLoadMapModal({
       open: state,
+      maps: maps,
       view: view,
     });
   };
@@ -439,14 +457,9 @@ const TestPage = () => {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        let camera = sigma.getCamera();
-        let prevState = camera.previousState;
+        let prev_state = sigma.getCamera().getState();
         if (graph.order < 4) {
-          if (prevState.ratio > CAMERA_MAX - 1) {
-            prevState.ratio = CAMERA_MAX;
-          } else {
-            prevState.ratio += 1.0;
-          }
+          prev_state.ratio = CAMERA_MAX;
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -459,9 +472,7 @@ const TestPage = () => {
           notes: '',
           color: color,
         });
-        // Resetting size to the min value;
-        setSize(Math.log(2) * 25);
-        camera.setState(prevState);
+        sigma.getCamera().setState(prev_state);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
@@ -823,11 +834,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          defaultValue={1}
-                          onChange={(e) => {
-                            setSize(Math.log(e.target.value + 1) * 25);
-                          }}
-                          marks
+                          onChange={(e) => setSize(e.target.value * 3)}
                           min={1}
                           max={10}
                           aria-label="small"
@@ -1020,10 +1027,10 @@ const TestPage = () => {
             />
           </div>
         </div>
-        <GraphEvents />
         <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
           <SearchControl />
         </ControlsContainer>
+        <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
         <DataSidebar
@@ -1058,6 +1065,7 @@ const TestPage = () => {
         <LoadMapModal
           profile={profile}
           modal={loadMapModal}
+          // cookies={cookies}
           changeModal={changeModal}
           changeProfile={changeProfile}
           ref={DBref}

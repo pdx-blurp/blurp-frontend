@@ -6,7 +6,8 @@ export const CAMERA_MAX = 3.0;
    https://github.com/vitejs/vite/issues/1973
    https://vitejs.dev/guide/env-and-mode.html
 */
-export const BACKEND_URL = import.meta.env.VITE_LOCAL_DEV;
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_DEV;
+export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_DEV;
 
 export enum COLORS {
   // node colors
@@ -44,6 +45,7 @@ export enum SIDEBAR_VIEW {
 export enum MODAL_VIEW {
   START = 'START',
   SAVING = 'SAVING',
+  NOTLOGGEDIN = 'NOTLOGGEDIN',
 }
 
 export enum MAP_TOOLS {
