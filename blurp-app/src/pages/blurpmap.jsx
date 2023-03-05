@@ -113,23 +113,24 @@ const TestPage = () => {
     });
   };
 
-  // Reset a specific node's color to its default
-  const resetNodeColor = (node) => {
-    let nodeType = graph.getNodeAttributes(node).entity;
+  const nodeTypeToColor = (nodeType) => {
     switch (nodeType) {
       case NODE_TYPE.PERSON:
-        graph.setNodeAttribute(node, 'color', COLORS.BROWN);
-        break;
+        return COLORS.BROWN;
       case NODE_TYPE.PLACE:
-        graph.setNodeAttribute(node, 'color', COLORS.GREY);
-        break;
+        return COLORS.GREY;
       case NODE_TYPE.IDEA:
-        graph.setNodeAttribute(node, 'color', COLORS.OLIVE);
-        break;
+        return COLORS.OLIVE;
       default:
-        break;
+        return COLORS.BROWN;
     }
-  }
+  };
+
+  // Reset a specific node's color to its default
+  const resetNodeColor = (node) => {
+    let nodeType = graph.getNodeAttribute(node, 'entity');
+    graph.setNodeAttribute(node, 'color', nodeTypeToColor(nodeType));
+  };
 
   // Reset the two selected nodes' colors
   const resetNodeColors = () => {
@@ -158,7 +159,8 @@ const TestPage = () => {
                 nodeinfo: {
                   nodeName: attr.label,
                   nodeID: current,
-                  color: attr.color,
+                  // color: attr.color,
+                  color: nodeTypeToColor(attr.entity),
                   size: attr.size,
                   age: attr.years === '' ? 0 : attr.years,
                   type: attr.entity.toLowerCase(),
@@ -250,7 +252,8 @@ const TestPage = () => {
                   size: node.size,
                   years: node.age === 0 ? '' : node.age,
                   notes: node.description,
-                  color: node.color,
+                  // color: node.color,
+                  color: nodeTypeToColor(node.type)
                 });
                 nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
               });
@@ -402,6 +405,7 @@ const TestPage = () => {
    * Triggers the user to download the map JSON as "map.blurp".
    */
   function downloadMapJson() {
+    resetEdgeSelection();
     // Get the JSON data string
     let jsonDataString =
       'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
@@ -514,7 +518,8 @@ const TestPage = () => {
           size: size,
           years: '',
           notes: '',
-          color: color,
+          // color: color,
+          color: nodeTypeToColor(nodeType),
         });
         setSize(Math.log(2) * 30);
         setNodes(nodes.concat({ id: id, label: name }));
@@ -526,7 +531,8 @@ const TestPage = () => {
               nodeinfo: {
                 nodeName: name,
                 nodeID: id,
-                color: color,
+                // color: color,
+                color: nodeTypeToColor(nodeType),
                 size: size,
                 age: 0,
                 type: nodeType.toLowerCase(),
@@ -989,6 +995,10 @@ const TestPage = () => {
                             ))}
                         </select>
                       </div> */}
+                      <div>
+                        <p>Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b></p>
+                        <p>Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b></p>
+                      </div>
                       <br />
                       <div>
                         <select
