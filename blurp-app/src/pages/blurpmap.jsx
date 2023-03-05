@@ -43,9 +43,6 @@ const TestPage = () => {
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
-  // When adding an edge, select 2 nodes
-  // const [selectedNode1, setSelectedNode1] = useState(null);
-  // let selectedNode2 = null;
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
   const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
@@ -638,8 +635,7 @@ const TestPage = () => {
             msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
           }
         } else {
-          // setUserNotification('Edge already exists between those nodes');
-          msgRef.current.showMessage('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between these nodes');
         }
       }
     }
@@ -668,13 +664,6 @@ const TestPage = () => {
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-              // if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-              //   if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-              //     msgRef.current.showMessage('Not enough nodes to add edges to');
-              //   } else {
-              //     setIsModalOpen(true);
-              //   }
-              // }
               if(mapToolbar === MAP_TOOLS.node) {
                 setModalTitle('Add Node');
                 setIsModalOpen(true);
@@ -773,13 +762,11 @@ const TestPage = () => {
             if(node1 == null) {
               setNode1(event.node);
               graph.setNodeAttribute(event.node, 'color', 'yellow');
-              console.log('first node selected:', event.node);
             }
             // Otherwise if this is the second node selected
             else {
               // Make sure it's not the same node
               if(node1 == event.node) {
-                console.log('same node selected');
                 resetNodeColor(event.node);
                 setNode1(null);
               }
@@ -797,9 +784,6 @@ const TestPage = () => {
                 else {
                   setNode2(event.node);
                   graph.setNodeAttribute(event.node, 'color', 'yellow');
-                  console.log('second node selected');
-                  console.log('first node:', node1);
-                  console.log('second node:', event.node);
                   setIsModalOpen(true);
                   setModalTitle('Add Edge');
                 }
@@ -971,43 +955,6 @@ const TestPage = () => {
                 {modalTitle === 'Add Edge' && (
                   <div className="relative flex-auto p-6">
                     <div>
-                      {/* <div>
-                        <select
-                          className="w-4/5 rounded text-center"
-                          value={node1}
-                          onChange={(e) => {
-                            setNode1(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes.map((node) => (
-                            <option key={node.id} value={node.id}>
-                              {node.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <select
-                          value={node2}
-                          className="w-4/5 rounded text-center"
-                          onChange={(e) => {
-                            setNode2(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes
-                            .filter((node) => node.id !== node1)
-                            .map((node) => (
-                              <option key={node.id} value={node.id}>
-                                {node.label}
-                              </option>
-                            ))}
-                        </select>
-                      </div> */}
                       <div>
                         <p>Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b></p>
                         <p>Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b></p>
