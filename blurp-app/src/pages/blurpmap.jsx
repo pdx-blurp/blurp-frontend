@@ -33,6 +33,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
+import { getLinearProgressUtilityClass } from '@mui/material';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -95,6 +96,35 @@ const TestPage = () => {
     }
   }, [cookies]); */
 
+  useEffect(() => {
+    graph.setAttribute('name', mapTitle);
+    if (profile.profileSet && profile.mapID != '') {
+      instance
+        .patch(BACKEND_URL + '/map/update', {
+          userID: profile.userID,
+          mapID: profile.mapID,
+          changes: { title: graph.getAttribute('name') },
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(error);
+            console.log(
+              'Error: Invalid post request, status:' +
+                error.response.status +
+                '\n' +
+                error.response.headers
+            );
+          } else if (error.request) {
+            console.log(
+              'Error: The server failed to respond to the post request\n' + error.message
+            );
+          } else {
+            console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+          }
+        });
+    }
+  }, [mapTitle]);
+
   const changeModal = (state, view) => {
     setLoadMapModal({
       open: state,
@@ -113,6 +143,28 @@ const TestPage = () => {
   const DBref = useRef({
     SaveToDB(mapID) {
       if (profile.profileSet && graph.order > 0) {
+        instance
+          .patch(BACKEND_URL + '/map/update', {
+            mapID: profile.mapID,
+            userID: profile.userID,
+            title: graph.getAttribute('name'),
+          })
+          .catch((error) => {
+            if (error.response) {
+              console.log(
+                'Error: Invalid post request, status:' +
+                  error.response.status +
+                  '\n' +
+                  error.response.headers
+              );
+            } else if (error.request) {
+              console.log(
+                'Error: The server failed to respond to the post request\n' + error.message
+              );
+            } else {
+              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+            }
+          });
         graph.forEachNode((current, attr) => {
           if (current) {
             instance
@@ -202,9 +254,11 @@ const TestPage = () => {
             mapID: mapID,
           })
           .then((response) => {
+            console.log(response);
             graph.clear();
             let nodeList = [];
             response.data.forEach((data) => {
+              setMapTitle(data.title);
               data.nodes.forEach((node) => {
                 graph.addNode(node.nodeID, {
                   x: node.pos.x,
@@ -1016,26 +1070,26 @@ const TestPage = () => {
           maxCameraRatio: CAMERA_MAX,
           autoScale: false,
         }}>
-        <div className="mapTitle ">
+        <div className="mapTitle">
           <label
             htmlFor="mapTitle"
             className=" sr-only text-sm font-medium text-gray-900 dark:text-white">
             Map Title
           </label>
-          <div className="relative w-96">
-            <input
-              type="mapTitle"
-              id="mapTitle"
-              className=" w-full rounded-lg border bg-gray-300 p-4 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Map Title"
-              required
-              onChange={(e) => setMapTitle(e.target.value)}
-            />
-          </div>
+          <input
+            type="mapTitle"
+            id="mapTitle"
+            name="mapTitle"
+            className="titleBox"
+            placeholder="Map Title"
+            required
+            value={mapTitle}
+            onChange={(e) => setMapTitle(e.target.value)}
+          />
+          <ControlsContainer className="w-96" position="top-right">
+            <SearchControl />
+          </ControlsContainer>
         </div>
-        <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
-          <SearchControl />
-        </ControlsContainer>
         <GraphEvents />
       </SigmaContainer>
       <div className="absolute inset-y-0 right-0">
@@ -1071,9 +1125,13 @@ const TestPage = () => {
         <LoadMapModal
           profile={profile}
           modal={loadMapModal}
+          mapTitle={mapTitle}
           // cookies={cookies}
           changeModal={changeModal}
           changeProfile={changeProfile}
+          changeTitle={(title) => {
+            setMapTitle(title);
+          }}
           ref={DBref}
         />
       </div>

@@ -48,7 +48,6 @@ const LoadMapModal = forwardRef((props, ref) => {
                       className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
                         props.changeProfile(props.profile.userID, e.target.value, true);
-
                         ref.current.LoadFromDB(e.target.value);
                         handleClose();
                       }}>
@@ -109,6 +108,7 @@ const LoadMapModal = forwardRef((props, ref) => {
       })
       .then((response) => {
         props.changeProfile(props.profile.userID, response.data.mapID, true);
+        props.changeTitle(mapName);
         // Won't do anything if the graph being saved has no nodes
         ref.current.SaveToDB(response.data.mapID);
       })
@@ -251,6 +251,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                 className="load-map-button float-right my-2 h-10 w-1/4"
                 onClick={() => {
                   props.changeProfile(props.profile.userID, props.profile.mapID, false);
+                  props.changeTitle(mapName);
                   handleClose();
                 }}>
                 Start a local session
