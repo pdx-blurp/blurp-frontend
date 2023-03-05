@@ -33,7 +33,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
-import { getLinearProgressUtilityClass } from '@mui/material';
+import { capitalize } from '@mui/material';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -55,6 +55,8 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
+  // Tell the user how to create an edge the first time they select the edge tool
+  const [showEdgeMessage, setShowEdgeMessage] = useState(true);
   const child = useRef();
   // const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
@@ -62,7 +64,6 @@ const TestPage = () => {
   });
 
   // Used for the message box that pops up and notifys users of errors
-  const [userNotification, setUserNotification] = useState('');
   const [isSidebarOn, setIsSidebarOn] = useState(false);
   const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
@@ -140,6 +141,38 @@ const TestPage = () => {
     });
   };
 
+  const nodeTypeToColor = (nodeType) => {
+    switch (nodeType) {
+      case NODE_TYPE.PERSON:
+        return COLORS.BROWN;
+      case NODE_TYPE.PLACE:
+        return COLORS.GREY;
+      case NODE_TYPE.IDEA:
+        return COLORS.OLIVE;
+      default:
+        return COLORS.BROWN;
+    }
+  };
+
+  // Reset a specific node's color to its default
+  const resetNodeColor = (node) => {
+    let nodeType = graph.getNodeAttribute(node, 'entity');
+    graph.setNodeAttribute(node, 'color', nodeTypeToColor(nodeType));
+  };
+
+  // Reset the two selected nodes' colors
+  const resetNodeColors = () => {
+    if (node1) resetNodeColor(node1);
+    if (node2) resetNodeColor(node2);
+  };
+
+  // Reset edge selection (user may have edges selected, reset)
+  const resetEdgeSelection = () => {
+    setNode1(null);
+    setNode2(null);
+    resetNodeColors();
+  };
+
   const SaveToDB = () => {
     instance
       .post(BACKEND_URL + '/map/create', {
@@ -162,7 +195,7 @@ const TestPage = () => {
                   nodeinfo: {
                     nodeName: attr.label,
                     nodeID: current,
-                    color: attr.color,
+                    color: nodeTypeToColor(attr.entity),
                     size: attr.size,
                     age: attr.years === '' ? 0 : attr.years,
                     type: attr.entity.toLowerCase(),
@@ -271,7 +304,7 @@ const TestPage = () => {
                 size: node.size,
                 years: node.age === 0 ? '' : node.age,
                 notes: node.description,
-                color: node.color,
+                color: nodeTypeToColor(node.type),
               });
               nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
             });
@@ -420,6 +453,7 @@ const TestPage = () => {
    * Triggers the user to download the map JSON as "map.blurp".
    */
   function downloadMapJson() {
+    resetEdgeSelection();
     // Get the JSON data string
     let jsonDataString =
       'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
@@ -486,12 +520,18 @@ const TestPage = () => {
   }
 
   function handleToolbarEvent(data) {
+    resetEdgeSelection();
     if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
       setMapToolbar(MAP_TOOLS.node);
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
       setMapToolbar(MAP_TOOLS.edge);
+      // If this is their first time selecting edge tool, specify how to use
+      if (showEdgeMessage) {
+        msgRef.current.showMessage('Select two nodes to add an edge.');
+        setShowEdgeMessage(false);
+      }
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
     } else {
@@ -508,6 +548,7 @@ const TestPage = () => {
   };
 
   function handleSubmit() {
+    resetEdgeSelection();
     if (mapToolbar === MAP_TOOLS.node && sigma) {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
@@ -530,7 +571,8 @@ const TestPage = () => {
           size: size,
           years: '',
           notes: '',
-          color: color,
+          // color: color,
+          color: nodeTypeToColor(nodeType),
         });
         setSize(Math.log(2) * 30);
         setNodes(nodes.concat({ id: id, label: name }));
@@ -542,7 +584,8 @@ const TestPage = () => {
               nodeinfo: {
                 nodeName: name,
                 nodeID: id,
-                color: color,
+                // color: color,
+                color: nodeTypeToColor(nodeType),
                 size: size,
                 age: 0,
                 type: nodeType.toLowerCase(),
@@ -554,7 +597,7 @@ const TestPage = () => {
               },
             })
             .then((response) => {
-              msgRef.current.showMessage(mapToolbar + ' was successfully created');
+              msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
             })
             .catch((error) => {
               if (error.response) {
@@ -575,7 +618,7 @@ const TestPage = () => {
               }
             });
         } else {
-          msgRef.current.showMessage(mapToolbar + ' was successfully created');
+          msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
       }
     } else {
@@ -621,7 +664,7 @@ const TestPage = () => {
                 },
               })
               .then((response) => {
-                msgRef.current.showMessage(mapToolbar + ' was successfully created');
+                msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
               })
               .catch((error) => {
                 if (error.response) {
@@ -644,11 +687,10 @@ const TestPage = () => {
                 }
               });
           } else {
-            msgRef.current.showMessage(mapToolbar + ' was successfully created');
+            msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
           }
         } else {
-          // setUserNotification('Edge already exists between those nodes');
-          msgRef.current.showMessage('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between these nodes');
         }
       }
     }
@@ -677,12 +719,9 @@ const TestPage = () => {
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-              if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-                if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-                  msgRef.current.showMessage('Not enough nodes to add edges to');
-                } else {
-                  setIsModalOpen(true);
-                }
+              if (mapToolbar === MAP_TOOLS.node) {
+                setModalTitle('Add Node');
+                setIsModalOpen(true);
               }
             }
           }
@@ -768,6 +807,41 @@ const TestPage = () => {
             }
             //reenable the click trigger
             setClickTrigger(true);
+          } else if (mapToolbar === MAP_TOOLS.edge) {
+            // This block occurs when the user is in 'edge' mode and clicks
+            // on a node.
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            // If this is the first node selected, simply record this node
+            if (node1 == null) {
+              setNode1(event.node);
+              graph.setNodeAttribute(event.node, 'color', 'yellow');
+            }
+            // Otherwise if this is the second node selected
+            else {
+              // Make sure it's not the same node
+              if (node1 == event.node) {
+                resetNodeColor(event.node);
+                setNode1(null);
+              } else {
+                // If there's already a node between these two nodes, don't show modal
+                let edgeExists = false;
+                for (const x of graph.edges(node1, event.node)) {
+                  if (x) {
+                    edgeExists = true;
+                  }
+                }
+                if (edgeExists) {
+                  msgRef.current.showMessage('Edge already exists between those nodes');
+                } else {
+                  setNode2(event.node);
+                  graph.setNodeAttribute(event.node, 'color', 'yellow');
+                  setIsModalOpen(true);
+                  setModalTitle('Add Edge');
+                }
+              }
+            }
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -935,41 +1009,12 @@ const TestPage = () => {
                   <div className="relative flex-auto p-6">
                     <div>
                       <div>
-                        <select
-                          className="w-4/5 rounded text-center"
-                          value={node1}
-                          onChange={(e) => {
-                            setNode1(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes.map((node) => (
-                            <option key={node.id} value={node.id}>
-                              {node.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <select
-                          value={node2}
-                          className="w-4/5 rounded text-center"
-                          onChange={(e) => {
-                            setNode2(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes
-                            .filter((node) => node.id !== node1)
-                            .map((node) => (
-                              <option key={node.id} value={node.id}>
-                                {node.label}
-                              </option>
-                            ))}
-                        </select>
+                        <p>
+                          Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b>
+                        </p>
+                        <p>
+                          Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b>
+                        </p>
                       </div>
                       <br />
                       <div>
@@ -1041,7 +1086,10 @@ const TestPage = () => {
                   <button
                     className="background-transparent mr-1 mb-1 px-6 py-2 text-sm font-bold uppercase text-red-500 outline-none transition-all duration-150 ease-linear focus:outline-none"
                     type="button"
-                    onClick={() => setIsModalOpen(false)}>
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      resetEdgeSelection();
+                    }}>
                     Close
                   </button>
                   <button
@@ -1118,7 +1166,7 @@ const TestPage = () => {
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
-        <TempMessage message={userNotification} ref={msgRef} />
+        <TempMessage ref={msgRef} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
