@@ -113,6 +113,39 @@ const TestPage = () => {
     });
   };
 
+  // Reset a specific node's color to its default
+  const resetNodeColor = (node) => {
+    let nodeType = graph.getNodeAttributes(node).entity;
+    switch (nodeType) {
+      case NODE_TYPE.PERSON:
+        graph.setNodeAttribute(node, 'color', COLORS.BROWN);
+        break;
+      case NODE_TYPE.PLACE:
+        graph.setNodeAttribute(node, 'color', COLORS.GREY);
+        break;
+      case NODE_TYPE.IDEA:
+        graph.setNodeAttribute(node, 'color', COLORS.OLIVE);
+        break;
+      default:
+        break;
+    }
+  }
+
+  // Reset the two selected nodes' colors
+  const resetNodeColors = () => {
+    if(node1)
+      resetNodeColor(node1);
+    if(node2)
+      resetNodeColor(node2);
+  }
+
+  // Reset edge selection (user may have edges selected, reset)
+  const resetEdgeSelection = () => {
+    setNode1(null);
+    setNode2(null);
+    resetNodeColors();
+  }
+
   const DBref = useRef({
     SaveToDB(mapID) {
       if (profile.profileSet && graph.order > 0) {
@@ -435,13 +468,12 @@ const TestPage = () => {
   }
 
   function handleToolbarEvent(data) {
+    resetEdgeSelection();
     if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
       setMapToolbar(MAP_TOOLS.node);
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
-      setNode1(null);
-      setNode2(null);
       setMapToolbar(MAP_TOOLS.edge);
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
@@ -459,6 +491,7 @@ const TestPage = () => {
   };
 
   function handleSubmit() {
+    resetEdgeSelection();
     if (mapToolbar === MAP_TOOLS.node && sigma) {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
@@ -732,6 +765,7 @@ const TestPage = () => {
             // If this is the first node selected, simply record this node
             if(node1 == null) {
               setNode1(event.node);
+              graph.setNodeAttribute(event.node, 'color', 'yellow');
               console.log('first node selected:', event.node);
             }
             // Otherwise if this is the second node selected
@@ -739,9 +773,12 @@ const TestPage = () => {
               // Make sure it's not the same node
               if(node1 == event.node) {
                 console.log('same node selected');
+                resetNodeColor(event.node);
+                setNode1(null);
               }
               else {
                 setNode2(event.node);
+                graph.setNodeAttribute(event.node, 'color', 'yellow');
                 console.log('second node selected');
                 console.log('first node:', node1);
                 console.log('second node:', event.node);
@@ -1022,7 +1059,11 @@ const TestPage = () => {
                   <button
                     className="background-transparent mr-1 mb-1 px-6 py-2 text-sm font-bold uppercase text-red-500 outline-none transition-all duration-150 ease-linear focus:outline-none"
                     type="button"
-                    onClick={() => setIsModalOpen(false)}>
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      resetEdgeSelection();
+                    }
+                  }>
                     Close
                   </button>
                   <button
