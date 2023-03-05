@@ -55,6 +55,8 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
+  // Tell the user how to create an edge the first time they select the edge tool
+  const [showEdgeMessage, setShowEdgeMessage] = useState(true);
   const child = useRef();
   // const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
@@ -476,7 +478,11 @@ const TestPage = () => {
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
       setMapToolbar(MAP_TOOLS.edge);
-      msgRef.current.showMessage('Select two nodes to add an edge.');
+      // If this is their first time selecting edge tool, specify how to use
+      if(showEdgeMessage) {
+        msgRef.current.showMessage('Select two nodes to add an edge.');
+        setShowEdgeMessage(false);
+      }
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
     } else {
