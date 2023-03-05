@@ -75,6 +75,14 @@ export enum RELATIONSHIPS {
   situational = 'situational',
 }
 
+export const FAMILIARITY = {
+  UNFAMILIAR: { label: 'Unfamiliar', value: 2},
+  SOMEWHAT_FAMILIAR: { label: 'Somewhat familiar', value: 4},
+  MODERATELY_FAMILIAR: { label: 'Moderately familiar', value: 6},
+  VERY_FAMILIAR: { label: 'Very familiar', value: 8},
+  HIGHLY_FAMILIAR: { label: 'Highly familiar', value: 10},
+}
+
 /* 
 Decided to use ints here as the data object doc specifies that the stress code is stored in an int
 */
