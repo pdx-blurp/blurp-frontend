@@ -42,6 +42,9 @@ const TestPage = () => {
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
+  // When adding an edge, select 2 nodes
+  // const [selectedNode1, setSelectedNode1] = useState(null);
+  // let selectedNode2 = null;
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
   const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
@@ -437,6 +440,8 @@ const TestPage = () => {
       setMapToolbar(MAP_TOOLS.node);
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
+      setNode1(null);
+      setNode2(null);
       setMapToolbar(MAP_TOOLS.edge);
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
@@ -623,12 +628,16 @@ const TestPage = () => {
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-              if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-                if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-                  msgRef.current.showMessage('Not enough nodes to add edges to');
-                } else {
-                  setIsModalOpen(true);
-                }
+              // if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
+              //   if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
+              //     msgRef.current.showMessage('Not enough nodes to add edges to');
+              //   } else {
+              //     setIsModalOpen(true);
+              //   }
+              // }
+              if(mapToolbar === MAP_TOOLS.node) {
+                setModalTitle('Add Node');
+                setIsModalOpen(true);
               }
             }
           }
@@ -714,6 +723,32 @@ const TestPage = () => {
             }
             //reenable the click trigger
             setClickTrigger(true);
+          } else if(mapToolbar === MAP_TOOLS.edge) {
+            // This block occurs when the user is in 'edge' mode and clicks
+            // on a node.
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            // If this is the first node selected, simply record this node
+            if(node1 == null) {
+              setNode1(event.node);
+              console.log('first node selected:', event.node);
+            }
+            // Otherwise if this is the second node selected
+            else {
+              // Make sure it's not the same node
+              if(node1 == event.node) {
+                console.log('same node selected');
+              }
+              else {
+                setNode2(event.node);
+                console.log('second node selected');
+                console.log('first node:', node1);
+                console.log('second node:', event.node);
+                setIsModalOpen(true);
+                setModalTitle('Add Edge');
+              }
+            }
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -880,7 +915,7 @@ const TestPage = () => {
                 {modalTitle === 'Add Edge' && (
                   <div className="relative flex-auto p-6">
                     <div>
-                      <div>
+                      {/* <div>
                         <select
                           className="w-4/5 rounded text-center"
                           value={node1}
@@ -916,7 +951,7 @@ const TestPage = () => {
                               </option>
                             ))}
                         </select>
-                      </div>
+                      </div> */}
                       <br />
                       <div>
                         <select
