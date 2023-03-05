@@ -62,6 +62,10 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     props.changeModal(true, props.modal.view);
   }
 
+  function handleScreenshotClick() {
+    props.screenshotMap();
+  }
+
   function handleModalSaveToggle() {
     if (!props.profile.profileSet) {
       props.changeModal(true, MODAL_VIEW.SAVING);
@@ -78,6 +82,9 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         </button>
         <button onClick={handleModalSaveToggle} className="btn-test">
           Save to Account
+        </button>
+        <button onClick={handleScreenshotClick} className="btn-test">
+          Screenshot
         </button>
       </div>
       <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
@@ -142,6 +149,7 @@ const System_Toolbar = forwardRef((props, ref) => {
         changeModal={props.changeModal}
         download={props.download}
         upload={props.upload}
+        screenshotMap={props.screenshotMap}
         expanded={expanded}
         toggle_toolbar={switchToolbar}
         onClickOutside={collapseToolbar}
