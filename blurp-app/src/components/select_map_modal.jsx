@@ -18,6 +18,7 @@ const LoadMapModal = forwardRef((props, ref) => {
   const [isLoading, setLoading] = useState(true);
   const [mapName, setMapName] = useState('');
   const [genList, setGenList] = useState();
+  const [errorMsg, setErrorMsg] = useState();
 
   useEffect(() => {
     /* 
@@ -40,30 +41,34 @@ const LoadMapModal = forwardRef((props, ref) => {
         })
         .catch((error) => {
           let error_msg = '';
-          if (error.response) {
-            error_msg =
-              'Error: Invalid post request, status:' +
-              error.response.status +
-              '\n' +
-              error.response.headers;
+          let dev_error_msg = '';
+          if (error.response && error.response.data) {
+            /* Temporary; currently backend will report that the user wasn't found
+               in the case that the user has no maps */
+            if (error.response.data.error === 'Could not find user') {
+              error_msg = 'No maps on account';
+            } else {
+              error_msg = error.response.data;
+            }
+            (dev_error_msg = 'status code: ' + error.response.status), error.response.data;
           } else if (error.request) {
-            error_msg = 'Error: The server failed to respond to the post request\n' + error.message;
+            error_msg = 'Server not responding';
+            dev_error_msg = error.request;
           } else {
-            error_msg = 'Error: Some error has occured\n' + 'error message:\n' + error.message;
+            error_msg = 'failed to load maps, some error has occured';
+            dev_error_msg = error;
           }
-
-          console.log(error_msg);
-          setMaps(<p>Failed to retrieve maps ({error_msg})</p>);
+          console.log(dev_error_msg);
+          setErrorMsg(error_msg);
           setLoading(false);
         });
     }
   }, [props.profile]);
 
   useEffect(() => {
-    console.log(maps);
     const list = mapList();
     setGenList(list);
-  }, [maps]);
+  }, [maps, errorMsg]);
 
   const handleClose = (reason) => {
     /* // Prevents the user from clicking the outside of the modal on start
@@ -73,26 +78,7 @@ const LoadMapModal = forwardRef((props, ref) => {
     props.changeModal(false, props.modal.view);
   };
 
-  const createNewMap = (props, mapName) => {
-    const id = props.profile.userID;
-    axios
-      .post(BACKEND_URL + '/map/create', {
-        userID: id,
-        title: mapName,
-      })
-      .then((response) => {
-        props.changeProfile(props.profile.userID, response.data.mapID, true);
-        props.changeTitle(mapName);
-        // Won't do anything if the graph being saved has no nodes
-        ref.current.SaveToDB(response.data.mapID);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   const deleteMap = (profile, mapID) => {
-    console.log(maps);
     const userID = profile.userID;
     axios
       .delete(BACKEND_URL + '/map/delete', {
@@ -103,6 +89,10 @@ const LoadMapModal = forwardRef((props, ref) => {
       })
       .then((response) => {
         console.log('map deleted');
+        if (mapID == profile.mapID) {
+          props.clearGraph();
+          props.changeProfile(props.profile.userID, '', false);
+        }
         setMaps(
           maps.filter((current) => {
             return current[0] != mapID;
@@ -116,42 +106,50 @@ const LoadMapModal = forwardRef((props, ref) => {
   };
 
   const mapList = () => {
-    if (!isLoading) {
+    if (!isLoading && maps) {
       return (
         <>
-          {maps.map((value) => (
-            <ListItem
-              key={value[0]}
-              disableGutters
-              sx={{ width: '98%' }}
-              className="my-3 rounded-lg bg-gray-50"
-              secondaryAction={
-                <div className="h-full">
-                  <button
-                    value={value[0]}
-                    className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
-                    onClick={(e) => {
-                      props.changeProfile(props.profile.userID, e.target.value, true);
-                      ref.current.LoadFromDB(e.target.value);
-                      handleClose();
-                    }}>
-                    Select
-                  </button>
-                  <button
-                    value={value[0]}
-                    className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
-                    onClick={(e) => {
-                      deleteMap(props.profile, e.target.value);
-                    }}>
-                    Delete
-                  </button>
-                </div>
-              }>
-              <div className="mx-2">{value[1]}</div>
-            </ListItem>
-          ))}
+          {maps.length > 0 ? (
+            maps.map((value) => (
+              <ListItem
+                key={value[0]}
+                disableGutters
+                sx={{ width: '98%' }}
+                className="my-3 rounded-lg bg-gray-50"
+                secondaryAction={
+                  <div className="h-full">
+                    <button
+                      value={value[0]}
+                      className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
+                      onClick={(e) => {
+                        props.changeProfile(props.profile.userID, e.target.value, true);
+                        props.LoadFromDB(e.target.value);
+                        handleClose();
+                      }}>
+                      Select
+                    </button>
+                    <button
+                      value={value[0]}
+                      className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
+                      onClick={(e) => {
+                        deleteMap(props.profile, e.target.value);
+                      }}>
+                      Delete
+                    </button>
+                  </div>
+                }>
+                <div className="mx-2">{value[1]}</div>
+              </ListItem>
+            ))
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-black">No maps on account</h1>
+            </>
+          )}
         </>
       );
+    } else if (!isLoading) {
+      return <h1 className="text-2xl font-bold text-black">{errorMsg}</h1>;
     } else {
       return (
         <>
@@ -169,7 +167,7 @@ const LoadMapModal = forwardRef((props, ref) => {
             <h1 className="text-center text-2xl text-black">Maps on your account</h1>
             <List
               sx={{ margin: '12px 0 12px 0' }}
-              className="grid max-h-96 w-full grid-cols-1 justify-items-center overflow-auto rounded-lg bg-neutral-400">
+              className="grid max-h-96 w-full grid-cols-1 justify-items-center overflow-auto rounded-lg border border-neutral-400">
               {genList}
             </List>
             <form>
@@ -180,14 +178,20 @@ const LoadMapModal = forwardRef((props, ref) => {
                   placeholder="Enter the name of a new map"
                   className="my-2 h-10 w-9/12 rounded-lg p-2"
                   value={mapName}
+                  required
                   onChange={(e) => setMapName(e.target.value)}
                 />
                 <button
-                  type="button"
+                  type="submit"
                   className="load-map-button float-right my-2 h-10 w-1/5"
-                  onClick={() => {
-                    createNewMap(props, mapName);
-                    handleClose();
+                  onClick={(e) => {
+                    if (mapName != '') {
+                      // Done to prevent title appearing in URL after submit
+                      e.preventDefault();
+                      props.changeTitle(mapName);
+                      props.SaveToDB();
+                      handleClose();
+                    }
                   }}>
                   Create new map
                 </button>
@@ -196,42 +200,20 @@ const LoadMapModal = forwardRef((props, ref) => {
                 <p>
                   Or, you could:
                   <button
-                    type="button"
+                    type="submit"
                     className="load-map-button m-2 h-10 w-1/4"
-                    onClick={() => {
-                      props.changeProfile(props.profile.userID, props.profile.mapID, false);
-                      handleClose();
+                    onClick={(e) => {
+                      if (mapName != '') {
+                        e.preventDefault();
+                        props.changeTitle(mapName);
+                        props.changeProfile(props.profile.userID, props.profile.mapID, false);
+                        handleClose();
+                      }
                     }}>
                     Start a local session
                   </button>
                 </p>
               </div>
-            </form>
-          </>
-        );
-      case MODAL_VIEW.SAVING:
-        return (
-          <>
-            <h1 className="text-center text-2xl text-black">Save to your account</h1>
-            <br />
-            <form>
-              <input
-                type="text"
-                name="mapName"
-                placeholder="Enter the name of a new map"
-                className="my-2 h-10 w-9/12 rounded-lg p-2"
-                value={mapName}
-                onChange={(e) => setMapName(e.target.value)}
-              />
-              <button
-                type="button"
-                className="load-map-button float-right my-2 h-10 w-1/5"
-                onClick={() => {
-                  createNewMap(props, mapName);
-                  handleClose();
-                }}>
-                Create new map
-              </button>
             </form>
           </>
         );
@@ -253,15 +235,19 @@ const LoadMapModal = forwardRef((props, ref) => {
                 placeholder="Enter the name of a new map"
                 className="my-2 h-10 w-8/12 rounded-lg p-2"
                 value={mapName}
+                required
                 onChange={(e) => setMapName(e.target.value)}
               />
               <button
-                type="button"
+                type="submit"
                 className="load-map-button float-right my-2 h-10 w-1/4"
-                onClick={() => {
-                  props.changeProfile(props.profile.userID, props.profile.mapID, false);
-                  props.changeTitle(mapName);
-                  handleClose();
+                onClick={(e) => {
+                  if (mapName != '') {
+                    e.preventDefault();
+                    props.changeTitle(mapName);
+                    props.changeProfile(props.profile.userID, props.profile.mapID, false);
+                    handleClose();
+                  }
                 }}>
                 Start a local session
               </button>
@@ -286,4 +272,3 @@ const LoadMapModal = forwardRef((props, ref) => {
 });
 
 export default LoadMapModal;
-1;

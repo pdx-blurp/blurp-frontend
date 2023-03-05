@@ -140,178 +140,178 @@ const TestPage = () => {
     });
   };
 
-  const DBref = useRef({
-    SaveToDB(mapID) {
-      if (profile.profileSet && graph.order > 0) {
-        instance
-          .patch(BACKEND_URL + '/map/update', {
-            mapID: profile.mapID,
-            userID: profile.userID,
-            title: graph.getAttribute('name'),
-          })
-          .catch((error) => {
-            if (error.response) {
-              console.log(
-                'Error: Invalid post request, status:' +
-                  error.response.status +
-                  '\n' +
-                  error.response.headers
-              );
-            } else if (error.request) {
-              console.log(
-                'Error: The server failed to respond to the post request\n' + error.message
-              );
-            } else {
-              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
-            }
-          });
-        graph.forEachNode((current, attr) => {
-          if (current) {
-            instance
-              .post(BACKEND_URL + '/map/node/create', {
-                userID: profile.userID,
-                mapID: mapID,
-                nodeinfo: {
-                  nodeName: attr.label,
-                  nodeID: current,
-                  color: attr.color,
-                  size: attr.size,
-                  age: attr.years === '' ? 0 : attr.years,
-                  type: attr.entity.toLowerCase(),
-                  description: attr.notes,
-                  pos: {
-                    x: attr.x,
-                    y: attr.y,
-                  },
-                },
-              })
-              .catch((error) => {
-                if (error.response) {
-                  console.log(
-                    'Error: Invalid post request, status:' +
-                      error.response.status +
-                      '\n' +
-                      error.response.headers
-                  );
-                } else if (error.request) {
-                  console.log(
-                    'Error: The server failed to respond to the post request\n' + error.message
-                  );
-                } else {
-                  console.log(
-                    'Error: Some error has occured\n' + 'error message:\n' + error.message
-                  );
-                }
-              });
-          }
+  const SaveToDB = () => {
+    instance
+      .post(BACKEND_URL + '/map/create', {
+        userID: profile.userID,
+        title: graph.getAttribute('name'),
+      })
+      .then((response) => {
+        setProfile({
+          ...profile,
+          mapID: response.data.mapID,
+          profileSet: true,
         });
-        graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
-          if (current) {
-            instance
-              .post(BACKEND_URL + '/map/relationship/create', {
-                mapID: mapID,
-                relationshipinfo: {
-                  relationshipID: current,
-                  nodePair: {
-                    nodeOne: source,
-                    nodeTwo: target,
-                  },
-                  description: 'unused',
-                  relationshipType: {
-                    type: attr.label,
-                    familiarity: attr.familiarity,
-                    stressCode: attr.stressCode,
+        if (graph.order > 0) {
+          graph.forEachNode((current, attr) => {
+            if (current) {
+              instance
+                .post(BACKEND_URL + '/map/node/create', {
+                  userID: profile.userID,
+                  mapID: response.data.mapID,
+                  nodeinfo: {
+                    nodeName: attr.label,
+                    nodeID: current,
+                    color: attr.color,
                     size: attr.size,
+                    age: attr.years === '' ? 0 : attr.years,
+                    type: attr.entity.toLowerCase(),
+                    description: attr.notes,
+                    pos: {
+                      x: attr.x,
+                      y: attr.y,
+                    },
                   },
-                },
-              })
-              .catch((error) => {
-                if (error.response) {
-                  console.log(
-                    'Error: Invalid post request, status:' +
-                      error.response.status +
-                      '\n' +
-                      error.response.headers
-                  );
-                } else if (error.request) {
-                  console.log(
-                    'Error: The server failed to respond to the post request\n' + error.message
-                  );
-                } else {
-                  console.log(
-                    'Error: Some error has occured\n' + 'error message:\n' + error.message
-                  );
-                }
-              });
-          }
-        });
-      }
-    },
-    LoadFromDB(mapID) {
-      if (profile.profileSet) {
-        instance
-          .post(BACKEND_URL + '/map/get', {
-            mapID: mapID,
-          })
-          .then((response) => {
-            console.log(response);
-            graph.clear();
-            let nodeList = [];
-            response.data.forEach((data) => {
-              setMapTitle(data.title);
-              data.nodes.forEach((node) => {
-                graph.addNode(node.nodeID, {
-                  x: node.pos.x,
-                  y: node.pos.y,
-                  label: node.nodeName,
-                  entity: node.type.toUpperCase(),
-                  size: node.size,
-                  years: node.age === 0 ? '' : node.age,
-                  notes: node.description,
-                  color: node.color,
-                });
-                nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
-              });
-              data.relationships.forEach((edge) => {
-                graph.addEdgeWithKey(
-                  edge.relationshipID,
-                  edge.nodePair.nodeOne,
-                  edge.nodePair.nodeTwo,
-                  {
-                    label: edge.relationshipType.type,
-                    familiarity: edge.relationshipType.familiarity,
-                    stressCode: edge.relationshipType.stressCode,
-                    node1: '',
-                    node2: '',
-                    size: edge.relationshipType.size,
-                    color: edgeColor(edge.relationshipType.stressCode),
+                })
+                .catch((error) => {
+                  if (error.response) {
+                    console.log(
+                      'Error: Invalid post request, status:' +
+                        error.response.status +
+                        '\n' +
+                        error.response.headers
+                    );
+                  } else if (error.request) {
+                    console.log(
+                      'Error: The server failed to respond to the post request\n' + error.message
+                    );
+                  } else {
+                    console.log(
+                      'Error: Some error has occured\n' + 'error message:\n' + error.message
+                    );
                   }
-                );
-              });
-            });
-            setNodes(nodeList);
-          })
-          .catch((error) => {
-            if (error.response) {
-              console.log(
-                'Error: Invalid get request, status:' +
-                  error.response.status +
-                  '\n' +
-                  error.response.headers
-              );
-              msgRef.current.showMessage('Failed to load from cloud, bad request');
-            } else if (error.request) {
-              console.log(
-                'Error: The server failed to respond to the get request\n' + error.message
-              );
-              msgRef.current.showMessage('Failed to load from cloud, server not responding');
-            } else {
-              console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+                });
             }
           });
-      }
-    },
-  });
+          graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
+            if (current) {
+              instance
+                .post(BACKEND_URL + '/map/relationship/create', {
+                  mapID: response.data.mapID,
+                  relationshipinfo: {
+                    relationshipID: current,
+                    nodePair: {
+                      nodeOne: source,
+                      nodeTwo: target,
+                    },
+                    description: 'unused',
+                    relationshipType: {
+                      type: attr.label,
+                      familiarity: attr.familiarity,
+                      stressCode: attr.stressCode,
+                      size: attr.size,
+                    },
+                  },
+                })
+                .catch((error) => {
+                  if (error.response) {
+                    console.log(
+                      'Error: Invalid post request, status:' +
+                        error.response.status +
+                        '\n' +
+                        error.response.headers
+                    );
+                  } else if (error.request) {
+                    console.log(
+                      'Error: The server failed to respond to the post request\n' + error.message
+                    );
+                  } else {
+                    console.log(
+                      'Error: Some error has occured\n' + 'error message:\n' + error.message
+                    );
+                  }
+                });
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(
+            'Error: Invalid post request, status:' +
+              error.response.status +
+              '\n' +
+              error.response.headers
+          );
+        } else if (error.request) {
+          console.log('Error: The server failed to respond to the post request\n' + error.message);
+        } else {
+          console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+        }
+      });
+  };
+
+  const LoadFromDB = (mapID) => {
+    if (profile.profileSet) {
+      instance
+        .post(BACKEND_URL + '/map/get', {
+          mapID: mapID,
+        })
+        .then((response) => {
+          graph.clear();
+          let nodeList = [];
+          response.data.forEach((data) => {
+            setMapTitle(data.title);
+            data.nodes.forEach((node) => {
+              graph.addNode(node.nodeID, {
+                x: node.pos.x,
+                y: node.pos.y,
+                label: node.nodeName,
+                entity: node.type.toUpperCase(),
+                size: node.size,
+                years: node.age === 0 ? '' : node.age,
+                notes: node.description,
+                color: node.color,
+              });
+              nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
+            });
+            data.relationships.forEach((edge) => {
+              graph.addEdgeWithKey(
+                edge.relationshipID,
+                edge.nodePair.nodeOne,
+                edge.nodePair.nodeTwo,
+                {
+                  label: edge.relationshipType.type,
+                  familiarity: edge.relationshipType.familiarity,
+                  stressCode: edge.relationshipType.stressCode,
+                  node1: '',
+                  node2: '',
+                  size: edge.relationshipType.size,
+                  color: edgeColor(edge.relationshipType.stressCode),
+                }
+              );
+            });
+          });
+          setNodes(nodeList);
+        })
+        .catch((error) => {
+          if (error.response) {
+            console.log(
+              'Error: Invalid get request, status:' +
+                error.response.status +
+                '\n' +
+                error.response.headers
+            );
+            msgRef.current.showMessage('Failed to load from cloud, bad request');
+          } else if (error.request) {
+            console.log('Error: The server failed to respond to the get request\n' + error.message);
+            msgRef.current.showMessage('Failed to load from cloud, server not responding');
+          } else {
+            console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+          }
+        });
+    }
+  };
 
   function changeNodeData(name, years, notes, id) {
     try {
@@ -426,7 +426,7 @@ const TestPage = () => {
 
     // Create the download link
     let downloadElement = document.createElement('a');
-    downloadElement.download = `${mapTitle.trim()}.blurp`;
+    downloadElement.download = mapTitle != '' ? `${mapTitle.trim()}.blurp` : `new map.blurp`;
     downloadElement.href = jsonDataString;
 
     // Add the download link, click it, then remove it
@@ -470,7 +470,7 @@ const TestPage = () => {
           graph.import(jsonDataString);
 
           changeProfile(profile.userID, '', false);
-
+          setMapTitle(graph.getAttribute('name'));
           let nodeList = [];
           graph.forEachNode((current, attr) => {
             nodeList = nodeList.concat({ id: current, label: attr.label });
@@ -1103,8 +1103,10 @@ const TestPage = () => {
       </div>
       <div className="absolute inset-y-0 left-0">
         <System_Toolbar
-          ref={DBref}
+          SaveToDB={SaveToDB}
+          LoadFromDB={LoadFromDB}
           msgs={msgRef}
+          mapTitle={mapTitle}
           modal={loadMapModal}
           profile={profile}
           changeModal={changeModal}
@@ -1123,6 +1125,8 @@ const TestPage = () => {
       </div>
       <div>
         <LoadMapModal
+          SaveToDB={SaveToDB}
+          LoadFromDB={LoadFromDB}
           profile={profile}
           modal={loadMapModal}
           mapTitle={mapTitle}
@@ -1131,8 +1135,13 @@ const TestPage = () => {
           changeProfile={changeProfile}
           changeTitle={(title) => {
             setMapTitle(title);
+            /* graph name is also being set here since SaveToDB
+               doesn't see the change until one state change later */
+            graph.setAttribute('name', title);
           }}
-          ref={DBref}
+          clearGraph={() => {
+            graph.clear();
+          }}
         />
       </div>
     </div>

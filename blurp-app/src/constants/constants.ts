@@ -44,7 +44,6 @@ export enum SIDEBAR_VIEW {
 
 export enum MODAL_VIEW {
   START = 'START',
-  SAVING = 'SAVING',
   NOTLOGGEDIN = 'NOTLOGGEDIN',
 }
 
