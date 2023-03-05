@@ -17,6 +17,7 @@ const LoadMapModal = forwardRef((props, ref) => {
   const [maps, setMaps] = useState();
   const [isLoading, setLoading] = useState(true);
   const [mapName, setMapName] = useState('');
+  const [genList, setGenList] = useState();
 
   useEffect(() => {
     /* 
@@ -34,39 +35,7 @@ const LoadMapModal = forwardRef((props, ref) => {
           response.data.forEach((current) => {
             list.push([current.mapID, current.title]);
           });
-          setMaps(
-            list.map((value) => (
-              <ListItem
-                key={value[0]}
-                disableGutters
-                sx={{ width: '98%' }}
-                className="my-3 rounded-lg bg-gray-50"
-                secondaryAction={
-                  <div className="h-full">
-                    <button
-                      value={value[0]}
-                      className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
-                      onClick={(e) => {
-                        props.changeProfile(props.profile.userID, e.target.value, true);
-                        ref.current.LoadFromDB(e.target.value);
-                        handleClose();
-                      }}>
-                      Select
-                    </button>
-                    <button
-                      value={value[0]}
-                      className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
-                      onClick={(e) => {
-                        deleteMap(props.profile, e.target.value);
-                      }}>
-                      Delete
-                    </button>
-                  </div>
-                }>
-                <div className="mx-2">{value[1]}</div>
-              </ListItem>
-            ))
-          );
+          setMaps(list);
           setLoading(false);
         })
         .catch((error) => {
@@ -88,8 +57,13 @@ const LoadMapModal = forwardRef((props, ref) => {
           setLoading(false);
         });
     }
-    // }, []);
   }, [props.profile]);
+
+  useEffect(() => {
+    console.log(maps);
+    const list = mapList();
+    setGenList(list);
+  }, [maps]);
 
   const handleClose = (reason) => {
     /* // Prevents the user from clicking the outside of the modal on start
@@ -117,7 +91,8 @@ const LoadMapModal = forwardRef((props, ref) => {
       });
   };
 
-  const deleteMap = (profile, mapID, maps) => {
+  const deleteMap = (profile, mapID) => {
+    console.log(maps);
     const userID = profile.userID;
     axios
       .delete(BACKEND_URL + '/map/delete', {
@@ -142,7 +117,41 @@ const LoadMapModal = forwardRef((props, ref) => {
 
   const mapList = () => {
     if (!isLoading) {
-      return <>{maps}</>;
+      return (
+        <>
+          {maps.map((value) => (
+            <ListItem
+              key={value[0]}
+              disableGutters
+              sx={{ width: '98%' }}
+              className="my-3 rounded-lg bg-gray-50"
+              secondaryAction={
+                <div className="h-full">
+                  <button
+                    value={value[0]}
+                    className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
+                    onClick={(e) => {
+                      props.changeProfile(props.profile.userID, e.target.value, true);
+                      ref.current.LoadFromDB(e.target.value);
+                      handleClose();
+                    }}>
+                    Select
+                  </button>
+                  <button
+                    value={value[0]}
+                    className="h-full rounded-r-lg bg-red-600 p-2 font-bold text-white hover:bg-red-900"
+                    onClick={(e) => {
+                      deleteMap(props.profile, e.target.value);
+                    }}>
+                    Delete
+                  </button>
+                </div>
+              }>
+              <div className="mx-2">{value[1]}</div>
+            </ListItem>
+          ))}
+        </>
+      );
     } else {
       return (
         <>
@@ -161,7 +170,7 @@ const LoadMapModal = forwardRef((props, ref) => {
             <List
               sx={{ margin: '12px 0 12px 0' }}
               className="grid max-h-96 w-full grid-cols-1 justify-items-center overflow-auto rounded-lg bg-neutral-400">
-              {mapList()}
+              {genList}
             </List>
             <form>
               <div>

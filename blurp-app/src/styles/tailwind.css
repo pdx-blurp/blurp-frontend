@@ -138,10 +138,10 @@
   }
 
   .mapTitle {
-    @apply absolute top-0 mt-6 flex w-full flex-none justify-evenly;
+    @apply absolute top-0 mt-3 flex w-full justify-evenly;
   }
 
   .titleBox {
-    @apply w-96 rounded-lg border bg-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500;
+    @apply mt-1 w-96 rounded-lg border bg-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500;
   }
 }
