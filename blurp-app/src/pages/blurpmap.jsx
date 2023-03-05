@@ -783,13 +783,25 @@ const TestPage = () => {
                 setNode1(null);
               }
               else {
-                setNode2(event.node);
-                graph.setNodeAttribute(event.node, 'color', 'yellow');
-                console.log('second node selected');
-                console.log('first node:', node1);
-                console.log('second node:', event.node);
-                setIsModalOpen(true);
-                setModalTitle('Add Edge');
+                // If there's already a node between these two nodes, don't show modal
+                let edgeExists = false;
+                for (const x of graph.edges(node1, event.node)) {
+                  if (x) {
+                    edgeExists = true;
+                  }
+                };
+                if(edgeExists) {
+                  msgRef.current.showMessage('Edge already exists between those nodes');
+                }
+                else {
+                  setNode2(event.node);
+                  graph.setNodeAttribute(event.node, 'color', 'yellow');
+                  console.log('second node selected');
+                  console.log('first node:', node1);
+                  console.log('second node:', event.node);
+                  setIsModalOpen(true);
+                  setModalTitle('Add Edge');
+                }
               }
             }
           } else {
