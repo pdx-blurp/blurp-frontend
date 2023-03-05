@@ -63,7 +63,7 @@ const LoadMapModal = forwardRef((props, ref) => {
           setLoading(false);
         });
     }
-  }, [props.profile]);
+  }, [props.profile.profileSet]);
 
   useEffect(() => {
     const list = mapList();
@@ -76,6 +76,7 @@ const LoadMapModal = forwardRef((props, ref) => {
       props.changeModal(false, [], MODAL_VIEW.START);
     } */
     props.changeModal(false, props.modal.view);
+    setMapName('');
   };
 
   const deleteMap = (profile, mapID) => {
@@ -188,6 +189,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                     if (mapName != '') {
                       // Done to prevent title appearing in URL after submit
                       e.preventDefault();
+                      props.clearGraph();
                       props.changeTitle(mapName);
                       props.SaveToDB();
                       handleClose();
