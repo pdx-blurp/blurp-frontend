@@ -33,6 +33,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
+import { capitalize } from '@mui/material';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -64,7 +65,6 @@ const TestPage = () => {
   });
 
   // Used for the message box that pops up and notifys users of errors
-  const [userNotification, setUserNotification] = useState('');
   const [isSidebarOn, setIsSidebarOn] = useState(false);
   const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
@@ -479,6 +479,7 @@ const TestPage = () => {
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
       setMapToolbar(MAP_TOOLS.edge);
+      msgRef.current.showMessage('Select two nodes to add an edge.');
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
     } else {
@@ -544,7 +545,7 @@ const TestPage = () => {
               },
             })
             .then((response) => {
-              msgRef.current.showMessage(mapToolbar + ' was successfully created');
+              msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
             })
             .catch((error) => {
               if (error.response) {
@@ -565,7 +566,7 @@ const TestPage = () => {
               }
             });
         } else {
-          msgRef.current.showMessage(mapToolbar + ' was successfully created');
+          msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
       }
     } else {
@@ -611,7 +612,7 @@ const TestPage = () => {
                 },
               })
               .then((response) => {
-                msgRef.current.showMessage(mapToolbar + ' was successfully created');
+                msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
               })
               .catch((error) => {
                 if (error.response) {
@@ -634,7 +635,7 @@ const TestPage = () => {
                 }
               });
           } else {
-            msgRef.current.showMessage(mapToolbar + ' was successfully created');
+            msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
           }
         } else {
           // setUserNotification('Edge already exists between those nodes');
@@ -1160,7 +1161,7 @@ const TestPage = () => {
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
-        <TempMessage message={userNotification} ref={msgRef} />
+        <TempMessage ref={msgRef} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
