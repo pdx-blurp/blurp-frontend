@@ -475,15 +475,12 @@ const TestPage = () => {
 
   /**
    * Save the Sigma graph as a PNG file
+   * Here is the code that is referenced from Sigma 
+   * https://codesandbox.io/s/github/jacomyal/sigma.js/tree/main/examples/png-snapshot?file=/index.ts 
    */
   function screenshotMap() {
     const container = document.getElementById("blurp-map-container");
 
-
-    // const renderer = new Sigma(graph, container, {
-    //   renderEdgeLabels: true,
-    // });
-    // renderer.setGraph(graph);
     const layout = new ForceSupervisor(graph);
     layout.start();
 
@@ -500,7 +497,6 @@ const TestPage = () => {
 
 
     const tmpRenderer = new Sigma(sigma.getGraph(), tmpRoot, sigma.getSettings());
-    //changed renderer --> sigma ^ and renderer.getSettings to sigma.getSettings
 
 
       // Copy camera and force to render now, to avoid having to wait the schedule /
@@ -550,7 +546,6 @@ const TestPage = () => {
       tmpRenderer.kill();
       tmpRoot.remove();
     }, "image/png");
-    //renderer.kill();
   }
 
   function handleToolbarEvent(data) {
