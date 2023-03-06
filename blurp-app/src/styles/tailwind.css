@@ -108,7 +108,7 @@
   }
 
   .load-map-button {
-    @apply bg-fuchsia-750 my-2 rounded-lg p-2 font-bold text-white hover:bg-fuchsia-900 text-sm;
+    @apply bg-fuchsia-750 my-2 rounded-lg p-2 text-sm font-bold text-white hover:bg-fuchsia-900;
   }
 
   .system-toolbar {
@@ -137,7 +137,11 @@
     @apply pointer-events-none absolute right-[-90px] top-[100px] flex h-fit w-[200px] p-[3px] items-center justify-center rounded-lg border border-black bg-[#f4f466] text-center transition transition-all duration-300 ease-in-out;
   }
 
-  .mapTitle { 
-    @apply w-full fixed top-0 flex justify-center mt-6
+  .mapTitle {
+    @apply absolute top-0 mt-3 flex w-full justify-evenly;
+  }
+
+  .titleBox {
+    @apply mt-1 w-96 rounded-lg border bg-gray-300 p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500;
   }
 }
