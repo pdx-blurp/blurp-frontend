@@ -7,6 +7,7 @@ import {
   SearchControl,
   useSigma,
 } from '@react-sigma/core';
+import Sigma from 'sigma';
 import getNodeProgramImage from 'sigma/rendering/webgl/programs/node.image';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
@@ -55,6 +56,7 @@ const TestPage = () => {
   const [node2, setNode2] = useState('');
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
+  const [draggedNode, setDraggedNode] = useState(null); // for allowing nodes to be dragged across map
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
@@ -1014,6 +1016,39 @@ const TestPage = () => {
             setIsSidebarOn(true);
           }
         },
+        downNode: (event) => {
+          // react sigma guide for drag'n'drop:
+          // https://sim51.github.io/react-sigma/docs/example/drag_n_drop/
+          if(mapToolbar === MAP_TOOLS.person
+            || mapToolbar === MAP_TOOLS.place
+            || mapToolbar === MAP_TOOLS.idea
+            || mapToolbar === MAP_TOOLS.edge
+            || mapToolbar === MAP_TOOLS.select
+            || mapToolbar === MAP_TOOLS.eraser) {
+            setDraggedNode(event.node);
+            graph.setNodeAttribute(event.node, 'highlighted', true);
+          }
+        },
+        mousedown: (event) => {
+          if (!sigma.getCustomBBox()) sigma.setCustomBBox(sigma.getBBox());
+        },
+        mousemove: (event) => {
+          if (draggedNode) {
+            // commit that reveals camera enable/disable
+            // https://github.com/jacomyal/sigma.js/commit/b7e45548d3dfdbfb8237a935db13b1c3baf88b6c
+            sigma.getCamera().disable();
+            const nodePosition = sigma.viewportToFramedGraph(event);
+            graph.setNodeAttribute(draggedNode, "x", nodePosition.x);
+            graph.setNodeAttribute(draggedNode, "y", nodePosition.y);
+          }
+        },
+        mouseup: (event) => {
+          if (draggedNode) {
+            sigma.getCamera().enable();
+            graph.removeNodeAttribute(draggedNode, "highlighted");
+            setDraggedNode(null);
+          }
+        },
         enterNode: (event) => {
           //once we enter a node, we do not want to trigger the click event. Only the clickNode.
           setClickTrigger(false);
@@ -1026,7 +1061,7 @@ const TestPage = () => {
         },
         leaveEdge: (event) => {
           setClickTrigger(true);
-        },
+        }
       });
     }, [registerEvents]);
 
