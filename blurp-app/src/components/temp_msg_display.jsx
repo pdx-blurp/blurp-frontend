@@ -1,7 +1,7 @@
 import React from 'react';
 
-const HIDDEN_MSG_CLASS = 'obj-deleted-msg opacity-0';
-const VISIBLE_MSG_CLASS = 'obj-deleted-msg opacity-100';
+const HIDDEN_MSG_CLASS = 'temp-msg opacity-0';
+const VISIBLE_MSG_CLASS = 'temp-msg opacity-100';
 
 class TempMessage extends React.Component {
   constructor(props) {

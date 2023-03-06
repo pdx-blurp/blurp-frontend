@@ -21,7 +21,7 @@ function ConfirmDeleteForm (props) {
 
   function delete_clicked() {
     hideForm();
-    tempMsgRef.current.showMessage();
+    tempMsgRef.current.showMessage('Object was deleted');
   }
 
   useEffect(() => {
@@ -52,7 +52,7 @@ function ConfirmDeleteForm (props) {
         </button>
         </div>
       </div>
-      <TempMessage message='Object was deleted' duration={1500} ref={tempMsgRef}></TempMessage>
+      <TempMessage ref={tempMsgRef}></TempMessage>
     </>
   );
 }
