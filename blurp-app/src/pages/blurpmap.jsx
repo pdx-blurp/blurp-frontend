@@ -539,7 +539,7 @@ const TestPage = () => {
 
     // Save the canvas as a PNG image:
     canvas.toBlob((blob) => {
-      if (blob) FileSaver.saveAs(blob, "graph.png");
+      if (blob) FileSaver.saveAs(blob, `${mapTitle.trim()}.png`);
 
 
       // Cleanup:
