@@ -16,9 +16,12 @@ export enum COLORS {
   OLIVE = '#665D1E',
   // stress level colors
   RED = '#C41E3A',
-  ORANGE = '#FF6700',
-  YELLOW = '#FFCC00',
-  GREEN = '#008000',
+  //ORANGE = '#FF6700',
+  //YELLOW = '#FFCC00',
+  //GREEN = '#008000',
+  MAGENTA = '#C81E96',
+  PURPLE = '#961EBE',
+  INDIGO = '#644AFA',
   BLUE = '#446CCF',
 }
 
