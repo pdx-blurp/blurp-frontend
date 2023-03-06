@@ -6,7 +6,8 @@ import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import TempMessage from './temp_msg_display';
 
 // Redirect after logging in
-const BACKEND_URL = 'http://localhost:3000';
+// const BACKEND_URL = 'http://localhost:3000';
+const BACKEND_URL = 'https://blurp-app.herokuapp.com';
 
 function GoogleLoginButton(props) {
   const [cookies, setCookie, removeCookie] = useCookies();
