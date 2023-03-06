@@ -44,12 +44,14 @@ export enum SIDEBAR_VIEW {
 
 export enum MODAL_VIEW {
   START = 'START',
-  SAVING = 'SAVING',
   NOTLOGGEDIN = 'NOTLOGGEDIN',
 }
 
 export enum MAP_TOOLS {
   node = 'node',
+  person = 'person',
+  place = 'place',
+  idea = 'idea',
   edge = 'edge',
   select = 'select',
   eraser = 'eraser',
