@@ -38,6 +38,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
+import { FAMILIARITY } from '../constants/constants';
 import { capitalize } from '@mui/material';
 
 const TestPage = () => {
@@ -45,7 +46,8 @@ const TestPage = () => {
   const [nodeType, setNodeType] = useState(NODE_TYPE.PERSON);
   const [color, setColor] = useState(COLORS.BROWN);
   const [name, setName] = useState('');
-  const [size, setSize] = useState(1);
+  const [familiarity, setFamiliarity] = useState('Unfamiliar');
+  const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
@@ -423,7 +425,7 @@ const TestPage = () => {
     }
   }
 
-  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id) {
+  function changeEdgeData(category, familiarity, stressCode, node1ID, node2ID, id, edgeSize) {
     try {
       graph.setEdgeAttribute(id, 'label', category);
       graph.setEdgeAttribute(id, 'familiarity', familiarity);
@@ -431,6 +433,7 @@ const TestPage = () => {
       graph.setEdgeAttribute(id, 'node1ID', node1ID);
       graph.setEdgeAttribute(id, 'node2ID', node2ID);
       graph.setEdgeAttribute(id, 'color', edgeColor(stressCode));
+      graph.setEdgeAttribute(id, 'size', edgeSize);
 
       if (profile.profileSet) {
         instance
@@ -572,6 +575,16 @@ const TestPage = () => {
     else if (stressCode == 4) return COLORS.ORANGE;
     else return COLORS.RED;
   };
+
+  const getThicknessSize = (familiarityLabel) => {
+    for (const[key, element] of Object.entries(FAMILIARITY)) {
+      if (element.label === familiarityLabel) {
+        console.log("value being return is " + element.value)
+        return element.value;
+      }
+    }
+    return 2;
+  }
 
   function handleSubmit() {
     resetEdgeSelection();
@@ -1022,8 +1035,7 @@ const TestPage = () => {
           if(mapToolbar === MAP_TOOLS.person
             || mapToolbar === MAP_TOOLS.place
             || mapToolbar === MAP_TOOLS.idea
-            || mapToolbar === MAP_TOOLS.edge
-            || mapToolbar === MAP_TOOLS.select
+            // || mapToolbar === MAP_TOOLS.select
             || mapToolbar === MAP_TOOLS.eraser) {
             setDraggedNode(event.node);
             graph.setNodeAttribute(event.node, 'highlighted', true);
@@ -1161,32 +1173,23 @@ const TestPage = () => {
                       </div>
                       <br />
                       <div>
-                        <label>Edge Thickness</label>
-                        <Slider
-                          onChange={(e) => setSize(e.target.value * 2)}
-                          min={1}
-                          max={5}
-                          aria-label="small"
-                          valueLabelDisplay="auto"
-                          sx={{ width: '75%' }}
-                          className="mx-3"
-                        />
-                      </div>
-                      <br />
-                      <div>
-                        <label>Familiarity</label>
+                        <label>Familiarity Level</label>
                         <br />
-                        <Slider
-                          sx={{ width: '75%' }}
-                          aria-label="Small"
-                          name="edgeData.familiarity"
-                          value={edgeData.familiarity}
-                          valueLabelDisplay="auto"
-                          onChange={(e) =>
+                        <select
+                          type="text"
+                          value={familiarity}
+                          className="rounded text-center"
+                          onChange={(e) => {
+                            setSize(getThicknessSize(e.target.value) * 2);
+                            setFamiliarity(e.target.value);
                             setEdgeData({ ...edgeData, familiarity: e.target.value })
-                          }
-                          className="mx-3"
-                        />
+                          }}>
+                          {Object.entries(FAMILIARITY).map(([key, value]) => (
+                            <option key={key} value={value.label}>
+                              {value.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <br />
                       <div>
