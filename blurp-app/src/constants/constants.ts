@@ -44,12 +44,14 @@ export enum SIDEBAR_VIEW {
 
 export enum MODAL_VIEW {
   START = 'START',
-  SAVING = 'SAVING',
   NOTLOGGEDIN = 'NOTLOGGEDIN',
 }
 
 export enum MAP_TOOLS {
   node = 'node',
+  person = 'person',
+  place = 'place',
+  idea = 'idea',
   edge = 'edge',
   select = 'select',
   eraser = 'eraser',
@@ -73,6 +75,14 @@ export enum RELATIONSHIPS {
   romantic = 'romantic',
   work = 'work',
   situational = 'situational',
+}
+
+export const FAMILIARITY = {
+  UNFAMILIAR: { label: 'Unfamiliar', value: 4},
+  SOMEWHAT_FAMILIAR: { label: 'Somewhat familiar', value: 6},
+  MODERATELY_FAMILIAR: { label: 'Moderately familiar', value: 8},
+  VERY_FAMILIAR: { label: 'Very familiar', value: 10},
+  HIGHLY_FAMILIAR: { label: 'Highly familiar', value: 12},
 }
 
 /* 

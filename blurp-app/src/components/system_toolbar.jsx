@@ -66,9 +66,13 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     props.screenshotMap();
   }
 
-  function handleModalSaveToggle() {
-    if (!props.profile.profileSet) {
-      props.changeModal(true, MODAL_VIEW.SAVING);
+  function handleModalSave() {
+    console.log(props);
+    if (!props.profile.profileSet && props.mapTitle != '') {
+      props.SaveToDB(props.mapTitle);
+      props.msgs.current.showMessage('Saved to account!');
+    } else if (props.mapTitle == '') {
+      props.msgs.current.showMessage('Need to provide a title!');
     } else {
       props.msgs.current.showMessage('Map already saved in DB');
     }
@@ -80,7 +84,7 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         <button onClick={handleModalToggle} className="btn-test">
           Load another map
         </button>
-        <button onClick={handleModalSaveToggle} className="btn-test">
+        <button onClick={handleModalSave} className="btn-test">
           Save to Account
         </button>
         <button onClick={handleScreenshotClick} className="btn-test">
@@ -142,8 +146,10 @@ const System_Toolbar = forwardRef((props, ref) => {
   return (
     <>
       <System_Toolbar_State
-        ref={ref}
+        SaveToDB={props.SaveToDB}
+        LoadFromDB={props.LoadFromDB}
         msgs={props.msgs}
+        mapTitle={props.mapTitle}
         modal={props.modal}
         profile={props.profile}
         changeModal={props.changeModal}
