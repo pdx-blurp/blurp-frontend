@@ -65,7 +65,7 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   function handleModalSave() {
     console.log(props);
     if (!props.profile.profileSet && props.mapTitle != '') {
-      props.SaveToDB();
+      props.SaveToDB(props.mapTitle);
       props.msgs.current.showMessage('Saved to account!');
     } else if (props.mapTitle == '') {
       props.msgs.current.showMessage('Need to provide a title!');

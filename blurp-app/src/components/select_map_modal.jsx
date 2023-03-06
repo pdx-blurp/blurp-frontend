@@ -63,7 +63,7 @@ const LoadMapModal = forwardRef((props, ref) => {
           setLoading(false);
         });
     }
-  }, [props.profile.profileSet]);
+  }, [props.profile.profileSet, props.modal.open]);
 
   useEffect(() => {
     const list = mapList();
@@ -124,6 +124,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                       className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
                         props.changeProfile(props.profile.userID, e.target.value, true);
+                        setMapName('');
                         props.LoadFromDB(e.target.value, true);
                         handleClose();
                       }}>
@@ -190,8 +191,8 @@ const LoadMapModal = forwardRef((props, ref) => {
                       // Done to prevent title appearing in URL after submit
                       e.preventDefault();
                       props.clearGraph();
-                      props.changeTitle(mapName);
-                      props.SaveToDB();
+                      // props.changeTitle(mapName);
+                      props.SaveToDB(mapName);
                       handleClose();
                     }
                   }}>

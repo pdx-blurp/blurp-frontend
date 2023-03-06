@@ -190,7 +190,7 @@ const TestPage = () => {
     resetNodeColors();
   };
 
-  const SaveToDB = () => {
+  const SaveToDB = (title) => {
     instance
       .post(BACKEND_URL + '/map/create', {
         userID: profile.userID,
@@ -202,6 +202,7 @@ const TestPage = () => {
           mapID: response.data.mapID,
           profileSet: true,
         });
+        setMapTitle(title);
         if (graph.order > 0) {
           graph.forEachNode((current, attr) => {
             if (current) {
@@ -302,7 +303,6 @@ const TestPage = () => {
   };
 
   const LoadFromDB = (mapID, profileSet) => {
-    console.log(profile);
     if (profileSet) {
       instance
         .post(BACKEND_URL + '/map/get', {
