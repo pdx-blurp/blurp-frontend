@@ -7,10 +7,14 @@ import {
   SearchControl,
   useSigma,
 } from '@react-sigma/core';
+import getNodeProgramImage from 'sigma/rendering/webgl/programs/node.image';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
+import Popover from '@mui/material/Popover';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import exportIcon from '../assets/export_icon.svg';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -37,10 +41,10 @@ import { capitalize } from '@mui/material';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
-  const [nodeType, setNodeType] = useState('PERSON');
+  const [nodeType, setNodeType] = useState(NODE_TYPE.PERSON);
   const [color, setColor] = useState(COLORS.BROWN);
   const [name, setName] = useState('');
-  const [size, setSize] = useState(10);
+  const [size, setSize] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
@@ -151,6 +155,19 @@ const TestPage = () => {
         return COLORS.OLIVE;
       default:
         return COLORS.BROWN;
+    }
+  };
+
+  const nodeTypeToIconPath = (nodeType) => {
+    switch (nodeType) {
+      case NODE_TYPE.PERSON:
+        return './src/assets/person.svg';
+      case NODE_TYPE.PLACE:
+        return './src/assets/place.svg';
+      case NODE_TYPE.IDEA:
+        return './src/assets/idea.svg';
+      default:
+        return './src/assets/person.svg';
     }
   };
 
@@ -284,8 +301,9 @@ const TestPage = () => {
       });
   };
 
-  const LoadFromDB = (mapID) => {
-    if (profile.profileSet) {
+  const LoadFromDB = (mapID, profileSet) => {
+    console.log(profile);
+    if (profileSet) {
       instance
         .post(BACKEND_URL + '/map/get', {
           mapID: mapID,
@@ -304,6 +322,8 @@ const TestPage = () => {
                 size: node.size,
                 years: node.age === 0 ? '' : node.age,
                 notes: node.description,
+                type: 'image',
+                image: nodeTypeToIconPath(node.type),
                 color: nodeTypeToColor(node.type),
               });
               nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
@@ -521,9 +541,13 @@ const TestPage = () => {
 
   function handleToolbarEvent(data) {
     resetEdgeSelection();
-    if (data === MAP_TOOLS.node) {
-      setModalTitle('Add Node');
-      setMapToolbar(MAP_TOOLS.node);
+    if (data === MAP_TOOLS.person) {
+      // setModalTitle('Add Node');
+      setMapToolbar(MAP_TOOLS.person);
+    } else if (data === MAP_TOOLS.place) {
+      setMapToolbar(MAP_TOOLS.place);
+    } else if (data === MAP_TOOLS.idea) {
+      setMapToolbar(MAP_TOOLS.idea);
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
       setMapToolbar(MAP_TOOLS.edge);
@@ -718,10 +742,80 @@ const TestPage = () => {
               setIsSidebarOn(false);
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
-              setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-              if (mapToolbar === MAP_TOOLS.node) {
-                setModalTitle('Add Node');
-                setIsModalOpen(true);
+              if (
+                mapToolbar === MAP_TOOLS.person ||
+                mapToolbar === MAP_TOOLS.place ||
+                mapToolbar === MAP_TOOLS.idea
+              ) {
+                // setModalTitle('Add Node');
+                // setIsModalOpen(true);
+
+                const id = uuidv4();
+                graph.addNode(id, {
+                  x: grabbed_pos.x,
+                  y: grabbed_pos.y,
+                  label: '',
+                  entity: nodeType,
+                  size: Math.log(size + 1) * 30,
+                  years: '',
+                  notes: '',
+                  type: 'image',
+                  image: nodeTypeToIconPath(nodeType),
+                  // color: color,
+                  color: nodeTypeToColor(nodeType),
+                });
+                setNodes(nodes.concat({ id: id, label: name }));
+                if (profile.profileSet) {
+                  instance
+                    .post(BACKEND_URL + '/map/node/create', {
+                      userID: profile.userID,
+                      mapID: profile.mapID,
+                      nodeinfo: {
+                        nodeName: name,
+                        nodeID: id,
+                        // color: color,
+                        color: nodeTypeToColor(nodeType),
+                        size: size,
+                        age: 0,
+                        type: nodeType.toLowerCase(),
+                        description: '',
+                        pos: {
+                          x: pos.x,
+                          y: pos.y,
+                        },
+                      },
+                    })
+                    .then((response) => {
+                      msgRef.current.showMessage(
+                        capitalize(mapToolbar) + ' was successfully created'
+                      );
+                    })
+                    .catch((error) => {
+                      if (error.response) {
+                        console.log(
+                          'Error: Invalid post request, status:' +
+                            error.response.status +
+                            '\n' +
+                            error.response.headers
+                        );
+                        msgRef.current.showMessage('Node not created in cloud, bad request');
+                      } else if (error.request) {
+                        console.log(
+                          'Error: The server failed to respond to the post request\n' +
+                            error.message
+                        );
+                        msgRef.current.showMessage(
+                          'Node not created in cloud, server not responding'
+                        );
+                      } else {
+                        console.log(
+                          'Error: Some error has occured\n' + 'error message:\n' + error.message
+                        );
+                      }
+                    });
+                } else {
+                  msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
+                }
               }
             }
           }
@@ -1113,6 +1207,8 @@ const TestPage = () => {
         graph={graph}
         ref={setSigma}
         settings={{
+          nodeProgramClasses: { image: getNodeProgramImage() },
+          defaultNodeType: 'image',
           renderEdgeLabels: true,
           minCameraRatio: CAMERA_MIN,
           maxCameraRatio: CAMERA_MAX,
@@ -1163,7 +1259,14 @@ const TestPage = () => {
         />
       </div>
       <div className="absolute inset-y-0 top-0 right-0">
-        <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
+        <MapToolbar
+          handleToolbarEvent={handleToolbarEvent}
+          setSigmaCursor={setSigmaCursor}
+          nodeType={nodeType}
+          setNodeType={(type) => setNodeType(type)}
+          size={size}
+          setSize={(size) => setSize(size)}
+        />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <TempMessage ref={msgRef} />

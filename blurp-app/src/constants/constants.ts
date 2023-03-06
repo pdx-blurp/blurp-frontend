@@ -49,6 +49,9 @@ export enum MODAL_VIEW {
 
 export enum MAP_TOOLS {
   node = 'node',
+  person = 'person',
+  place = 'place',
+  idea = 'idea',
   edge = 'edge',
   select = 'select',
   eraser = 'eraser',

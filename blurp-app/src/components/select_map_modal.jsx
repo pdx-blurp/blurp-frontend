@@ -124,7 +124,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                       className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
                         props.changeProfile(props.profile.userID, e.target.value, true);
-                        props.LoadFromDB(e.target.value);
+                        props.LoadFromDB(e.target.value, true);
                         handleClose();
                       }}>
                       Select
