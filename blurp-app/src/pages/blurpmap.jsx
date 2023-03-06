@@ -11,11 +11,8 @@ import Sigma from 'sigma';
 import getNodeProgramImage from 'sigma/rendering/webgl/programs/node.image';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
-import Popover from '@mui/material/Popover';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import exportIcon from '../assets/export_icon.svg';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -577,61 +574,55 @@ const TestPage = () => {
   };
 
   const getThicknessSize = (familiarityLabel) => {
-    for (const[key, element] of Object.entries(FAMILIARITY)) {
+    for (const [key, element] of Object.entries(FAMILIARITY)) {
       if (element.label === familiarityLabel) {
-        console.log("value being return is " + element.value)
+        console.log('value being return is ' + element.value);
         return element.value;
       }
     }
     return 2;
-  }
+  };
 
   function handleSubmit() {
     resetEdgeSelection();
-    if (mapToolbar === MAP_TOOLS.node && sigma) {
-      if (name == '') {
-        msgRef.current.showMessage('Need to provide name for the node');
-      } else {
-        let camera = sigma.getCamera();
-        let prevState = camera.previousState;
-        if (graph.order < 4) {
-          if (prevState.ratio > CAMERA_MAX - 1) {
-            prevState.ratio = CAMERA_MAX;
-          } else {
-            prevState.ratio += 1.0;
+    if (node1 == '' || node2 == '') {
+      msgRef.current.showMessage('Need to select two nodes to attach an edge to');
+    } else {
+      const edgeExists = () => {
+        for (const x of graph.edges(node1, node2)) {
+          if (x) {
+            return true;
           }
         }
+        return false;
+      };
+      if (!edgeExists()) {
         const id = uuidv4();
-        graph.addNode(id, {
-          x: pos.x,
-          y: pos.y,
-          label: name,
-          entity: nodeType,
+        graph.addEdgeWithKey(id, node1, node2, {
+          label: relationship,
+          familiarity: edgeData.familiarity,
+          stressCode: edgeData.stressCode,
+          node1: '',
+          node2: '',
           size: size,
-          years: '',
-          notes: '',
-          // color: color,
-          color: nodeTypeToColor(nodeType),
+          color: edgeColor(edgeData.stressCode),
         });
-        setSize(Math.log(2) * 30);
-        setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
-            .post(BACKEND_URL + '/map/node/create', {
-              userID: profile.userID,
+            .post(BACKEND_URL + '/map/relationship/create', {
               mapID: profile.mapID,
-              nodeinfo: {
-                nodeName: name,
-                nodeID: id,
-                // color: color,
-                color: nodeTypeToColor(nodeType),
-                size: size,
-                age: 0,
-                type: nodeType.toLowerCase(),
-                description: '',
-                pos: {
-                  x: pos.x,
-                  y: pos.y,
+              relationshipinfo: {
+                relationshipID: id,
+                nodePair: {
+                  nodeOne: node1,
+                  nodeTwo: node2,
+                },
+                description: 'unused',
+                relationshipType: {
+                  type: relationship,
+                  familiarity: edgeData.familiarity,
+                  stressCode: edgeData.stressCode,
+                  size: size,
                 },
               },
             })
@@ -646,12 +637,12 @@ const TestPage = () => {
                     '\n' +
                     error.response.headers
                 );
-                msgRef.current.showMessage('Node not created in cloud, bad request');
+                msgRef.current.showMessage('Edge not created in cloud, bad request');
               } else if (error.request) {
                 console.log(
                   'Error: The server failed to respond to the post request\n' + error.message
                 );
-                msgRef.current.showMessage('Node not created in cloud, server not responding');
+                msgRef.current.showMessage('Edge not created in cloud, server not responding');
               } else {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
@@ -659,78 +650,8 @@ const TestPage = () => {
         } else {
           msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
-      }
-    } else {
-      if (node1 == '' || node2 == '') {
-        msgRef.current.showMessage('Need to select two nodes to attach an edge to');
       } else {
-        const edgeExists = () => {
-          for (const x of graph.edges(node1, node2)) {
-            if (x) {
-              return true;
-            }
-          }
-          return false;
-        };
-        if (!edgeExists()) {
-          const id = uuidv4();
-          graph.addEdgeWithKey(id, node1, node2, {
-            label: relationship,
-            familiarity: edgeData.familiarity,
-            stressCode: edgeData.stressCode,
-            node1: '',
-            node2: '',
-            size: size,
-            color: edgeColor(edgeData.stressCode),
-          });
-          if (profile.profileSet) {
-            instance
-              .post(BACKEND_URL + '/map/relationship/create', {
-                mapID: profile.mapID,
-                relationshipinfo: {
-                  relationshipID: id,
-                  nodePair: {
-                    nodeOne: node1,
-                    nodeTwo: node2,
-                  },
-                  description: 'unused',
-                  relationshipType: {
-                    type: relationship,
-                    familiarity: edgeData.familiarity,
-                    stressCode: edgeData.stressCode,
-                    size: size,
-                  },
-                },
-              })
-              .then((response) => {
-                msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
-              })
-              .catch((error) => {
-                if (error.response) {
-                  console.log(
-                    'Error: Invalid post request, status:' +
-                      error.response.status +
-                      '\n' +
-                      error.response.headers
-                  );
-                  msgRef.current.showMessage('Edge not created in cloud, bad request');
-                } else if (error.request) {
-                  console.log(
-                    'Error: The server failed to respond to the post request\n' + error.message
-                  );
-                  msgRef.current.showMessage('Edge not created in cloud, server not responding');
-                } else {
-                  console.log(
-                    'Error: Some error has occured\n' + 'error message:\n' + error.message
-                  );
-                }
-              });
-          } else {
-            msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
-          }
-        } else {
-          msgRef.current.showMessage('Edge already exists between these nodes');
-        }
+        msgRef.current.showMessage('Edge already exists between these nodes');
       }
     }
 
@@ -762,9 +683,6 @@ const TestPage = () => {
                 mapToolbar === MAP_TOOLS.place ||
                 mapToolbar === MAP_TOOLS.idea
               ) {
-                // setModalTitle('Add Node');
-                // setIsModalOpen(true);
-
                 const id = uuidv4();
                 graph.addNode(id, {
                   x: grabbed_pos.x,
@@ -1032,11 +950,7 @@ const TestPage = () => {
         downNode: (event) => {
           // react sigma guide for drag'n'drop:
           // https://sim51.github.io/react-sigma/docs/example/drag_n_drop/
-          if(mapToolbar === MAP_TOOLS.person
-            || mapToolbar === MAP_TOOLS.place
-            || mapToolbar === MAP_TOOLS.idea
-            // || mapToolbar === MAP_TOOLS.select
-            || mapToolbar === MAP_TOOLS.eraser) {
+          if (mapToolbar === MAP_TOOLS.select) {
             setDraggedNode(event.node);
             graph.setNodeAttribute(event.node, 'highlighted', true);
           }
@@ -1049,16 +963,55 @@ const TestPage = () => {
             // commit that reveals camera enable/disable
             // https://github.com/jacomyal/sigma.js/commit/b7e45548d3dfdbfb8237a935db13b1c3baf88b6c
             sigma.getCamera().disable();
-            const nodePosition = sigma.viewportToFramedGraph(event);
-            graph.setNodeAttribute(draggedNode, "x", nodePosition.x);
-            graph.setNodeAttribute(draggedNode, "y", nodePosition.y);
+            const nodePosition = sigma.viewportToGraph(event);
+            graph.setNodeAttribute(draggedNode, 'x', nodePosition.x);
+            graph.setNodeAttribute(draggedNode, 'y', nodePosition.y);
           }
         },
         mouseup: (event) => {
           if (draggedNode) {
             sigma.getCamera().enable();
-            graph.removeNodeAttribute(draggedNode, "highlighted");
+            graph.removeNodeAttribute(draggedNode, 'highlighted');
             setDraggedNode(null);
+            if (profile.profileSet) {
+              const nodePosition = sigma.viewportToGraph(event);
+              instance
+                .patch(BACKEND_URL + '/map/node/update', {
+                  nodeID: draggedNode,
+                  mapID: profile.mapID,
+                  changes: {
+                    pos: {
+                      x: nodePosition.x,
+                      y: nodePosition.y,
+                    },
+                  },
+                })
+                .catch((error) => {
+                  if (error.response) {
+                    console.log(
+                      'Error: Invalid update request, status:' +
+                        error.response.status +
+                        '\n' +
+                        error.response.headers
+                    );
+                    msgRef.current.showMessage('Changes not saved, bad request');
+                  } else if (error.request) {
+                    console.log(
+                      'Error: The server failed to respond to the update request\n' + error.message
+                    );
+                    msgRef.current.showMessage('Changes not saved, server not responding');
+                  } else {
+                    console.log(
+                      'Error: Some error has occured\n' +
+                        'Node ID:' +
+                        draggedNode +
+                        '\n' +
+                        'error message:\n' +
+                        error.message
+                    );
+                  }
+                });
+            }
           }
         },
         enterNode: (event) => {
@@ -1073,7 +1026,7 @@ const TestPage = () => {
         },
         leaveEdge: (event) => {
           setClickTrigger(true);
-        }
+        },
       });
     }, [registerEvents]);
 
@@ -1095,57 +1048,6 @@ const TestPage = () => {
                   <h3 className="text-3xl font-semibold">{modalTitle}</h3>
                 </div>
                 {/*body*/}
-                {modalTitle === 'Add Node' && (
-                  <div className="relative flex-auto p-6">
-                    <div>
-                      <div>
-                        <input
-                          placeholder="Name"
-                          type="text"
-                          onChange={(e) => setName(e.target.value)}
-                        />
-                      </div>
-                      <br />
-                      <div>
-                        <label>Size</label>
-                        <Slider
-                          onChange={(e) => setSize(Math.log(e.target.value + 1) * 30)}
-                          min={1}
-                          max={10}
-                          aria-label="small"
-                          valueLabelDisplay="auto"
-                        />
-                      </div>
-                      <br />
-                      <div>
-                        <select
-                          type="text"
-                          value={nodeType}
-                          className="rounded text-center"
-                          onChange={(e) => {
-                            setNodeType(e.target.value);
-                            switch (e.target.value) {
-                              case NODE_TYPE.PERSON:
-                                setColor(COLORS.BROWN);
-                                break;
-                              case NODE_TYPE.PLACE:
-                                setColor(COLORS.GREY);
-                                break;
-                              case NODE_TYPE.IDEA:
-                                setColor(COLORS.OLIVE);
-                                break;
-                            }
-                          }}>
-                          {Object.entries(NODE_TYPE).map(([key, value]) => (
-                            <option key={key} value={value}>
-                              {key}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
                 {modalTitle === 'Add Edge' && (
                   <div className="relative flex-auto p-6">
                     <div>
@@ -1182,7 +1084,7 @@ const TestPage = () => {
                           onChange={(e) => {
                             setSize(getThicknessSize(e.target.value) * 2);
                             setFamiliarity(e.target.value);
-                            setEdgeData({ ...edgeData, familiarity: e.target.value })
+                            setEdgeData({ ...edgeData, familiarity: e.target.value });
                           }}>
                           {Object.entries(FAMILIARITY).map(([key, value]) => (
                             <option key={key} value={value.label}>
