@@ -1035,7 +1035,7 @@ const TestPage = () => {
           if(mapToolbar === MAP_TOOLS.person
             || mapToolbar === MAP_TOOLS.place
             || mapToolbar === MAP_TOOLS.idea
-            || mapToolbar === MAP_TOOLS.select
+            // || mapToolbar === MAP_TOOLS.select
             || mapToolbar === MAP_TOOLS.eraser) {
             setDraggedNode(event.node);
             graph.setNodeAttribute(event.node, 'highlighted', true);
