@@ -66,8 +66,8 @@ function GoogleLoginButton(props) {
   async function logout() {
     fetch(BACKEND_URL + '/login/google/logout', {
       credentials: 'include',
-    }).then(res => res.json()).then(res => {
-      if(res.success) {
+    }).then(res => res.text()).then((res) => {
+      if(res == 'success') {
         removeCookie('loggedIn');
         removeCookie('userName');
         removeCookie('profileUrl');
