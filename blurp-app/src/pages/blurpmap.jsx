@@ -50,7 +50,7 @@ const TestPage = () => {
   const [size, setSize] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
-  const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
+  const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[5]);
   const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
   const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
@@ -1157,59 +1157,6 @@ const TestPage = () => {
                           Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b>
                         </p>
                       </div>
-                      <br />
-                      <div>
-                        <select
-                          type="text"
-                          className="w-4/5 rounded text-center"
-                          value={relationship}
-                          onChange={(e) => setRelationship(e.target.value)}>
-                          {Object.entries(RELATIONSHIPS).map(([relationship, value]) => (
-                            <option key={relationship} value={value}>
-                              {relationship}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <label>Familiarity Level</label>
-                        <br />
-                        <select
-                          type="text"
-                          value={familiarity}
-                          className="rounded text-center"
-                          onChange={(e) => {
-                            setSize(getThicknessSize(e.target.value) * 2);
-                            setFamiliarity(e.target.value);
-                            setEdgeData({ ...edgeData, familiarity: e.target.value })
-                          }}>
-                          {Object.entries(FAMILIARITY).map(([key, value]) => (
-                            <option key={key} value={value.label}>
-                              {value.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <label>Stress Level</label>
-                        <br />
-                        <select
-                          name="edgeData.stressCode"
-                          value={edgeData.stressCode}
-                          className="rounded text-center"
-                          onChange={(e) =>
-                            setEdgeData({ ...edgeData, stressCode: e.target.value })
-                          }>
-                          <option value="1">1 - feeling good</option>
-                          <option value="2">2 - feeling fine</option>
-                          <option value="3">3 - feeling anxious</option>
-                          <option value="4">4 - high stress/discomfort</option>
-                          <option value="5">5 - very high stress</option>
-                        </select>
-                      </div>
-                      <br />
                     </div>
                   </div>
                 )}
