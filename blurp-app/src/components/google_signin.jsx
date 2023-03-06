@@ -67,7 +67,6 @@ function GoogleLoginButton(props) {
     fetch(BACKEND_URL + '/login/google/logout', {
       credentials: 'include',
     }).then(res => res.json()).then(res => {
-      console.log(res);
       if(res.success) {
         removeCookie('loggedIn');
         removeCookie('userName');
@@ -84,15 +83,12 @@ function GoogleLoginButton(props) {
   }
 
   async function onLoginSuccess(codeResponse) {
-    console.log('logged in successfully');
     let accessToken = codeResponse.access_token;
-    console.log('access token:', accessToken);
     // Send the access token to the back end
     const response = await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
       credentials: 'include'
     }).then(res => res.json()).then(res => {
       let success = res.success;
-      console.log(success);
       // If successfully authenticated user profile in backend
       if(success) {
         setCookie('loggedIn', 'true', {maxAge: res.maxAge});
@@ -100,8 +96,6 @@ function GoogleLoginButton(props) {
         setCookie('profileUrl', res.profileUrl, {maxAge: res.maxAge});
         msgRef.current.showMessage('Login successful');
       } else {
-        console.log('Failed to log in');
-        console.log(msgRef);
         msgRef.current.showMessage('Failed to log in');
       }
     });
