@@ -7,11 +7,8 @@ import {
   SearchControl,
   useSigma,
 } from '@react-sigma/core';
-<<<<<<< HEAD
 import Sigma from 'sigma';
-=======
 import getNodeProgramImage from 'sigma/rendering/webgl/programs/node.image';
->>>>>>> test
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import Popover from '@mui/material/Popover';
@@ -1022,7 +1019,12 @@ const TestPage = () => {
         downNode: (event) => {
           // react sigma guide for drag'n'drop:
           // https://sim51.github.io/react-sigma/docs/example/drag_n_drop/
-          if(mapToolbar === MAP_TOOLS.node) {
+          if(mapToolbar === MAP_TOOLS.person
+            || mapToolbar === MAP_TOOLS.place
+            || mapToolbar === MAP_TOOLS.idea
+            || mapToolbar === MAP_TOOLS.edge
+            || mapToolbar === MAP_TOOLS.select
+            || mapToolbar === MAP_TOOLS.eraser) {
             setDraggedNode(event.node);
             graph.setNodeAttribute(event.node, 'highlighted', true);
           }
