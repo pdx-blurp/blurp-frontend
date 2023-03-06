@@ -10,6 +10,7 @@ import {
 import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -32,7 +33,7 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
-import getMaps from '../utils/utils';
+import { capitalize } from '@mui/material';
 
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
@@ -54,33 +55,51 @@ const TestPage = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
   const [clickTrigger, setClickTrigger] = useState(true);
+  // Tell the user how to create an edge the first time they select the edge tool
+  const [showEdgeMessage, setShowEdgeMessage] = useState(true);
   const child = useRef();
+  // const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
     timeout: 1000,
   });
 
   // Used for the message box that pops up and notifys users of errors
-  const [userNotification, setUserNotification] = useState('');
   const [isSidebarOn, setIsSidebarOn] = useState(false);
-  const [mapTitle, setMapTitle] = useState("");
+  const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
 
   // Temporary db userID/mapID for testing
   const [profile, setProfile] = useState({
     profileSet: true,
     userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    // userID: '',
     mapID: '',
   });
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
     view: MODAL_VIEW.START,
+    // When cookies are implemented, this will be default
+    // view: MODAL_VIEW.NOTLOGGEDIN,
   });
 
-  const changeModal = (state, maps, view) => {
+  /* useEffect(() => {
+    if (cookies.userID) {
+      setProfile({
+        ...profile,
+        userID: cookies.userID,
+      });
+
+      setLoadMapModal({
+        ...loadMapModal,
+        view: MODAL_VIEW.START,
+      });
+    }
+  }, [cookies]); */
+
+  const changeModal = (state, view) => {
     setLoadMapModal({
       open: state,
-      maps: maps,
       view: view,
     });
   };
@@ -92,6 +111,40 @@ const TestPage = () => {
       mapID: map,
     });
   };
+
+  const nodeTypeToColor = (nodeType) => {
+    switch (nodeType) {
+      case NODE_TYPE.PERSON:
+        return COLORS.BROWN;
+      case NODE_TYPE.PLACE:
+        return COLORS.GREY;
+      case NODE_TYPE.IDEA:
+        return COLORS.OLIVE;
+      default:
+        return COLORS.BROWN;
+    }
+  };
+
+  // Reset a specific node's color to its default
+  const resetNodeColor = (node) => {
+    let nodeType = graph.getNodeAttribute(node, 'entity');
+    graph.setNodeAttribute(node, 'color', nodeTypeToColor(nodeType));
+  };
+
+  // Reset the two selected nodes' colors
+  const resetNodeColors = () => {
+    if(node1)
+      resetNodeColor(node1);
+    if(node2)
+      resetNodeColor(node2);
+  }
+
+  // Reset edge selection (user may have edges selected, reset)
+  const resetEdgeSelection = () => {
+    setNode1(null);
+    setNode2(null);
+    resetNodeColors();
+  }
 
   const DBref = useRef({
     SaveToDB(mapID) {
@@ -105,7 +158,8 @@ const TestPage = () => {
                 nodeinfo: {
                   nodeName: attr.label,
                   nodeID: current,
-                  color: attr.color,
+                  // color: attr.color,
+                  color: nodeTypeToColor(attr.entity),
                   size: attr.size,
                   age: attr.years === '' ? 0 : attr.years,
                   type: attr.entity.toLowerCase(),
@@ -197,7 +251,8 @@ const TestPage = () => {
                   size: node.size,
                   years: node.age === 0 ? '' : node.age,
                   notes: node.description,
-                  color: node.color,
+                  // color: node.color,
+                  color: nodeTypeToColor(node.type)
                 });
                 nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
               });
@@ -349,6 +404,7 @@ const TestPage = () => {
    * Triggers the user to download the map JSON as "map.blurp".
    */
   function downloadMapJson() {
+    resetEdgeSelection();
     // Get the JSON data string
     let jsonDataString =
       'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(graph.toJSON()));
@@ -415,12 +471,18 @@ const TestPage = () => {
   }
 
   function handleToolbarEvent(data) {
+    resetEdgeSelection();
     if (data === MAP_TOOLS.node) {
       setModalTitle('Add Node');
       setMapToolbar(MAP_TOOLS.node);
     } else if (data === MAP_TOOLS.edge) {
       setModalTitle('Add Edge');
       setMapToolbar(MAP_TOOLS.edge);
+      // If this is their first time selecting edge tool, specify how to use
+      if(showEdgeMessage) {
+        msgRef.current.showMessage('Select two nodes to add an edge.');
+        setShowEdgeMessage(false);
+      }
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
     } else {
@@ -437,13 +499,19 @@ const TestPage = () => {
   };
 
   function handleSubmit() {
+    resetEdgeSelection();
     if (mapToolbar === MAP_TOOLS.node && sigma) {
       if (name == '') {
         msgRef.current.showMessage('Need to provide name for the node');
       } else {
-        let prev_state = sigma.getCamera().getState();
+        let camera = sigma.getCamera();
+        let prevState = camera.previousState;
         if (graph.order < 4) {
-          prev_state.ratio = CAMERA_MAX;
+          if (prevState.ratio > CAMERA_MAX - 1) {
+            prevState.ratio = CAMERA_MAX;
+          } else {
+            prevState.ratio += 1.0;
+          }
         }
         const id = uuidv4();
         graph.addNode(id, {
@@ -454,9 +522,10 @@ const TestPage = () => {
           size: size,
           years: '',
           notes: '',
-          color: color,
+          // color: color,
+          color: nodeTypeToColor(nodeType),
         });
-        sigma.getCamera().setState(prev_state);
+        setSize(Math.log(2) * 30);
         setNodes(nodes.concat({ id: id, label: name }));
         if (profile.profileSet) {
           instance
@@ -466,7 +535,8 @@ const TestPage = () => {
               nodeinfo: {
                 nodeName: name,
                 nodeID: id,
-                color: color,
+                // color: color,
+                color: nodeTypeToColor(nodeType),
                 size: size,
                 age: 0,
                 type: nodeType.toLowerCase(),
@@ -478,7 +548,7 @@ const TestPage = () => {
               },
             })
             .then((response) => {
-              msgRef.current.showMessage(mapToolbar + ' was successfully created');
+              msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
             })
             .catch((error) => {
               if (error.response) {
@@ -499,7 +569,7 @@ const TestPage = () => {
               }
             });
         } else {
-          msgRef.current.showMessage(mapToolbar + ' was successfully created');
+          msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
       }
     } else {
@@ -545,7 +615,7 @@ const TestPage = () => {
                 },
               })
               .then((response) => {
-                msgRef.current.showMessage(mapToolbar + ' was successfully created');
+                msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
               })
               .catch((error) => {
                 if (error.response) {
@@ -568,11 +638,10 @@ const TestPage = () => {
                 }
               });
           } else {
-            msgRef.current.showMessage(mapToolbar + ' was successfully created');
+            msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
           }
         } else {
-          // setUserNotification('Edge already exists between those nodes');
-          msgRef.current.showMessage('Edge already exists between those nodes');
+          msgRef.current.showMessage('Edge already exists between these nodes');
         }
       }
     }
@@ -598,16 +667,12 @@ const TestPage = () => {
           if (clickTrigger === true) {
             if (isSidebarOn) {
               setIsSidebarOn(false);
-            } 
-            else {
+            } else {
               const grabbed_pos = sigma.viewportToGraph(event);
               setPos({ x: grabbed_pos.x, y: grabbed_pos.y });
-              if (mapToolbar === MAP_TOOLS.node || mapToolbar === MAP_TOOLS.edge) {
-                if (mapToolbar === MAP_TOOLS.edge && graph.order < 2) {
-                  msgRef.current.showMessage('Not enough nodes to add edges to');
-                } else {
-                  setIsModalOpen(true);
-                }
+              if(mapToolbar === MAP_TOOLS.node) {
+                setModalTitle('Add Node');
+                setIsModalOpen(true);
               }
             }
           }
@@ -693,6 +758,43 @@ const TestPage = () => {
             }
             //reenable the click trigger
             setClickTrigger(true);
+          } else if(mapToolbar === MAP_TOOLS.edge) {
+            // This block occurs when the user is in 'edge' mode and clicks
+            // on a node.
+            // Done to clear data and avoid reopening old selections
+            setNode({ selected: new NodeData('', '', '', '', '') });
+            setEdge({ selected: new EdgeData('', '', '', '', '', '') });
+            // If this is the first node selected, simply record this node
+            if(node1 == null) {
+              setNode1(event.node);
+              graph.setNodeAttribute(event.node, 'color', 'yellow');
+            }
+            // Otherwise if this is the second node selected
+            else {
+              // Make sure it's not the same node
+              if(node1 == event.node) {
+                resetNodeColor(event.node);
+                setNode1(null);
+              }
+              else {
+                // If there's already a node between these two nodes, don't show modal
+                let edgeExists = false;
+                for (const x of graph.edges(node1, event.node)) {
+                  if (x) {
+                    edgeExists = true;
+                  }
+                };
+                if(edgeExists) {
+                  msgRef.current.showMessage('Edge already exists between those nodes');
+                }
+                else {
+                  setNode2(event.node);
+                  graph.setNodeAttribute(event.node, 'color', 'yellow');
+                  setIsModalOpen(true);
+                  setModalTitle('Add Edge');
+                }
+              }
+            }
           } else {
             // Done to clear data and avoid reopening old selections
             setNode({ selected: new NodeData('', '', '', '', '') });
@@ -783,7 +885,7 @@ const TestPage = () => {
         },
         leaveEdge: (event) => {
           setClickTrigger(true);
-        }
+        },
       });
     }, [registerEvents]);
 
@@ -819,7 +921,7 @@ const TestPage = () => {
                       <div>
                         <label>Size</label>
                         <Slider
-                          onChange={(e) => setSize(e.target.value * 3)}
+                          onChange={(e) => setSize(Math.log(e.target.value + 1) * 30)}
                           min={1}
                           max={10}
                           aria-label="small"
@@ -860,41 +962,8 @@ const TestPage = () => {
                   <div className="relative flex-auto p-6">
                     <div>
                       <div>
-                        <select
-                          className="w-4/5 rounded text-center"
-                          value={node1}
-                          onChange={(e) => {
-                            setNode1(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes.map((node) => (
-                            <option key={node.id} value={node.id}>
-                              {node.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <br />
-                      <div>
-                        <select
-                          value={node2}
-                          className="w-4/5 rounded text-center"
-                          onChange={(e) => {
-                            setNode2(e.target.value);
-                          }}>
-                          <option value="" disabled hidden>
-                            Select Name
-                          </option>
-                          {nodes
-                            .filter((node) => node.id !== node1)
-                            .map((node) => (
-                              <option key={node.id} value={node.id}>
-                                {node.label}
-                              </option>
-                            ))}
-                        </select>
+                        <p>Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b></p>
+                        <p>Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b></p>
                       </div>
                       <br />
                       <div>
@@ -966,7 +1035,11 @@ const TestPage = () => {
                   <button
                     className="background-transparent mr-1 mb-1 px-6 py-2 text-sm font-bold uppercase text-red-500 outline-none transition-all duration-150 ease-linear focus:outline-none"
                     type="button"
-                    onClick={() => setIsModalOpen(false)}>
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      resetEdgeSelection();
+                    }
+                  }>
                     Close
                   </button>
                   <button
@@ -996,12 +1069,23 @@ const TestPage = () => {
           autoScale: false,
         }}>
         <div className="mapTitle ">
-          <label htmlFor="mapTitle" className=" text-sm font-medium text-gray-900 sr-only dark:text-white">Map Title</label>
-          <div className="relative w-96" >
-              <input type="mapTitle" id="mapTitle" className=" w-full p-4 pl-10 text-sm text-gray-900 border rounded-lg bg-gray-300 focus:ring-blue-500 focus:border-blue-500  dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Map Title" required onChange={(e) => setMapTitle(e.target.value)}/>
+          <label
+            htmlFor="mapTitle"
+            className=" sr-only text-sm font-medium text-gray-900 dark:text-white">
+            Map Title
+          </label>
+          <div className="relative w-96">
+            <input
+              type="mapTitle"
+              id="mapTitle"
+              className=" w-full rounded-lg border bg-gray-300 p-4 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500  dark:border-gray-600 dark:text-black dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Map Title"
+              required
+              onChange={(e) => setMapTitle(e.target.value)}
+            />
           </div>
         </div>
-        <ControlsContainer className="absolute top-5 w-[500px] mt-6" position="top-right">
+        <ControlsContainer className="absolute top-5 mt-6 w-[500px]" position="top-right">
           <SearchControl />
         </ControlsContainer>
         <GraphEvents />
@@ -1030,7 +1114,7 @@ const TestPage = () => {
         <MapToolbar handleToolbarEvent={handleToolbarEvent} setSigmaCursor={setSigmaCursor} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
-        <TempMessage message={userNotification} ref={msgRef} />
+        <TempMessage ref={msgRef} />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
@@ -1039,6 +1123,7 @@ const TestPage = () => {
         <LoadMapModal
           profile={profile}
           modal={loadMapModal}
+          // cookies={cookies}
           changeModal={changeModal}
           changeProfile={changeProfile}
           ref={DBref}

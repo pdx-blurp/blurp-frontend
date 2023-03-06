@@ -5,7 +5,6 @@ import export_icon from '../assets/export_icon.svg';
 import React, { useState, useEffect, useRef, forwardRef } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { MODAL_VIEW } from '../constants/constants';
-import getMaps from '../utils/utils';
 
 const System_Toolbar_State = forwardRef((props, ref) => {
   // Set the className based on whether the toolbar is expanded
@@ -48,7 +47,7 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   if (!props.show) return null;
 
   function handleCogwheelClick() {
-    alert('Cogwheel clicked.');
+    alert('[WIP] Personal Account Settings');
   }
 
   function handleImportClick() {
@@ -60,12 +59,12 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   }
 
   function handleModalToggle() {
-    props.changeModal(true, getMaps(props.profile), MODAL_VIEW.START);
+    props.changeModal(true, props.modal.view);
   }
 
   function handleModalSaveToggle() {
     if (!props.profile.profileSet) {
-      props.changeModal(true, getMaps(props.profile), MODAL_VIEW.SAVING);
+      props.changeModal(true, MODAL_VIEW.SAVING);
     } else {
       props.msgs.current.showMessage('Map already saved in DB');
     }
