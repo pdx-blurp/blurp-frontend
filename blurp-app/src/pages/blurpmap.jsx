@@ -876,10 +876,11 @@ const TestPage = () => {
           }
         },
         downNode: (event) => {
+          // react sigma guide for drag'n'drop:
+          // https://sim51.github.io/react-sigma/docs/example/drag_n_drop/
           if(mapToolbar === MAP_TOOLS.node) {
             setDraggedNode(event.node);
             graph.setNodeAttribute(event.node, 'highlighted', true);
-            graph.setNodeAttribute(event.node, 'color', 'orange');
           }
         },
         mousedown: (event) => {
@@ -887,11 +888,8 @@ const TestPage = () => {
         },
         mousemove: (event) => {
           if (draggedNode) {
-            /*
-            event.preventSigmaDefault();
-            event.original.preventDefault();
-            event.original.stopPropagation();
-            */
+            // commit that reveals camera enable/disable
+            // https://github.com/jacomyal/sigma.js/commit/b7e45548d3dfdbfb8237a935db13b1c3baf88b6c
             sigma.getCamera().disable();
             const nodePosition = sigma.viewportToFramedGraph(event);
             graph.setNodeAttribute(draggedNode, "x", nodePosition.x);
@@ -902,7 +900,6 @@ const TestPage = () => {
           if (draggedNode) {
             sigma.getCamera().enable();
             graph.removeNodeAttribute(draggedNode, "highlighted");
-            graph.setNodeAttribute(draggedNode, 'color', 'blue');
             setDraggedNode(null);
           }
         },
