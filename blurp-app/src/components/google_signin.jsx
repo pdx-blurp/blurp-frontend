@@ -64,19 +64,15 @@ function GoogleLoginButton(props) {
 
   // When the user clicks logout
   async function logout() {
-    fetch(BACKEND_URL + '/login/google/logout', {
+    fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
       credentials: 'include',
     }).then(res => res.text()).then((res) => {
-      if(res == 'success') {
-        removeCookie('loggedIn');
-        removeCookie('userName');
-        removeCookie('profileUrl');
-        removeCookie('connect.sid');
-        msgRef.current.showMessage('Logout successful');
-      }
-      else {
-        msgRef.current.showMessage('Failed to log out');
-      }
+      // Remove all cookies
+      removeCookie('loggedIn');
+      removeCookie('userName');
+      removeCookie('profileUrl');
+      removeCookie('sessionID');
+      msgRef.current.showMessage('Logout successful');
     }).catch((err) => {
       msgRef.current.showMessage('Failed to log out');
     });
@@ -85,7 +81,7 @@ function GoogleLoginButton(props) {
   async function onLoginSuccess(codeResponse) {
     let accessToken = codeResponse.access_token;
     // Send the access token to the back end
-    const response = await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
+    await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
       credentials: 'include'
     }).then(res => res.json()).then(res => {
       let success = res.success;
@@ -94,6 +90,7 @@ function GoogleLoginButton(props) {
         setCookie('loggedIn', 'true', {maxAge: res.maxAge});
         setCookie('userName', res.userName, {maxAge:res.maxAge});
         setCookie('profileUrl', res.profileUrl, {maxAge: res.maxAge});
+        setCookie('sessionID', res.sessionID, {maxAge: res.maxAge});
         msgRef.current.showMessage('Login successful');
       } else {
         msgRef.current.showMessage('Failed to log in');
