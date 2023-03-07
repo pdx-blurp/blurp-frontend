@@ -54,6 +54,7 @@ const TestPage = () => {
   const [node1, setNode1] = useState('');
   const [node2, setNode2] = useState('');
   const [sigmaCursor, setSigmaCursor] = useState(SIGMA_CURSOR.DEFAULT);
+  const [sigmaClass, setSigmaClass] = useState('flex w-full justify-center');
   const [mapToolbar, setMapToolbar] = useState(MAP_TOOLS.select);
   const [draggedNode, setDraggedNode] = useState(null); // for allowing nodes to be dragged across map
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
@@ -130,6 +131,10 @@ const TestPage = () => {
         });
     }
   }, [mapTitle]);
+
+  useEffect(() => {
+    setSigmaClass('flex w-full justify-center ' + sigmaCursor);
+  }, [sigmaCursor]);
 
   const changeModal = (state, view) => {
     setLoadMapModal({
@@ -560,6 +565,8 @@ const TestPage = () => {
       }
     } else if (data === MAP_TOOLS.eraser) {
       setMapToolbar(MAP_TOOLS.eraser);
+    } else if (data === MAP_TOOLS.move) {
+      setMapToolbar(MAP_TOOLS.move);
     } else {
       setMapToolbar(MAP_TOOLS.select);
     }
@@ -950,8 +957,9 @@ const TestPage = () => {
         downNode: (event) => {
           // react sigma guide for drag'n'drop:
           // https://sim51.github.io/react-sigma/docs/example/drag_n_drop/
-          if (mapToolbar === MAP_TOOLS.select) {
+          if (mapToolbar === MAP_TOOLS.move) {
             setDraggedNode(event.node);
+            setSigmaCursor('cursor-move');
             graph.setNodeAttribute(event.node, 'highlighted', true);
           }
         },
@@ -970,6 +978,7 @@ const TestPage = () => {
         },
         mouseup: (event) => {
           if (draggedNode) {
+            setSigmaCursor('cursor-default');
             sigma.getCamera().enable();
             graph.removeNodeAttribute(draggedNode, 'highlighted');
             setDraggedNode(null);
@@ -1142,7 +1151,7 @@ const TestPage = () => {
       </div>
       <SigmaContainer
         id="blurp-map-container"
-        className={'flex w-full justify-center ' + sigmaCursor}
+        className={sigmaClass}
         style={{
           backgroundColor: '#f4f4f5',
         }}
