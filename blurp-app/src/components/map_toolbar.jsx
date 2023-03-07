@@ -5,6 +5,7 @@ import person_image from '../assets/person.svg';
 import place_image from '../assets/place.svg';
 import idea_image from '../assets/idea.svg';
 import edge_image from '../assets/edge_image.svg';
+import move_icon from '../assets/grab_icon.svg';
 import eraser_icon from '../assets/eraser_icon.svg';
 import select_icon from '../assets/select_icon.svg';
 
@@ -21,6 +22,7 @@ function MapToolbar(props) {
   const [placeClass, setPlaceClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [ideaClass, setIdeaClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [edgeClass, setEdgeClass] = useState(UNSELECTED_ICON_CLASSNAME);
+  const [moveClass, setMoveClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [selectClass, setSelectClass] = useState(SELECTED_ICON_CLASSNAME);
   const [eraserClass, setEraserClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [anchorEl, setAnchorEl] = useState();
@@ -31,6 +33,7 @@ function MapToolbar(props) {
     setPlaceClass(UNSELECTED_ICON_CLASSNAME);
     setIdeaClass(UNSELECTED_ICON_CLASSNAME);
     setEdgeClass(UNSELECTED_ICON_CLASSNAME);
+    setMoveClass(UNSELECTED_ICON_CLASSNAME);
     setSelectClass(UNSELECTED_ICON_CLASSNAME);
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
   }
@@ -68,6 +71,15 @@ function MapToolbar(props) {
     setSelected(MAP_TOOLS.edge);
     setEdgeClass(SELECTED_ICON_CLASSNAME);
   }
+
+  function handleMoveSelection() {
+    props.handleToolbarEvent(MAP_TOOLS.move);
+    clearIconSelection();
+    props.setSigmaCursor(SIGMA_CURSOR.MOVE);
+    setSelected(MAP_TOOLS.default);
+    setMoveClass(SELECTED_ICON_CLASSNAME);
+  }
+
   function handleSelectSelection() {
     props.handleToolbarEvent(MAP_TOOLS.select);
     clearIconSelection();
@@ -237,6 +249,11 @@ function MapToolbar(props) {
           </button>
         </Tooltip>
         <div className="absolute right-0 bottom-0 mb-0">
+          <Tooltip title="Move mode" enterDelay={700} placement="left" arrow>
+            <button className="graph-toolbar-btn" onClick={() => handleMoveSelection()}>
+              <img alt="Move mode" className={moveClass} src={move_icon}></img>
+            </button>
+          </Tooltip>
           <Tooltip title="Select mode" enterDelay={700} placement="left" arrow>
             <button className="graph-toolbar-btn" onClick={() => handleSelectSelection()}>
               <img alt="Select mode" className={selectClass} src={select_icon}></img>
