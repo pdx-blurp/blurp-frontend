@@ -11,9 +11,9 @@ export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_DEV;
 
 export enum COLORS {
   // node colors
-  BROWN = '#836953',
-  GREY = '#848482',
-  OLIVE = '#665D1E',
+  BROWN = '#B3B3E6', //people
+  GREY = '#7393B3', //place
+  OLIVE = '#FEDD00F', //idea
   // stress level colors
   RED = '#C41E3A',
   ORANGE = '#FF6700',
