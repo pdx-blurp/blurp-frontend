@@ -8,6 +8,18 @@ import TempMessage from './temp_msg_display';
 // Redirect after logging in
 const BACKEND_URL = 'http://localhost:3000';
 
+// This function gets the current value of a cookie
+function getCookie(cookieLabel) {
+  let myCookies = document.cookie.replace(/ /g, '').split(';');
+  for(let i = 0; i < myCookies.length; i++) {
+    let thisCookie = myCookies[i].split('=');
+    if(thisCookie[0] == cookieLabel) {
+      return thisCookie[1];
+    }
+  }
+  return null;
+}
+
 function GoogleLoginButton(props) {
   const [cookies, setCookie, removeCookie] = useCookies();
   const [renderedContent, setRenderedContent] = useState(signInButton());
@@ -64,18 +76,26 @@ function GoogleLoginButton(props) {
 
   // When the user clicks logout
   async function logout() {
-    fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
-      credentials: 'include',
-    }).then(res => res.text()).then((res) => {
-      // Remove all cookies
-      removeCookie('loggedIn');
-      removeCookie('userName');
-      removeCookie('profileUrl');
-      removeCookie('sessionID');
-      msgRef.current.showMessage('Logout successful');
-    }).catch((err) => {
-      msgRef.current.showMessage('Failed to log out');
-    });
+    let sessionID = getCookie('sessionID');
+    // Only send request if user session didn't exipre yet
+    if(sessionID) {
+      fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
+        credentials: 'include',
+      }).then(res => res.text()).then((res) => {
+        // Remove all cookies
+        removeCookie('loggedIn');
+        removeCookie('userName');
+        removeCookie('profileUrl');
+        removeCookie('sessionID');
+        msgRef.current.showMessage('Logout successful');
+      }).catch((err) => {
+        msgRef.current.showMessage('Failed to log out');
+      });
+    }
+    else {
+      msgRef.current.showMessage('Already logged out');
+    }
+    setRenderedContent(signInButton());
   }
 
   async function onLoginSuccess(codeResponse) {
