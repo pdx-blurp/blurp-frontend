@@ -48,11 +48,11 @@ export enum MODAL_VIEW {
 }
 
 export enum MAP_TOOLS {
-  node = 'node',
   person = 'person',
   place = 'place',
   idea = 'idea',
   edge = 'edge',
+  move = 'move',
   select = 'select',
   eraser = 'eraser',
 }
@@ -60,6 +60,7 @@ export enum MAP_TOOLS {
 export enum SIGMA_CURSOR {
   DEFAULT = 'cursor-default',
   NODE = 'cursor-node',
+  MOVE = 'cursor-move',
   EDGE = 'cursor-edge',
   ERASER = 'cursor-eraser',
 }
@@ -78,12 +79,12 @@ export enum RELATIONSHIPS {
 }
 
 export const FAMILIARITY = {
-  UNFAMILIAR: { label: 'Unfamiliar', value: 4},
-  SOMEWHAT_FAMILIAR: { label: 'Somewhat familiar', value: 6},
-  MODERATELY_FAMILIAR: { label: 'Moderately familiar', value: 8},
-  VERY_FAMILIAR: { label: 'Very familiar', value: 10},
-  HIGHLY_FAMILIAR: { label: 'Highly familiar', value: 12},
-}
+  UNFAMILIAR: { label: 'Unfamiliar', value: 4 },
+  SOMEWHAT_FAMILIAR: { label: 'Somewhat familiar', value: 6 },
+  MODERATELY_FAMILIAR: { label: 'Moderately familiar', value: 8 },
+  VERY_FAMILIAR: { label: 'Very familiar', value: 10 },
+  HIGHLY_FAMILIAR: { label: 'Highly familiar', value: 12 },
+};
 
 /* 
 Decided to use ints here as the data object doc specifies that the stress code is stored in an int
