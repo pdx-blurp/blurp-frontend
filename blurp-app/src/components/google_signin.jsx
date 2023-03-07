@@ -9,6 +9,18 @@ import TempMessage from './temp_msg_display';
 // const BACKEND_URL = 'http://localhost:3000';
 const BACKEND_URL = 'https://blurp-app.herokuapp.com';
 
+// This function gets the current value of a cookie
+function getCookie(cookieLabel) {
+  let myCookies = document.cookie.replace(/ /g, '').split(';');
+  for(let i = 0; i < myCookies.length; i++) {
+    let thisCookie = myCookies[i].split('=');
+    if(thisCookie[0] == cookieLabel) {
+      return thisCookie[1];
+    }
+  }
+  return null;
+}
+
 function GoogleLoginButton(props) {
   const [cookies, setCookie, removeCookie] = useCookies();
   const [renderedContent, setRenderedContent] = useState(signInButton());
@@ -65,28 +77,32 @@ function GoogleLoginButton(props) {
 
   // When the user clicks logout
   async function logout() {
-    fetch(BACKEND_URL + '/login/google/logout', {
-      credentials: 'include',
-    }).then(res => res.text()).then((res) => {
-      if(res == 'success') {
+    let sessionID = getCookie('sessionID');
+    // Only send request if user session didn't exipre yet
+    if(sessionID) {
+      fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
+        credentials: 'include',
+      }).then(res => res.text()).then((res) => {
+        // Remove all cookies
         removeCookie('loggedIn');
         removeCookie('userName');
         removeCookie('profileUrl');
-        removeCookie('connect.sid');
+        removeCookie('sessionID');
         msgRef.current.showMessage('Logout successful');
-      }
-      else {
+      }).catch((err) => {
         msgRef.current.showMessage('Failed to log out');
-      }
-    }).catch((err) => {
-      msgRef.current.showMessage('Failed to log out');
-    });
+      });
+    }
+    else {
+      msgRef.current.showMessage('Already logged out');
+    }
+    setRenderedContent(signInButton());
   }
 
   async function onLoginSuccess(codeResponse) {
     let accessToken = codeResponse.access_token;
     // Send the access token to the back end
-    const response = await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
+    await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
       credentials: 'include'
     }).then(res => res.json()).then(res => {
       let success = res.success;
@@ -95,6 +111,7 @@ function GoogleLoginButton(props) {
         setCookie('loggedIn', 'true', {maxAge: res.maxAge});
         setCookie('userName', res.userName, {maxAge:res.maxAge});
         setCookie('profileUrl', res.profileUrl, {maxAge: res.maxAge});
+        setCookie('sessionID', res.sessionID, {maxAge: res.maxAge});
         msgRef.current.showMessage('Login successful');
       } else {
         msgRef.current.showMessage('Failed to log in');
