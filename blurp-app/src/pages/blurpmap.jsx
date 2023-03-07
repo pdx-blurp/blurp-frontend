@@ -64,7 +64,7 @@ const TestPage = () => {
   // Tell the user how to create an edge the first time they select the edge tool
   const [showEdgeMessage, setShowEdgeMessage] = useState(true);
   const child = useRef();
-  // const [cookies, setCookie, removeCookie] = useCookies();
+  const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
     timeout: 1000,
   });
@@ -76,24 +76,25 @@ const TestPage = () => {
 
   // Temporary db userID/mapID for testing
   const [profile, setProfile] = useState({
-    profileSet: true,
-    userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
-    // userID: '',
+    profileSet: false,
+    // userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    userID: '',
     mapID: '',
   });
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
-    view: MODAL_VIEW.START,
+    // view: MODAL_VIEW.START,
     // When cookies are implemented, this will be default
-    // view: MODAL_VIEW.NOTLOGGEDIN,
+    view: MODAL_VIEW.NOTLOGGEDIN,
   });
 
-  /* useEffect(() => {
-    if (cookies.userID) {
+  useEffect(() => {
+    if (cookies.sessionID) {
       setProfile({
         ...profile,
-        userID: cookies.userID,
+        profileSet: true,
+        userID: cookies.sessionID,
       });
 
       setLoadMapModal({
@@ -101,7 +102,7 @@ const TestPage = () => {
         view: MODAL_VIEW.START,
       });
     }
-  }, [cookies]); */
+  }, [cookies]);
 
   useEffect(() => {
     graph.setAttribute('name', mapTitle);
@@ -329,8 +330,8 @@ const TestPage = () => {
                 years: node.age === 0 ? '' : node.age,
                 notes: node.description,
                 type: 'image',
-                image: nodeTypeToIconPath(node.type),
-                color: nodeTypeToColor(node.type),
+                image: nodeTypeToIconPath(node.type.toUpperCase()),
+                color: nodeTypeToColor(node.type.toUpperCase()),
               });
               nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
             });
@@ -685,6 +686,7 @@ const TestPage = () => {
               setIsSidebarOn(false);
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
+              const nodeSize = Math.log(size + 1) * 30;
               if (
                 mapToolbar === MAP_TOOLS.person ||
                 mapToolbar === MAP_TOOLS.place ||
@@ -696,7 +698,7 @@ const TestPage = () => {
                   y: grabbed_pos.y,
                   label: '',
                   entity: nodeType,
-                  size: Math.log(size + 1) * 30,
+                  size: nodeSize,
                   years: '',
                   notes: '',
                   type: 'image',
@@ -715,13 +717,13 @@ const TestPage = () => {
                         nodeID: id,
                         // color: color,
                         color: nodeTypeToColor(nodeType),
-                        size: size,
+                        size: nodeSize,
                         age: 0,
                         type: nodeType.toLowerCase(),
                         description: '',
                         pos: {
-                          x: pos.x,
-                          y: pos.y,
+                          x: grabbed_pos.x,
+                          y: grabbed_pos.y,
                         },
                       },
                     })

@@ -25,7 +25,9 @@ const LoadMapModal = forwardRef((props, ref) => {
     Set up the map to wait until its ready by following the article below:
     https://codewithnico.com/react-wait-axios-to-render/ 
     */
+    console.log("testing");
     if (props.profile.userID != '') {
+      console.log("test")
       const id = props.profile.userID;
       let list = [];
       axios
