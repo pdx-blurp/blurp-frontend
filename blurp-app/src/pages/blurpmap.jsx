@@ -64,7 +64,7 @@ const TestPage = () => {
   // Tell the user how to create an edge the first time they select the edge tool
   const [showEdgeMessage, setShowEdgeMessage] = useState(true);
   const child = useRef();
-  // const [cookies, setCookie, removeCookie] = useCookies();
+  const [cookies, setCookie, removeCookie] = useCookies();
   const instance = axios.create({
     timeout: 1000,
   });
@@ -74,26 +74,28 @@ const TestPage = () => {
   const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
 
-  // Temporary db userID/mapID for testing
+  // Temporary db sessionID/mapID for testing
   const [profile, setProfile] = useState({
-    profileSet: true,
-    userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
-    // userID: '',
+    profileSet: false,
+    // sessionID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    sessionID: '',
     mapID: '',
   });
 
   const [loadMapModal, setLoadMapModal] = useState({
     open: true,
-    view: MODAL_VIEW.START,
+    // view: MODAL_VIEW.START,
     // When cookies are implemented, this will be default
-    // view: MODAL_VIEW.NOTLOGGEDIN,
+    view: MODAL_VIEW.NOTLOGGEDIN,
   });
 
-  /* useEffect(() => {
-    if (cookies.userID) {
+  useEffect(() => {
+    console.log(cookies);
+    if (cookies.sessionID) {
       setProfile({
         ...profile,
-        userID: cookies.userID,
+        profileSet: true,
+        sessionID: cookies.sessionID,
       });
 
       setLoadMapModal({
@@ -101,14 +103,14 @@ const TestPage = () => {
         view: MODAL_VIEW.START,
       });
     }
-  }, [cookies]); */
+  }, [cookies]);
 
   useEffect(() => {
     graph.setAttribute('name', mapTitle);
     if (profile.profileSet && profile.mapID != '') {
       instance
         .patch(BACKEND_URL + '/map/update', {
-          userID: profile.userID,
+          sessionID: profile.sessionID,
           mapID: profile.mapID,
           changes: { title: graph.getAttribute('name') },
         })
@@ -146,7 +148,7 @@ const TestPage = () => {
   const changeProfile = (user, map, isSet) => {
     setProfile({
       profileSet: isSet,
-      userID: user,
+      sessionID: user,
       mapID: map,
     });
   };
@@ -199,7 +201,7 @@ const TestPage = () => {
   const SaveToDB = (title) => {
     instance
       .post(BACKEND_URL + '/map/create', {
-        userID: profile.userID,
+        sessionID: profile.sessionID,
         title: graph.getAttribute('name'),
       })
       .then((response) => {
@@ -214,7 +216,7 @@ const TestPage = () => {
             if (current) {
               instance
                 .post(BACKEND_URL + '/map/node/create', {
-                  userID: profile.userID,
+                  sessionID: profile.sessionID,
                   mapID: response.data.mapID,
                   nodeinfo: {
                     nodeName: attr.label,
@@ -329,8 +331,8 @@ const TestPage = () => {
                 years: node.age === 0 ? '' : node.age,
                 notes: node.description,
                 type: 'image',
-                image: nodeTypeToIconPath(node.type),
-                color: nodeTypeToColor(node.type),
+                image: nodeTypeToIconPath(node.type.toUpperCase()),
+                color: nodeTypeToColor(node.type.toUpperCase()),
               });
               nodeList = nodeList.concat({ id: node.nodeID, label: node.nodeName });
             });
@@ -530,7 +532,7 @@ const TestPage = () => {
           graph.clear();
           graph.import(jsonDataString);
 
-          changeProfile(profile.userID, '', false);
+          changeProfile(profile.sessionID, '', false);
           setMapTitle(graph.getAttribute('name'));
           let nodeList = [];
           graph.forEachNode((current, attr) => {
@@ -690,13 +692,15 @@ const TestPage = () => {
                 mapToolbar === MAP_TOOLS.place ||
                 mapToolbar === MAP_TOOLS.idea
               ) {
+                const nodeSize = Math.log(size + 1) * 30;
+                console.log('nodeSize: ', nodeSize);
                 const id = uuidv4();
                 graph.addNode(id, {
                   x: grabbed_pos.x,
                   y: grabbed_pos.y,
                   label: '',
                   entity: nodeType,
-                  size: Math.log(size + 1) * 30,
+                  size: nodeSize,
                   years: '',
                   notes: '',
                   type: 'image',
@@ -708,20 +712,20 @@ const TestPage = () => {
                 if (profile.profileSet) {
                   instance
                     .post(BACKEND_URL + '/map/node/create', {
-                      userID: profile.userID,
+                      sessionID: profile.sessionID,
                       mapID: profile.mapID,
                       nodeinfo: {
                         nodeName: name,
                         nodeID: id,
                         // color: color,
                         color: nodeTypeToColor(nodeType),
-                        size: size,
+                        size: nodeSize,
                         age: 0,
                         type: nodeType.toLowerCase(),
                         description: '',
                         pos: {
-                          x: pos.x,
-                          y: pos.y,
+                          x: grabbed_pos.x,
+                          y: grabbed_pos.y,
                         },
                       },
                     })

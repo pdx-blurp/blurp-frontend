@@ -25,12 +25,12 @@ const LoadMapModal = forwardRef((props, ref) => {
     Set up the map to wait until its ready by following the article below:
     https://codewithnico.com/react-wait-axios-to-render/ 
     */
-    if (props.profile.userID != '') {
-      const id = props.profile.userID;
+    if (props.profile.sessionID != '') {
+      const id = props.profile.sessionID;
       let list = [];
       axios
         .post(BACKEND_URL + '/map', {
-          userID: id,
+          sessionID: id,
         })
         .then((response) => {
           response.data.forEach((current) => {
@@ -80,19 +80,20 @@ const LoadMapModal = forwardRef((props, ref) => {
   };
 
   const deleteMap = (profile, mapID) => {
-    const userID = profile.userID;
+    const sessionID = profile.sessionID;
     axios
       .delete(BACKEND_URL + '/map/delete', {
         data: {
           mapID: mapID,
-          userID: userID,
+          sessionID: sessionID,
         },
       })
       .then((response) => {
         console.log('map deleted');
         if (mapID == profile.mapID) {
           props.clearGraph();
-          props.changeProfile(props.profile.userID, '', false);
+          props.changeProfile(props.profile.sessionID, '', false);
+          props.changeTitle('');
         }
         setMaps(
           maps.filter((current) => {
@@ -123,7 +124,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                       value={value[0]}
                       className="h-full rounded-l-lg bg-green-600 p-2 font-bold text-white hover:bg-green-900"
                       onClick={(e) => {
-                        props.changeProfile(props.profile.userID, e.target.value, true);
+                        props.changeProfile(props.profile.sessionID, e.target.value, true);
                         setMapName('');
                         props.LoadFromDB(e.target.value, true);
                         handleClose();
@@ -209,7 +210,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                       if (mapName != '') {
                         e.preventDefault();
                         props.changeTitle(mapName);
-                        props.changeProfile(props.profile.userID, props.profile.mapID, false);
+                        props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
                         handleClose();
                       }
                     }}>
@@ -248,7 +249,7 @@ const LoadMapModal = forwardRef((props, ref) => {
                   if (mapName != '') {
                     e.preventDefault();
                     props.changeTitle(mapName);
-                    props.changeProfile(props.profile.userID, props.profile.mapID, false);
+                    props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
                     handleClose();
                   }
                 }}>
