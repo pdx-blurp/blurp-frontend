@@ -63,7 +63,6 @@ const System_Toolbar_State = forwardRef((props, ref) => {
   }
 
   function handleModalSave() {
-    console.log(props);
     if (!props.profile.profileSet && props.mapTitle != '') {
       props.SaveToDB(props.mapTitle);
       props.msgs.current.showMessage('Saved to account!');
