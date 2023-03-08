@@ -145,7 +145,7 @@ const ContactPage = () => {
                       d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
                     />
                   </svg>
-                  <p class="mb-5"> 0000 SX ABCD St, Portland, OR, 97201 </p>
+                  <p class="mb-5"> 1825 SW Broadway, Portland, OR, 97201 </p>
                 </div>
                 <div class="... my-10 flex flex-row">
                   <svg
@@ -161,7 +161,7 @@ const ContactPage = () => {
                       d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
                     />
                   </svg>
-                  <p class="mb-5">(000)-000-0000</p>
+                  <p class="mb-5">(503)-725-8410</p>
                 </div>
                 <div class="... mt-10 mb-5 flex flex-row">
                   <svg
@@ -178,7 +178,7 @@ const ContactPage = () => {
                     />
                   </svg>
 
-                  <p class="mb-0"> wait_for_an_email@gmail.com</p>
+                  <p class="mb-0"> blurp.mgmt@gmail.com</p>
                 </div>
                 <hr class="my-0" />
                 <div class="... my-10 flex flex-row">
