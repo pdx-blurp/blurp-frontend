@@ -90,7 +90,6 @@ const TestPage = () => {
   });
 
   useEffect(() => {
-    console.log(cookies);
     if (cookies.sessionID) {
       setProfile({
         ...profile,
