@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import x_button from '../assets/x_button.svg';
 import { useCookies } from 'react-cookie';
-// import { FRONTEND_URL, BACKEND_URL } from '../constants/constants';
+import { BACKEND_URL } from '../constants/constants';
 import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import TempMessage from './temp_msg_display';
 
-// Redirect after logging in
-const BACKEND_URL = 'http://localhost:3000';
 
 // This function gets the current value of a cookie
 function getCookie(cookieLabel) {
