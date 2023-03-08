@@ -74,11 +74,11 @@ const TestPage = () => {
   const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
 
-  // Temporary db userID/mapID for testing
+  // Temporary db sessionID/mapID for testing
   const [profile, setProfile] = useState({
     profileSet: false,
-    // userID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
-    userID: '',
+    // sessionID: 'bb9e434a-7bb9-493a-80b6-abafd0210de3',
+    sessionID: '',
     mapID: '',
   });
 
@@ -90,11 +90,12 @@ const TestPage = () => {
   });
 
   useEffect(() => {
+    console.log(cookies);
     if (cookies.sessionID) {
       setProfile({
         ...profile,
         profileSet: true,
-        userID: cookies.sessionID,
+        sessionID: cookies.sessionID,
       });
 
       setLoadMapModal({
@@ -109,7 +110,7 @@ const TestPage = () => {
     if (profile.profileSet && profile.mapID != '') {
       instance
         .patch(BACKEND_URL + '/map/update', {
-          userID: profile.userID,
+          sessionID: profile.sessionID,
           mapID: profile.mapID,
           changes: { title: graph.getAttribute('name') },
         })
@@ -147,7 +148,7 @@ const TestPage = () => {
   const changeProfile = (user, map, isSet) => {
     setProfile({
       profileSet: isSet,
-      userID: user,
+      sessionID: user,
       mapID: map,
     });
   };
@@ -200,7 +201,7 @@ const TestPage = () => {
   const SaveToDB = (title) => {
     instance
       .post(BACKEND_URL + '/map/create', {
-        userID: profile.userID,
+        sessionID: profile.sessionID,
         title: graph.getAttribute('name'),
       })
       .then((response) => {
@@ -215,7 +216,7 @@ const TestPage = () => {
             if (current) {
               instance
                 .post(BACKEND_URL + '/map/node/create', {
-                  userID: profile.userID,
+                  sessionID: profile.sessionID,
                   mapID: response.data.mapID,
                   nodeinfo: {
                     nodeName: attr.label,
@@ -531,7 +532,7 @@ const TestPage = () => {
           graph.clear();
           graph.import(jsonDataString);
 
-          changeProfile(profile.userID, '', false);
+          changeProfile(profile.sessionID, '', false);
           setMapTitle(graph.getAttribute('name'));
           let nodeList = [];
           graph.forEachNode((current, attr) => {
@@ -686,12 +687,13 @@ const TestPage = () => {
               setIsSidebarOn(false);
             } else {
               const grabbed_pos = sigma.viewportToGraph(event);
-              const nodeSize = Math.log(size + 1) * 30;
               if (
                 mapToolbar === MAP_TOOLS.person ||
                 mapToolbar === MAP_TOOLS.place ||
                 mapToolbar === MAP_TOOLS.idea
               ) {
+                const nodeSize = Math.log(size + 1) * 30;
+                console.log('nodeSize: ', nodeSize);
                 const id = uuidv4();
                 graph.addNode(id, {
                   x: grabbed_pos.x,
@@ -710,7 +712,7 @@ const TestPage = () => {
                 if (profile.profileSet) {
                   instance
                     .post(BACKEND_URL + '/map/node/create', {
-                      userID: profile.userID,
+                      sessionID: profile.sessionID,
                       mapID: profile.mapID,
                       nodeinfo: {
                         nodeName: name,
