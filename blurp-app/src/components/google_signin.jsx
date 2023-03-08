@@ -96,13 +96,6 @@ function GoogleLoginButton(props) {
     setRenderedContent(signInButton());
   }
 
-<<<<<<< HEAD
-  function signIn() {
-    // Set cookie to where to redirect to
-    document.cookie = 'redirectAfterLogin='+redirectAfterLogin;
-    // Redirect to sign in
-    window.location.href = 'https://blurp-app.herokuapp.com/login/google';
-=======
   async function onLoginSuccess(codeResponse) {
     let accessToken = codeResponse.access_token;
     // Send the access token to the back end
@@ -122,7 +115,6 @@ function GoogleLoginButton(props) {
       }
     });
     setPopoutVisible(false);
->>>>>>> test
   }
 
   const signIn = useGoogleLogin({
