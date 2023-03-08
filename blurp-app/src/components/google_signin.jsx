@@ -1,166 +1,178 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useGoogleLogin, googleLogout } from '@react-oauth/google';
-import guestPic from '../assets/guest_profile_pic.svg';
 import x_button from '../assets/x_button.svg';
-import axios from 'axios';
-import Cookies from 'universal-cookie';
+import { useCookies } from 'react-cookie';
+import { BACKEND_URL } from '../constants/constants';
+import { useGoogleLogin, googleLogout } from '@react-oauth/google';
+import TempMessage from './temp_msg_display';
 
-function GoogleLoginButton (props) {
 
-  // What to render in place of the sign-in button
+// This function gets the current value of a cookie
+function getCookie(cookieLabel) {
+  let myCookies = document.cookie.replace(/ /g, '').split(';');
+  for(let i = 0; i < myCookies.length; i++) {
+    let thisCookie = myCookies[i].split('=');
+    if(thisCookie[0] == cookieLabel) {
+      return thisCookie[1];
+    }
+  }
+  return null;
+}
+
+function GoogleLoginButton(props) {
+  const [cookies, setCookie, removeCookie] = useCookies();
   const [renderedContent, setRenderedContent] = useState(signInButton());
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
   const [popoutVisible, setPopoutVisible] = useState(false);
-  const cookies = new Cookies();
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
+  const msgRef = useRef(null);
+  const [showFailMessage, setShowFailMessage] = useState(false);
 
-  // Load cookies
-  if(!user && cookies.get('googleLoginUser')){
-    setUser(cookies.get('googleLoginUser'));
-  }
-
-  // Update cookies when user/profile change
-  useEffect(() => {
-    if(user && user != 'null')
-      cookies.set('googleLoginUser', user, {path: '/'});
-    else
-      cookies.remove('googleLoginUser');
-  }, [user, profile]);
-
-  // If the user changes, update the profile
-  useEffect(() => {
-    if(user && user != 'null') {
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-        headers: {
-          Authorization: `Basic ${user.access_token}`,
-          Accept: 'application/json'
-        }
-      }).then((res) => {
-        setProfile(res.data);
-      }).catch((err) => console.log(err));
-    }
-    else {
-      setProfile(null);
-    }
-  }, [user]);
-
-  // If the profile changes (logged in, logged out, image change, etc),
-  // then we should change what is rendered
-  useEffect(() => {
-    if(profile && profile != 'null') {
-      setPopoutVisible(false);
-      setRenderedContent(userProfile());
-    }
-    else {
-      setRenderedContent(signInButton);
-    }
-  }, [profile]);
 
   // Collapse popout if user clicks outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if(expanded_div_ref.current && !expanded_div_ref.current.contains(event.target) &&
-        profile_pic_ref.current && !profile_pic_ref.current.contains(event.target)) {
+      if (
+        expanded_div_ref.current &&
+        !expanded_div_ref.current.contains(event.target) &&
+        profile_pic_ref.current &&
+        !profile_pic_ref.current.contains(event.target)
+      ) {
         closePopout();
       }
     };
     document.addEventListener('mousedown', handleClickOutside, true);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside, true);
-    }
+    };
   }, [closePopout]);
 
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
-    if(profile && profile != 'null') {
+    // If the user is logged in, render logged-in page
+    if (cookies.loggedIn == 'true') {
       setRenderedContent(userProfile());
+    } else {
+      setRenderedContent(signInButton());
     }
-  }, [popoutVisible])
-
-  function onLoginSuccess(googleUser) {
-    setUser(googleUser);
-  }
-  
-  const onLoginFailure = (error) => {
-    console.log("Google sign-in failed.");
-  }
+  }, [popoutVisible, cookies.loggedIn]);
 
   // When the profile is clicked, switch the popout.
   // If expanded, collapse, and vice versa.
-  function handle_profile_click () {
-    if(popoutVisible) {
+  function handle_profile_click() {
+    if (popoutVisible) {
       setPopoutVisible(false);
-    }
-    else {
+    } else {
       setPopoutVisible(true);
     }
   }
 
   // Close the popout that appears when user clicks on
   // their profile picture
-  function closePopout () {
+  function closePopout() {
     setPopoutVisible(false);
   }
 
-  // Expand the popout that appears when user clicks on
-  // their profile picture
-  function expandPopout () {
-    setPopoutVisible(true);
+  // When the user clicks logout
+  async function logout() {
+    let sessionID = getCookie('sessionID');
+    // Only send request if user session didn't exipre yet
+    if(sessionID) {
+      fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
+        credentials: 'include',
+      }).then(res => res.text()).then((res) => {
+        // Remove all cookies
+        removeCookie('loggedIn');
+        removeCookie('userName');
+        removeCookie('profileUrl');
+        removeCookie('sessionID');
+        msgRef.current.showMessage('Logout successful');
+      }).catch((err) => {
+        msgRef.current.showMessage('Failed to log out');
+      });
+    }
+    else {
+      msgRef.current.showMessage('Already logged out');
+    }
+    setRenderedContent(signInButton());
   }
 
-  const login = useGoogleLogin({
+  async function onLoginSuccess(codeResponse) {
+    let accessToken = codeResponse.access_token;
+    // Send the access token to the back end
+    await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
+      credentials: 'include'
+    }).then(res => res.json()).then(res => {
+      let success = res.success;
+      // If successfully authenticated user profile in backend
+      if(success) {
+        setCookie('loggedIn', 'true', {maxAge: res.maxAge});
+        setCookie('userName', res.userName, {maxAge:res.maxAge});
+        setCookie('profileUrl', res.profileUrl, {maxAge: res.maxAge});
+        setCookie('sessionID', res.sessionID, {maxAge: res.maxAge});
+        msgRef.current.showMessage('Login successful');
+      } else {
+        msgRef.current.showMessage('Failed to log in');
+      }
+    });
+    setPopoutVisible(false);
+  }
+
+  const signIn = useGoogleLogin({
     onSuccess: codeResponse => onLoginSuccess(codeResponse),
-    onError: error => onLoginFailure(error)
+    onError: error => {msgRef.current.showMessage('Failed to log in');}
   });
 
-  // When the user clicks logout
-  function logout () {
-    googleLogout();
-    setUser(null);
-    setProfile(null);
-    cookies.remove('googleLoginUser');
-  }
-  
-  function signInButton () {
+  function signInButton() {
     return (
       <>
-        <li onClick={() => login()} className='btn-navbar sign-in-btn'>Sign In</li>
+        <li onClick={() => signIn()} className="btn-navbar sign-in-btn">
+          Sign In
+        </li>
       </>
     );
   }
 
-  function userProfile () {
-
+  function userProfile() {
     let popoutVisibility = 'invisible';
-    if(popoutVisible)
-      popoutVisibility = '';
-
-    let imageUrl = guestPic;
-    if(profile && profile.picture)
-      imageUrl = profile.picture;
+    if (popoutVisible) popoutVisibility = '';
 
     return (
       <>
         <li className="cursor-pointer">
-          <img className="w-9 h-9 rounded-full" src={imageUrl} onClick={handle_profile_click} ref={profile_pic_ref}/>
+          <img
+            className="h-9 w-9 rounded-full"
+            src={cookies.profileUrl}
+            referrerPolicy="no-referrer"
+            onClick={handle_profile_click}
+            ref={profile_pic_ref}
+          />
         </li>
-        <div className={'absolute flex items-center mt-[120px] w-[180px] h-[60px] bg-gray-900/75 ' + popoutVisibility}  ref={expanded_div_ref}>
+        <div
+          className={
+            'absolute mt-[120px] flex h-[60px] w-[180px] items-center bg-gray-900/75 ' +
+            popoutVisibility
+          }
+          ref={expanded_div_ref}>
           <div className={'btn-navbar sign-in-btn inline-block align-middle'} onClick={logout}>
             Sign out
           </div>
           <div>
-            <img src={x_button} className='cursor-pointer w-9 h-9 rounded-full hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25' onClick={closePopout}></img>
+            <img
+              src={x_button}
+              className="h-9 w-9 cursor-pointer rounded-full hover:border-2 hover:border-blue-300/10 hover:bg-blue-300/25"
+              onClick={closePopout}></img>
           </div>
         </div>
       </>
     );
   }
-  
+
   return (
     <>
       {renderedContent}
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+	      <TempMessage ref={msgRef}/>
+      </div>
     </>
   );
 }

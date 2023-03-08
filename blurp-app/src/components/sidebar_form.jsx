@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
-import { NodeData, EdgeData } from '../constants/classes.jsx';
-import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS, STRESS_CODE } from '../constants/constants.ts';
+import { NodeData, EdgeData} from '../constants/classes.jsx';
+import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS, STRESS_CODE, FAMILIARITY } from '../constants/constants.ts';
 import Slider from '@mui/material/Slider';
 
 const notes_size = 255;
@@ -31,11 +31,12 @@ const SidebarForm = forwardRef((props, ref) => {
 
   const [edge, setEdge] = useState({
     relation: RELATIONSHIPS.situational,
-    familiarity: 0,
+    familiarity: '',
     stressCode: 1,
     node1ID: '',
     node2ID: '',
     id: '',
+    edgeSize: 4,
   });
   /* 
     Using this to work on pulling info from the forms:
@@ -70,16 +71,6 @@ const SidebarForm = forwardRef((props, ref) => {
     }
   };
 
-  const display = () => {
-    console.log('name: ' + node.name);
-    console.log('years: ' + node.years);
-    console.log('notes: ' + node.notes);
-    console.log('type: ' + node.type);
-    console.log('relation: ' + edge.relation);
-    console.log('familiarity: ' + edge.familiarity);
-    console.log('stressCode: ' + edge.stressCode);
-  };
-
   const handleSubmit = (e) => {
     if (view == SIDEBAR_VIEW.edge) {
       props.changeEdgeData(
@@ -88,7 +79,8 @@ const SidebarForm = forwardRef((props, ref) => {
         edge.stressCode,
         edge.node1ID,
         edge.node2ID,
-        edge.id
+        edge.id,
+        getSize(edge.familiarity) * 2,
       );
     } else {
       props.changeNodeData(node.name, node.years, node.notes, node.id);
@@ -112,9 +104,18 @@ const SidebarForm = forwardRef((props, ref) => {
       node1ID: '',
       node2ID: '',
       id: '',
+      edgeSize: 4,
     });
   };
 
+  const getSize = (familiarityLabel) => {
+    for (const[key, element] of Object.entries(FAMILIARITY)) {
+      if (element.label === familiarityLabel) {
+        return element.value;
+      }
+    }
+    return 2;
+  }
   const setData = () => {
     const selected_node = props.parent_node.selected;
     const selected_edge = props.parent_edge.selected;
@@ -135,11 +136,12 @@ const SidebarForm = forwardRef((props, ref) => {
     } else if (selected_edge.id != '') {
       setEdge({
         relation: selected_edge.category,
-        familiarity: Number(selected_edge.familiarity),
+        familiarity: selected_edge.familiarity,
         stressCode: selected_edge.stressCode,
         node1ID: selected_edge.node1,
         node2ID: selected_edge.node2,
         id: selected_edge.id,
+        edgeSize: getSize(selected_edge.familiarity) * 2,
       });
       setView(SIDEBAR_VIEW.edge);
     }
@@ -316,15 +318,18 @@ const SidebarForm = forwardRef((props, ref) => {
             </fieldset>
             <div className="m-2 grid w-11/12">
               <label>Familiarity</label>
-              <Slider
-                sx={{ width: '90%' }}
+              <select
                 aria-label="Small"
                 name="edge.familiarity"
                 value={edge.familiarity}
-                valueLabelDisplay="auto"
                 onChange={handleChange}
-                className="mx-3"
-              />
+                className="mx-3">
+                {Object.entries(FAMILIARITY).map(([key, value]) => (
+                  <option key={key} value={value.label}>
+                    {value.label}
+                  </option>
+                ))}
+              </select>
               <label>Stress Level</label>
               <select
                 name="edge.stressCode"

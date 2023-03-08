@@ -3,8 +3,20 @@ import BrandName from '../assets/blurp_full_logo_white.png';
 import NavbarProp from '../components/navbar';
 import Spline from '@splinetool/react-spline';
 import SplineModel from '../assets/scene.splinecode';
+import TempMessage from '../components/temp_msg_display';
+import { useRef } from 'react';
+import { useCookies } from 'react-cookie';
 
 const Home = () => {
+  const welcomeMsgRef = useRef(false);
+  const [cookies, setCookie, removeCookie] = useCookies();
+
+  // If there's a userName, the user is logged in. Welcome msg:
+  let msgToDisplayOnLoad = '';
+  if (cookies['userName']) {
+    msgToDisplayOnLoad = "Hello, " + cookies['userName'];
+  }
+  
   return (
     <div className="landing-background">
       <NavbarProp />
@@ -13,8 +25,8 @@ const Home = () => {
           <div className="my-5">
             <div className="grid justify-center">
               <img className="mx-24" src={BrandName} alt="Blurp the Greatest" />
-              <h2 className="text-center main-subtitle text-indigo-500">
-                Bridging Lives. Understanding Relaionships & People.
+              <h2 className="text-center main-subtitle text-slate-400">
+                Bridging <p className='sugar-text1'>Lives</p>. Understanding <p className='sugar-text1'>Relationships</p> & <p className='sugar-text1'>People</p>.
               </h2>
             </div>
           </div>
@@ -27,18 +39,15 @@ const Home = () => {
             <div className="grid lg:grid-cols-2"></div>
           </div>
           <div className="grid justify-center my-5">
-            <h1 className="text-center section-title">What is an Ecomap?</h1>
+            <h1 className="text-center section-title">what is blurp?</h1>
             <p className="text-2xl text-neutral-300">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolor veritatis, illum velit
-              quasi, sed tenetur ipsa recusandae assumenda distinctio asperiores, a non rerum
-              repellat. Nulla quae velit harum quisquam aspernatur. Lorem ipsum dolor, sit amet
-              consectetur adipisicing elit. Nostrum, labore quisquam aperiam quibusdam expedita
-              numquam quaerat omnis nihil ratione aliquid ex quos veniam commodi. Soluta perferendis
-              sit placeat iure minima.
+              Blurp is a creative, visualization tool for mapping relationships in one's life. Relationships 
+              include anything from work relationships with your tyrant boss to relationships you have with 
+              an idea about the existence of rubber ducks... anything goes :)
             </p>
           </div>
           <div className="grid justify-center my-5">
-            <h1 className="text-center section-title">How it can help you</h1>
+            <h1 className="text-center section-title">how it can help you</h1>
             <p className="text-2xl text-neutral-300">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur labore facilis
               assumenda, laborum quae rerum beatae non magni ipsam quasi doloremque omnis facere ab
@@ -49,25 +58,20 @@ const Home = () => {
             </p>
           </div>
           <div className="grid justify-center my-5">
-            <h1 className="text-center section-title">How to make an ecomap</h1>
+            <h1 className="text-center section-title">how to make a blurp map</h1>
             <p className="text-2xl text-neutral-300">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, rem eaque culpa
               reiciendis nostrum suscipit exercitationem magni eum ratione, mollitia itaque
               voluptatibus vero consequatur consectetur optio officiis harum facilis repellat?
             </p>
           </div>
-          {/* <div>
-            <h3 className="my-5 text-2xl">Video on how to make an ecomap:</h3>
-            <div className="youtube-placeholder flex items-center justify-center">
-              <div className="relative bg-red-600 rounded-xl w-1/5 h-1/5 flex items-center justify-center">
-                <div className="youtube-triangle"></div>
-              </div>
-            </div>
-          </div> */}
         </div>
         <Spline className="order-first xl:order-last xl:scale-[0.9] lg:scale-[0.88] md:scale-[0.72] scale-[0.55]" scene={SplineModel} />
       </div>
-      <footer className="text-center text-white">Made with love in 2022 by PDX Blurp</footer>
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+	      <TempMessage ref={welcomeMsgRef} message={msgToDisplayOnLoad} duration={1000}/>
+      </div>
+      <footer className="text-center text-white">Made with <div className="inline text-red-500">love</div> in 2022 by PDX Blurp</footer>
     </div>
   );
 };

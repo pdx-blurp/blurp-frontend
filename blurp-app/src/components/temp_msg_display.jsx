@@ -1,7 +1,7 @@
 import React from 'react';
 
-const HIDDEN_MSG_CLASS = 'obj-deleted-msg opacity-0';
-const VISIBLE_MSG_CLASS = 'obj-deleted-msg opacity-100';
+const HIDDEN_MSG_CLASS = 'temp-msg opacity-0';
+const VISIBLE_MSG_CLASS = 'temp-msg opacity-100';
 
 class TempMessage extends React.Component {
   constructor(props) {
@@ -12,6 +12,14 @@ class TempMessage extends React.Component {
       msg: '',
       deleteMsgClass: HIDDEN_MSG_CLASS,
     };
+  }
+
+  // Caller may want to have message appear on load. When loaded,
+  // call showMessage to display the message.
+  componentDidMount() {
+    if (this.props.message && this.props.message != '') {
+      this.showMessage(this.props.message);
+    }
   }
 
   showMessage = (new_msg) => {
