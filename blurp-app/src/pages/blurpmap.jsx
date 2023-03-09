@@ -48,7 +48,7 @@ const TestPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
-  const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '') });
+  const [node, setNode] = useState({ selected: new NodeData('', '', '', '', '', '') });
   const [edge, setEdge] = useState({ selected: new EdgeData('', '', '', '', '', '') });
   const [nodes, setNodes] = useState([]);
   const [node1, setNode1] = useState('');
@@ -378,6 +378,7 @@ const TestPage = () => {
       graph.setNodeAttribute(id, 'label', name);
       graph.setNodeAttribute(id, 'years', years);
       graph.setNodeAttribute(id, 'notes', notes);
+      //graph.setNodeAttribute(id, 'size', size);
       setNodes((prevNodes) =>
         prevNodes.map((node) => {
           if (node.id === id) {
@@ -848,7 +849,7 @@ const TestPage = () => {
             // This block occurs when the user is in 'edge' mode and clicks
             // on a node.
             // Done to clear data and avoid reopening old selections
-            setNode({ selected: new NodeData('', '', '', '', '') });
+            setNode({ selected: new NodeData('', '', '', '', '', '') });
             setEdge({ selected: new EdgeData('', '', '', '', '', '') });
             // If this is the first node selected, simply record this node
             if (node1 == null) {
@@ -881,7 +882,7 @@ const TestPage = () => {
             }
           } else {
             // Done to clear data and avoid reopening old selections
-            setNode({ selected: new NodeData('', '', '', '', '') });
+            setNode({ selected: new NodeData('', '', '', '', '', '') });
             setEdge({ selected: new EdgeData('', '', '', '', '', '') });
             let retrieved = graph.getNodeAttributes(event.node);
             if (retrieved.entity === NODE_TYPE.PERSON) {

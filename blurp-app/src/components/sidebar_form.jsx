@@ -25,6 +25,7 @@ const SidebarForm = forwardRef((props, ref) => {
     name: '',
     years: '',
     notes: '',
+    size: '',
     type: NODE_TYPE.PERSON,
     id: '',
   });
@@ -179,12 +180,27 @@ const SidebarForm = forwardRef((props, ref) => {
               type="text"
               name="node.notes"
               className="textbox-sidebar resize-none"
-              rows="10"
+              rows="8"
               cols="25"
               maxLength={notes_size}
               value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
+            />
+            <label className="m-2 self-center font-bold">Size</label>
+            <Slider
+              value={props.size}
+              onChange={(e) => props.setSize(e.target.value)}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '15rem',
+              }}
             />
             <button type="submit" className="btn-sidebar">
               Save
@@ -213,6 +229,21 @@ const SidebarForm = forwardRef((props, ref) => {
               value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
+            />
+            <label className="m-2 self-center font-bold">Size</label>
+              <Slider
+              value={props.size}
+              onChange={(e) => props.setSize(e.target.value)}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '15rem',
+              }}
             />
             <button type="submit" className="btn-sidebar">
               Save
@@ -243,12 +274,27 @@ const SidebarForm = forwardRef((props, ref) => {
               type="text"
               name="node.notes"
               className="textbox-sidebar resize-none"
-              rows="10"
+              rows="8"
               cols="25"
               maxLength={notes_size}
               value={node.notes}
               onChange={handleChange}
               placeholder="Notes"
+            />
+            <label className="m-2 self-center font-bold">Size</label>
+            <Slider
+              value={props.size}
+              onChange={(e) => props.setSize(e.target.value)}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '15rem',
+              }}
             />
             <button type="submit" className="btn-sidebar">
               Save
