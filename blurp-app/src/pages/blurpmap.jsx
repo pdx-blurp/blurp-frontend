@@ -570,7 +570,6 @@ const TestPage = () => {
   const getThicknessSize = (familiarityLabel) => {
     for (const [key, element] of Object.entries(FAMILIARITY)) {
       if (element.label === familiarityLabel) {
-        console.log('value being return is ' + element.value);
         return element.value;
       }
     }
