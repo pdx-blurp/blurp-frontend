@@ -44,7 +44,7 @@ import { capitalize } from '@mui/material';
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
   const [nodeType, setNodeType] = useState(NODE_TYPE.PERSON);
-  const [color, setColor] = useState(COLORS.BROWN);
+  const [color, setColor] = useState(COLORS.PEOPLE);
   const [name, setName] = useState('');
   const [familiarity, setFamiliarity] = useState('Unfamiliar');
   const [edgeSize, setEdgeSize] = useState(10);
@@ -159,13 +159,13 @@ const TestPage = () => {
   const nodeTypeToColor = (nodeType) => {
     switch (nodeType) {
       case NODE_TYPE.PERSON:
-        return COLORS.BROWN;
+        return COLORS.PEOPLE;
       case NODE_TYPE.PLACE:
-        return COLORS.GREY;
+        return COLORS.PLACE;
       case NODE_TYPE.IDEA:
-        return COLORS.OLIVE;
+        return COLORS.IDEA;
       default:
-        return COLORS.BROWN;
+        return COLORS.PEOPLE;
     }
   };
 
@@ -257,9 +257,6 @@ const TestPage = () => {
                 nodes: nodes,
                 relationships: relationships,
               },
-            })
-            .then((response) => {
-              msgRef.current.showMessage('Saved to database!');
             })
             .catch((error) => {
               if (error.response) {
@@ -619,9 +616,6 @@ const TestPage = () => {
                 },
               },
             })
-            .then((response) => {
-              msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
-            })
             .catch((error) => {
               if (error.response) {
                 console.log(
@@ -640,8 +634,6 @@ const TestPage = () => {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
             });
-        } else {
-          msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
       } else {
         msgRef.current.showMessage('Edge already exists between these nodes');
@@ -712,11 +704,6 @@ const TestPage = () => {
                         },
                       },
                     })
-                    .then((response) => {
-                      msgRef.current.showMessage(
-                        capitalize(mapToolbar) + ' was successfully created'
-                      );
-                    })
                     .catch((error) => {
                       if (error.response) {
                         console.log(
@@ -740,8 +727,6 @@ const TestPage = () => {
                         );
                       }
                     });
-                } else {
-                  msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
                 }
               }
             }
