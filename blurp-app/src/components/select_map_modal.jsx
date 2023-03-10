@@ -230,8 +230,10 @@ const LoadMapModal = forwardRef((props, ref) => {
               multiple maps to your account, and more! However, you can start a local session if you
               don't want to log in. You will have to save your maps manually though!
             </p>
-            <form>
+            <div className="w-64">
               <GoogleLoginButton />
+            </div>
+            <form>
               <br />
               <input
                 type="text"

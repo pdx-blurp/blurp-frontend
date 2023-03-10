@@ -13,6 +13,9 @@ import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
+import PersonIcon from '../assets/person.svg';
+import PlaceIcon from '../assets/place.svg';
+import IdeaIcon from '../assets/idea.svg';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -168,13 +171,13 @@ const TestPage = () => {
   const nodeTypeToIconPath = (nodeType) => {
     switch (nodeType) {
       case NODE_TYPE.PERSON:
-        return './src/assets/person.svg';
+        return PersonIcon;
       case NODE_TYPE.PLACE:
-        return './src/assets/place.svg';
+        return PlaceIcon;
       case NODE_TYPE.IDEA:
-        return './src/assets/idea.svg';
+        return IdeaIcon;
       default:
-        return './src/assets/person.svg';
+        return PersonIcon;
     }
   };
 
@@ -211,86 +214,70 @@ const TestPage = () => {
         });
         setMapTitle(title);
         if (graph.order > 0) {
+          let nodes = [];
+          let relationships = [];
           graph.forEachNode((current, attr) => {
-            if (current) {
-              instance
-                .post(BACKEND_URL + '/map/node/create', {
-                  sessionID: profile.sessionID,
-                  mapID: response.data.mapID,
-                  nodeinfo: {
-                    nodeName: attr.label,
-                    nodeID: current,
-                    color: nodeTypeToColor(attr.entity),
-                    size: attr.size,
-                    age: attr.years === '' ? 0 : attr.years,
-                    type: attr.entity.toLowerCase(),
-                    description: attr.notes,
-                    pos: {
-                      x: attr.x,
-                      y: attr.y,
-                    },
-                  },
-                })
-                .catch((error) => {
-                  if (error.response) {
-                    console.log(
-                      'Error: Invalid post request, status:' +
-                        error.response.status +
-                        '\n' +
-                        error.response.headers
-                    );
-                  } else if (error.request) {
-                    console.log(
-                      'Error: The server failed to respond to the post request\n' + error.message
-                    );
-                  } else {
-                    console.log(
-                      'Error: Some error has occured\n' + 'error message:\n' + error.message
-                    );
-                  }
-                });
-            }
+            nodes.push({
+              nodeName: attr.label,
+              nodeID: current,
+              color: nodeTypeToColor(attr.entity),
+              size: attr.size,
+              age: attr.years === '' ? 0 : attr.years,
+              type: attr.entity.toLowerCase(),
+              description: attr.notes,
+              pos: {
+                x: attr.x,
+                y: attr.y,
+              },
+            });
           });
           graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
-            if (current) {
-              instance
-                .post(BACKEND_URL + '/map/relationship/create', {
-                  mapID: response.data.mapID,
-                  relationshipinfo: {
-                    relationshipID: current,
-                    nodePair: {
-                      nodeOne: source,
-                      nodeTwo: target,
-                    },
-                    description: 'unused',
-                    relationshipType: {
-                      type: attr.label,
-                      familiarity: attr.familiarity,
-                      stressCode: attr.stressCode,
-                      size: attr.size,
-                    },
-                  },
-                })
-                .catch((error) => {
-                  if (error.response) {
-                    console.log(
-                      'Error: Invalid post request, status:' +
-                        error.response.status +
-                        '\n' +
-                        error.response.headers
-                    );
-                  } else if (error.request) {
-                    console.log(
-                      'Error: The server failed to respond to the post request\n' + error.message
-                    );
-                  } else {
-                    console.log(
-                      'Error: Some error has occured\n' + 'error message:\n' + error.message
-                    );
-                  }
-                });
-            }
+            relationships.push({
+              relationshipID: current,
+              nodePair: {
+                nodeOne: source,
+                nodeTwo: target,
+              },
+              description: 'unused',
+              relationshipType: {
+                type: attr.label,
+                familiarity: attr.familiarity,
+                stressCode: attr.stressCode,
+                size: attr.size,
+              },
+            });
           });
+
+          instance
+            .patch(BACKEND_URL + '/map/update', {
+              mapID: response.data.mapID,
+              sessionID: profile.sessionID,
+              changes: {
+                nodes: nodes,
+                relationships: relationships,
+              },
+            })
+            .then((response) => {
+              msgRef.current.showMessage('Saved to database!');
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(
+                  'Error: Invalid patch request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the patch request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
+            });
+          console.log(nodes);
+          console.log(relationships);
         }
       })
       .catch((error) => {
