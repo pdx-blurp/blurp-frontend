@@ -18,6 +18,7 @@ const LoadMapModal = forwardRef((props, ref) => {
   const [isLoading, setLoading] = useState(true);
   const [mapName, setMapName] = useState('');
   const [genList, setGenList] = useState();
+  const [serverFailure, setServerFailure] = useState(false);
   const [errorMsg, setErrorMsg] = useState();
 
   useEffect(() => {
@@ -54,9 +55,11 @@ const LoadMapModal = forwardRef((props, ref) => {
           } else if (error.request) {
             error_msg = 'Server not responding';
             dev_error_msg = error.request;
+            setServerFailure(true);
           } else {
             error_msg = 'failed to load maps, some error has occured';
             dev_error_msg = error;
+            setServerFailure(true);
           }
           console.log(dev_error_msg);
           setErrorMsg(error_msg);
@@ -174,49 +177,45 @@ const LoadMapModal = forwardRef((props, ref) => {
               {genList}
             </List>
             <form>
-              <div>
+              <div className="flex justify-between">
                 <input
                   type="text"
                   name="mapName"
                   placeholder="Enter the name of a new map"
-                  className="my-2 h-10 w-9/12 rounded-lg p-2"
+                  className="my-2 h-10 w-7/12 rounded-lg p-2"
                   value={mapName}
                   required
                   onChange={(e) => setMapName(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="load-map-button float-right my-2 h-10 w-1/5"
+                  className="load-map-button my-2 h-10 w-1/5"
+                  disabled={serverFailure}
                   onClick={(e) => {
                     if (mapName != '') {
                       // Done to prevent title appearing in URL after submit
                       e.preventDefault();
                       props.clearGraph();
-                      // props.changeTitle(mapName);
                       props.SaveToDB(mapName);
                       handleClose();
                     }
                   }}>
                   Create new map
                 </button>
+                <button
+                  type="submit"
+                  className="load-map-button my-2 h-10 w-1/5"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    props.changeTitle('My Demo Map');
+                    props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
+                    handleClose();
+                  }}>
+                  Demo
+                </button>
               </div>
               <div>
-                <p>
-                  Or, you could:
-                  <button
-                    type="submit"
-                    className="load-map-button m-2 h-10 w-1/4"
-                    onClick={(e) => {
-                      if (mapName != '') {
-                        e.preventDefault();
-                        props.changeTitle(mapName);
-                        props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
-                        handleClose();
-                      }
-                    }}>
-                    Start a local session
-                  </button>
-                </p>
+                <p></p>
               </div>
             </form>
           </>
@@ -230,11 +229,7 @@ const LoadMapModal = forwardRef((props, ref) => {
               multiple maps to your account, and more! However, you can start a local session if you
               don't want to log in. You will have to save your maps manually though!
             </p>
-            <div className="w-64">
-              <GoogleLoginButton />
-            </div>
             <form>
-              <br />
               <input
                 type="text"
                 name="mapName"
@@ -258,6 +253,13 @@ const LoadMapModal = forwardRef((props, ref) => {
                 Start a local session
               </button>
             </form>
+            <br />
+            <div>
+              Log in with Google:
+              <div className="w-48">
+                <GoogleLoginButton />
+              </div>
+            </div>
           </>
         );
     }

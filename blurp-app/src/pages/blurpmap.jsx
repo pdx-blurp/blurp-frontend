@@ -47,7 +47,8 @@ const TestPage = () => {
   const [color, setColor] = useState(COLORS.BROWN);
   const [name, setName] = useState('');
   const [familiarity, setFamiliarity] = useState('Unfamiliar');
-  const [size, setSize] = useState(10);
+  const [edgeSize, setEdgeSize] = useState(10);
+  const [nodeSize, setNodeSize] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
@@ -276,8 +277,6 @@ const TestPage = () => {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
             });
-          console.log(nodes);
-          console.log(relationships);
         }
       })
       .catch((error) => {
@@ -599,7 +598,7 @@ const TestPage = () => {
           stressCode: edgeData.stressCode,
           node1: '',
           node2: '',
-          size: size,
+          size: edgeSize,
           color: edgeColor(edgeData.stressCode),
         });
         if (profile.profileSet) {
@@ -617,7 +616,7 @@ const TestPage = () => {
                   type: relationship,
                   familiarity: edgeData.familiarity,
                   stressCode: edgeData.stressCode,
-                  size: size,
+                  size: edgeSize,
                 },
               },
             })
@@ -678,15 +677,14 @@ const TestPage = () => {
                 mapToolbar === MAP_TOOLS.place ||
                 mapToolbar === MAP_TOOLS.idea
               ) {
-                const nodeSize = Math.log(size + 1) * 30;
-                console.log('nodeSize: ', nodeSize);
+                const newNodeSize = Math.log(nodeSize + 1) * 30;
                 const id = uuidv4();
                 graph.addNode(id, {
                   x: grabbed_pos.x,
                   y: grabbed_pos.y,
                   label: '',
                   entity: nodeType,
-                  size: nodeSize,
+                  size: newNodeSize,
                   years: '',
                   notes: '',
                   type: 'image',
@@ -705,7 +703,7 @@ const TestPage = () => {
                         nodeID: id,
                         // color: color,
                         color: nodeTypeToColor(nodeType),
-                        size: nodeSize,
+                        size: newNodeSize,
                         age: 0,
                         type: nodeType.toLowerCase(),
                         description: '',
@@ -1081,7 +1079,7 @@ const TestPage = () => {
                           value={familiarity}
                           className="rounded text-center"
                           onChange={(e) => {
-                            setSize(getThicknessSize(e.target.value) * 2);
+                            setEdgeSize(getThicknessSize(e.target.value) * 2);
                             setFamiliarity(e.target.value);
                             setEdgeData({ ...edgeData, familiarity: e.target.value });
                           }}>
@@ -1203,8 +1201,8 @@ const TestPage = () => {
           setSigmaCursor={setSigmaCursor}
           nodeType={nodeType}
           setNodeType={(type) => setNodeType(type)}
-          size={size}
-          setSize={(size) => setSize(size)}
+          nodeSize={nodeSize}
+          setNodeSize={(size) => setNodeSize(size)}
         />
       </div>
       <div className="absolute inset-y-1/2 inset-x-1/2">
