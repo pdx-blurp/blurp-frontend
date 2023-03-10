@@ -226,37 +226,22 @@ const LoadMapModal = forwardRef((props, ref) => {
             <h1 className="my-2 text-center text-2xl text-black">Not logged in</h1>
             <p className="my-2">
               If you log in with your Google Account, you can access your maps from wherever, save
-              multiple maps to your account, and more! However, you can start a local session if you
-              don't want to log in. You will have to save your maps manually though!
+              multiple maps to your account, and more! However, you can demo our app if you don't
+              want to log in. You will have to save your maps manually though!
             </p>
-            <form>
-              <input
-                type="text"
-                name="mapName"
-                placeholder="Enter the name of a new map"
-                className="my-2 h-10 w-8/12 rounded-lg p-2"
-                value={mapName}
-                required
-                onChange={(e) => setMapName(e.target.value)}
-              />
+            <div className="flex">
               <button
                 type="submit"
-                className="load-map-button float-right my-2 h-10 w-1/4"
+                className="load-map-button my-2 h-10 w-1/4"
                 onClick={(e) => {
-                  if (mapName != '') {
-                    e.preventDefault();
-                    props.changeTitle(mapName);
-                    props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
-                    handleClose();
-                  }
+                  e.preventDefault();
+                  props.changeTitle('My Demo Map');
+                  props.changeProfile(props.profile.sessionID, props.profile.mapID, false);
+                  handleClose();
                 }}>
-                Start a local session
+                Demo
               </button>
-            </form>
-            <br />
-            <div>
-              Log in with Google:
-              <div className="w-48">
+              <div className="m-2 w-48">
                 <GoogleLoginButton />
               </div>
             </div>
