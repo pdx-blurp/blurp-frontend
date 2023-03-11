@@ -1033,15 +1033,7 @@ const TestPage = () => {
                   <div className="relative flex-auto p-6">
                     <div>
                       <div>
-                        <p>
-                          Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b>
-                        </p>
-                        <p>
-                          Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b>
-                        </p>
-                      </div>
-                      <br />
-                      <div>
+                        <label>Relationship Type</label>
                         <select
                           type="text"
                           className="w-4/5 rounded text-center"
@@ -1061,7 +1053,7 @@ const TestPage = () => {
                         <select
                           type="text"
                           value={familiarity}
-                          className="rounded text-center"
+                          className="w-4/5 rounded text-center"
                           onChange={(e) => {
                             setEdgeSize(getThicknessSize(e.target.value) * 2);
                             setFamiliarity(e.target.value);
@@ -1081,7 +1073,7 @@ const TestPage = () => {
                         <select
                           name="edgeData.stressCode"
                           value={edgeData.stressCode}
-                          className="rounded text-center"
+                          className="w-4/5 rounded text-center"
                           onChange={(e) =>
                             setEdgeData({ ...edgeData, stressCode: e.target.value })
                           }>

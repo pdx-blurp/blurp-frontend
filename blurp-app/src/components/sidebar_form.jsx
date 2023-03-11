@@ -343,9 +343,6 @@ const SidebarForm = forwardRef((props, ref) => {
                 <option value="5">5 - very high stress</option>
               </select>
             </div>
-            <div className="m-2 w-11/12 text-lg">
-              <u>{edge.node1ID}</u> is related to <u>{edge.node2ID}</u>
-            </div>
             <button type="submit" className="btn-sidebar">
               Save
             </button>
