@@ -38,7 +38,7 @@ function MapToolbar(props) {
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(event, type) {
-    props.setSize(1);
+    props.setNodeSize(1);
     props.setSigmaCursor(SIGMA_CURSOR.NODE);
     clearIconSelection();
     props.setNodeType(type);
@@ -133,8 +133,8 @@ function MapToolbar(props) {
           <div className="flex justify-center overflow-visible rounded-l-lg border border-gray-400 bg-gray-300">
             <label className="m-2 self-center font-bold">Size</label>
             <Slider
-              value={props.size}
-              onChange={(e) => props.setSize(e.target.value)}
+              value={props.nodeSize}
+              onChange={(e) => props.setNodeSize(e.target.value)}
               min={1}
               max={10}
               marks
@@ -180,8 +180,8 @@ function MapToolbar(props) {
           <div className="flex justify-center overflow-visible rounded-l-lg border border-gray-400 bg-gray-300">
             <label className="m-2 self-center font-bold">Size</label>
             <Slider
-              value={props.size}
-              onChange={(e) => props.setSize(e.target.value)}
+              value={props.nodeSize}
+              onChange={(e) => props.setNodeSize(e.target.value)}
               min={1}
               max={10}
               marks
@@ -227,8 +227,8 @@ function MapToolbar(props) {
           <div className="flex justify-center overflow-visible rounded-l-lg border border-gray-400 bg-gray-300">
             <label className="m-2 self-center font-bold">Size</label>
             <Slider
-              value={props.size}
-              onChange={(e) => props.setSize(e.target.value)}
+              value={props.nodeSize}
+              onChange={(e) => props.setNodeSize(e.target.value)}
               min={1}
               max={10}
               marks
