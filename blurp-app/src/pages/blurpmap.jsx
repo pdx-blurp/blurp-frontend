@@ -558,9 +558,9 @@ const TestPage = () => {
 
   const edgeColor = (stressCode) => {
     if (stressCode == 1) return COLORS.BLUE;
-    else if (stressCode == 2) return COLORS.GREEN;
-    else if (stressCode == 3) return COLORS.YELLOW;
-    else if (stressCode == 4) return COLORS.ORANGE;
+    else if (stressCode == 2) return COLORS.INDIGO;
+    else if (stressCode == 3) return COLORS.PURPLE;
+    else if (stressCode == 4) return COLORS.MAGENTA;
     else return COLORS.RED;
   };
 
