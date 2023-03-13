@@ -38,6 +38,8 @@ import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
+import FileSaver from "file-saver";
+import ForceSupervisor from "graphology-layout-force/worker";
 import { FAMILIARITY } from '../constants/constants';
 import { capitalize } from '@mui/material';
 
@@ -528,6 +530,81 @@ const TestPage = () => {
 
     // Remove upload element now that we're done
     document.body.removeChild(uploadElement);
+  }
+
+  /**
+   * Save the Sigma graph as a PNG file
+   * Here is the code that is referenced from Sigma 
+   * https://codesandbox.io/s/github/jacomyal/sigma.js/tree/main/examples/png-snapshot?file=/index.ts 
+   */
+  function screenshotMap() {
+    const container = document.getElementById("blurp-map-container");
+
+    const layout = new ForceSupervisor(graph);
+    layout.start();
+
+
+    const { width, height } = sigma.getDimensions();
+    const pixelRatio = window.devicePixelRatio || 1;
+    const tmpRoot = document.createElement("DIV");
+    tmpRoot.style.width = `${width}px`;
+    tmpRoot.style.height = `${height}px`;
+    tmpRoot.style.position = "absolute";
+    tmpRoot.style.right = "101%";
+    tmpRoot.style.bottom = "101%";
+    document.body.appendChild(tmpRoot);
+
+
+    const tmpRenderer = new Sigma(sigma.getGraph(), tmpRoot, sigma.getSettings());
+
+
+      // Copy camera and force to render now, to avoid having to wait the schedule /
+    // debounce frame:
+    tmpRenderer.getCamera().setState(sigma.getCamera().getState());
+    tmpRenderer.refresh();
+
+
+    // Create a new canvas, on which the different layers will be drawn:
+    const canvas = document.createElement("CANVAS");
+    canvas.setAttribute("width", width * pixelRatio + "");
+    canvas.setAttribute("height", height * pixelRatio + "");
+    const ctx = canvas.getContext("2d");
+
+
+    // Draw a white background first:
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width * pixelRatio, height * pixelRatio);
+
+
+    // For each layer, draw it on our canvas:
+    const canvases = tmpRenderer.getCanvases();
+
+
+    const layers = Object.keys(canvases);
+    layers.forEach((id) => {
+      ctx.drawImage(
+        canvases[id],
+        0,
+        0,
+        width * pixelRatio,
+        height * pixelRatio,
+        0,
+        0,
+        width * pixelRatio,
+        height * pixelRatio,
+      );
+    });
+    
+
+    // Save the canvas as a PNG image:
+    canvas.toBlob((blob) => {
+      if (blob) FileSaver.saveAs(blob, `${mapTitle.trim()}.png`);
+
+
+      // Cleanup:
+      tmpRenderer.kill();
+      tmpRoot.remove();
+    }, "image/png");
   }
 
   function handleToolbarEvent(data) {
@@ -1167,6 +1244,7 @@ const TestPage = () => {
           modal={loadMapModal}
           profile={profile}
           changeModal={changeModal}
+          screenshotMap={screenshotMap}
           download={downloadMapJson}
           upload={uploadMapJson}
         />

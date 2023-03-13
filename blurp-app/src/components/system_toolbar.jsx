@@ -62,6 +62,10 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     props.changeModal(true, props.modal.view);
   }
 
+  function handleScreenshotClick() {
+    props.screenshotMap();
+  }
+
   function handleModalSave() {
     if (props.mapTitle == '') {
       props.msgs.current.showMessage('Need to provide a title!');
@@ -83,6 +87,9 @@ const System_Toolbar_State = forwardRef((props, ref) => {
         </button>
         <button onClick={handleModalSave} className="btn-test">
           Save Map
+        </button>
+        <button onClick={handleScreenshotClick} className="btn-test">
+          Screenshot
         </button>
       </div>
       <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
@@ -149,6 +156,7 @@ const System_Toolbar = forwardRef((props, ref) => {
         changeModal={props.changeModal}
         download={props.download}
         upload={props.upload}
+        screenshotMap={props.screenshotMap}
         expanded={expanded}
         toggle_toolbar={switchToolbar}
         onClickOutside={collapseToolbar}
