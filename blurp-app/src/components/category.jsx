@@ -8,19 +8,17 @@ const filters = [
     id: 'category',
     name: 'Categories',
     options: [
-      { value: '1', label: 'Blue Stress Level', checked: false },
-      { value: '2', label: 'Green Stress Level', checked: false },
-      { value: '3', label: 'Yellow Stress Level', checked: false },
-      { value: '4', label: 'Orange Stress Level', checked: false },
-      { value: '5', label: 'Red Stress Level', checked: false },
+      { value: '1', label: 'Blue Stress Level', checked: true },
+      { value: '2', label: 'Green Stress Level', checked: true },
+      { value: '3', label: 'Yellow Stress Level', checked: true },
+      { value: '4', label: 'Orange Stress Level', checked: true },
+      { value: '5', label: 'Red Stress Level', checked: true },
     ],
   },
 ];
 
 function Category(props) {
-  const [checkedState, setCheckedState] = useState(
-    new Array(filters[0].options.length).fill(false)
-  );
+  const [checkedState, setCheckedState] = useState(new Array(filters[0].options.length).fill(true));
   //const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [graph, setGraph] = useState(props.currentGraph);
   //let refDiv = useRef(null);
@@ -43,6 +41,25 @@ function Category(props) {
       if (filters[0].options[index].checked === true) {
         graph.forEachEdge((edge, attribute, sources, target) => {
           if (filters[0].options[index].value === attribute.stressCode.toString()) {
+            //  if (graph.getNodeAttribute(sources, 'hidden', true) === true) {
+            graph.setNodeAttribute(sources, 'hidden', false);
+            //   }
+            // if (graph.getNodeAttribute(target, 'hidden', true) === true) {
+            graph.setNodeAttribute(target, 'hidden', false);
+            // }
+            //   if (graph.getEdgeAttribute(edge, 'hidden') === true) {
+            graph.updateEdgeAttributes(edge, (attr) => {
+              return {
+                ...attr,
+                hidden: false,
+              };
+            });
+            //   }
+          }
+        });
+      } else if (filters[0].options[index].checked === false) {
+        graph.forEachEdge((edge, attribute, sources, target) => {
+          if (filters[0].options[index].value === attribute.stressCode.toString()) {
             graph.setEdgeAttribute(edge, 'hidden', true);
 
             const sourceEdges = hadEdges(sources);
@@ -57,25 +74,6 @@ function Category(props) {
             }
           }
           return edge;
-        });
-      } else if (filters[0].options[index].checked === false) {
-        graph.forEachEdge((edge, attribute, sources, target) => {
-          if (filters[0].options[index].value === attribute.stressCode.toString()) {
-            if (graph.getNodeAttribute(sources, 'hidden', true) === true) {
-              graph.setNodeAttribute(sources, 'hidden', false);
-            }
-            if (graph.getNodeAttribute(target, 'hidden', true) === true) {
-              graph.setNodeAttribute(target, 'hidden', false);
-            }
-            if (graph.getEdgeAttribute(edge, 'hidden') === true) {
-              graph.updateEdgeAttributes(edge, (attr) => {
-                return {
-                  ...attr,
-                  hidden: false,
-                };
-              });
-            }
-          }
         });
       }
     });
