@@ -5,7 +5,6 @@ import { BACKEND_URL } from '../constants/constants';
 import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 import TempMessage from './temp_msg_display';
 
-
 // This function gets the current value of a cookie
 function getCookie(cookieLabel) {
   let myCookies = document.cookie.replace(/ /g, '').split(';');

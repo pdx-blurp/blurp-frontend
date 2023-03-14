@@ -13,6 +13,9 @@ import '@react-sigma/core/lib/react-sigma.min.css';
 import Slider from '@mui/material/Slider';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
+import PersonIcon from '../assets/person.svg';
+import PlaceIcon from '../assets/place.svg';
+import IdeaIcon from '../assets/idea.svg';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -42,10 +45,11 @@ import { capitalize } from '@mui/material';
 const TestPage = () => {
   const [graph, setGraph] = useState(new MultiGraph());
   const [nodeType, setNodeType] = useState(NODE_TYPE.PERSON);
-  const [color, setColor] = useState(COLORS.BROWN);
+  const [color, setColor] = useState(COLORS.PEOPLE);
   const [name, setName] = useState('');
   const [familiarity, setFamiliarity] = useState('Unfamiliar');
-  const [size, setSize] = useState(10);
+  const [edgeSize, setEdgeSize] = useState(10);
+  const [nodeSize, setNodeSize] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add Node');
   const [relationship, setRelationship] = useState(Object.keys(RELATIONSHIPS)[0]);
@@ -159,26 +163,26 @@ const TestPage = () => {
   const nodeTypeToColor = (nodeType) => {
     switch (nodeType) {
       case NODE_TYPE.PERSON:
-        return COLORS.BROWN;
+        return COLORS.PEOPLE;
       case NODE_TYPE.PLACE:
-        return COLORS.GREY;
+        return COLORS.PLACE;
       case NODE_TYPE.IDEA:
-        return COLORS.OLIVE;
+        return COLORS.IDEA;
       default:
-        return COLORS.BROWN;
+        return COLORS.PEOPLE;
     }
   };
 
   const nodeTypeToIconPath = (nodeType) => {
     switch (nodeType) {
       case NODE_TYPE.PERSON:
-        return './src/assets/person.svg';
+        return PersonIcon;
       case NODE_TYPE.PLACE:
-        return './src/assets/place.svg';
+        return PlaceIcon;
       case NODE_TYPE.IDEA:
-        return './src/assets/idea.svg';
+        return IdeaIcon;
       default:
-        return './src/assets/person.svg';
+        return PersonIcon;
     }
   };
 
@@ -215,86 +219,65 @@ const TestPage = () => {
         });
         setMapTitle(title);
         if (graph.order > 0) {
+          let nodes = [];
+          let relationships = [];
           graph.forEachNode((current, attr) => {
-            if (current) {
-              instance
-                .post(BACKEND_URL + '/map/node/create', {
-                  sessionID: profile.sessionID,
-                  mapID: response.data.mapID,
-                  nodeinfo: {
-                    nodeName: attr.label,
-                    nodeID: current,
-                    color: nodeTypeToColor(attr.entity),
-                    size: attr.size,
-                    age: attr.years === '' ? 0 : attr.years,
-                    type: attr.entity.toLowerCase(),
-                    description: attr.notes,
-                    pos: {
-                      x: attr.x,
-                      y: attr.y,
-                    },
-                  },
-                })
-                .catch((error) => {
-                  if (error.response) {
-                    console.log(
-                      'Error: Invalid post request, status:' +
-                        error.response.status +
-                        '\n' +
-                        error.response.headers
-                    );
-                  } else if (error.request) {
-                    console.log(
-                      'Error: The server failed to respond to the post request\n' + error.message
-                    );
-                  } else {
-                    console.log(
-                      'Error: Some error has occured\n' + 'error message:\n' + error.message
-                    );
-                  }
-                });
-            }
+            nodes.push({
+              nodeName: attr.label,
+              nodeID: current,
+              color: nodeTypeToColor(attr.entity),
+              size: attr.size,
+              age: attr.years === '' ? 0 : attr.years,
+              type: attr.entity.toLowerCase(),
+              description: attr.notes,
+              pos: {
+                x: attr.x,
+                y: attr.y,
+              },
+            });
           });
           graph.forEachEdge((current, attr, source, target, sourceAttr, targetAttr) => {
-            if (current) {
-              instance
-                .post(BACKEND_URL + '/map/relationship/create', {
-                  mapID: response.data.mapID,
-                  relationshipinfo: {
-                    relationshipID: current,
-                    nodePair: {
-                      nodeOne: source,
-                      nodeTwo: target,
-                    },
-                    description: 'unused',
-                    relationshipType: {
-                      type: attr.label,
-                      familiarity: attr.familiarity,
-                      stressCode: attr.stressCode,
-                      size: attr.size,
-                    },
-                  },
-                })
-                .catch((error) => {
-                  if (error.response) {
-                    console.log(
-                      'Error: Invalid post request, status:' +
-                        error.response.status +
-                        '\n' +
-                        error.response.headers
-                    );
-                  } else if (error.request) {
-                    console.log(
-                      'Error: The server failed to respond to the post request\n' + error.message
-                    );
-                  } else {
-                    console.log(
-                      'Error: Some error has occured\n' + 'error message:\n' + error.message
-                    );
-                  }
-                });
-            }
+            relationships.push({
+              relationshipID: current,
+              nodePair: {
+                nodeOne: source,
+                nodeTwo: target,
+              },
+              description: 'unused',
+              relationshipType: {
+                type: attr.label,
+                familiarity: attr.familiarity,
+                stressCode: attr.stressCode,
+                size: attr.size,
+              },
+            });
           });
+
+          instance
+            .patch(BACKEND_URL + '/map/update', {
+              mapID: response.data.mapID,
+              sessionID: profile.sessionID,
+              changes: {
+                nodes: nodes,
+                relationships: relationships,
+              },
+            })
+            .catch((error) => {
+              if (error.response) {
+                console.log(
+                  'Error: Invalid patch request, status:' +
+                    error.response.status +
+                    '\n' +
+                    error.response.headers
+                );
+              } else if (error.request) {
+                console.log(
+                  'Error: The server failed to respond to the patch request\n' + error.message
+                );
+              } else {
+                console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
+              }
+            });
         }
       })
       .catch((error) => {
@@ -588,7 +571,6 @@ const TestPage = () => {
   const getThicknessSize = (familiarityLabel) => {
     for (const [key, element] of Object.entries(FAMILIARITY)) {
       if (element.label === familiarityLabel) {
-        console.log('value being return is ' + element.value);
         return element.value;
       }
     }
@@ -616,7 +598,7 @@ const TestPage = () => {
           stressCode: edgeData.stressCode,
           node1: '',
           node2: '',
-          size: size,
+          size: edgeSize,
           color: edgeColor(edgeData.stressCode),
         });
         if (profile.profileSet) {
@@ -634,12 +616,9 @@ const TestPage = () => {
                   type: relationship,
                   familiarity: edgeData.familiarity,
                   stressCode: edgeData.stressCode,
-                  size: size,
+                  size: edgeSize,
                 },
               },
-            })
-            .then((response) => {
-              msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
             })
             .catch((error) => {
               if (error.response) {
@@ -659,8 +638,6 @@ const TestPage = () => {
                 console.log('Error: Some error has occured\n' + 'error message:\n' + error.message);
               }
             });
-        } else {
-          msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
         }
       } else {
         msgRef.current.showMessage('Edge already exists between these nodes');
@@ -695,15 +672,14 @@ const TestPage = () => {
                 mapToolbar === MAP_TOOLS.place ||
                 mapToolbar === MAP_TOOLS.idea
               ) {
-                const nodeSize = Math.log(size + 1) * 30;
-                console.log('nodeSize: ', nodeSize);
+                const newNodeSize = Math.log(nodeSize + 1) * 30;
                 const id = uuidv4();
                 graph.addNode(id, {
                   x: grabbed_pos.x,
                   y: grabbed_pos.y,
                   label: '',
                   entity: nodeType,
-                  size: nodeSize,
+                  size: newNodeSize,
                   years: '',
                   notes: '',
                   type: 'image',
@@ -722,7 +698,7 @@ const TestPage = () => {
                         nodeID: id,
                         // color: color,
                         color: nodeTypeToColor(nodeType),
-                        size: nodeSize,
+                        size: newNodeSize,
                         age: 0,
                         type: nodeType.toLowerCase(),
                         description: '',
@@ -731,11 +707,6 @@ const TestPage = () => {
                           y: grabbed_pos.y,
                         },
                       },
-                    })
-                    .then((response) => {
-                      msgRef.current.showMessage(
-                        capitalize(mapToolbar) + ' was successfully created'
-                      );
                     })
                     .catch((error) => {
                       if (error.response) {
@@ -760,8 +731,6 @@ const TestPage = () => {
                         );
                       }
                     });
-                } else {
-                  msgRef.current.showMessage(capitalize(mapToolbar) + ' was successfully created');
                 }
               }
             }
@@ -1068,15 +1037,7 @@ const TestPage = () => {
                   <div className="relative flex-auto p-6">
                     <div>
                       <div>
-                        <p>
-                          Node 1: <b>{graph.getNodeAttribute(node1, 'label')}</b>
-                        </p>
-                        <p>
-                          Node 2: <b>{graph.getNodeAttribute(node2, 'label')}</b>
-                        </p>
-                      </div>
-                      <br />
-                      <div>
+                        <label>Relationship Type</label>
                         <select
                           type="text"
                           className="w-4/5 rounded text-center"
@@ -1096,9 +1057,9 @@ const TestPage = () => {
                         <select
                           type="text"
                           value={familiarity}
-                          className="rounded text-center"
+                          className="w-4/5 rounded text-center"
                           onChange={(e) => {
-                            setSize(getThicknessSize(e.target.value) * 2);
+                            setEdgeSize(getThicknessSize(e.target.value) * 2);
                             setFamiliarity(e.target.value);
                             setEdgeData({ ...edgeData, familiarity: e.target.value });
                           }}>
@@ -1116,7 +1077,7 @@ const TestPage = () => {
                         <select
                           name="edgeData.stressCode"
                           value={edgeData.stressCode}
-                          className="rounded text-center"
+                          className="w-4/5 rounded text-center"
                           onChange={(e) =>
                             setEdgeData({ ...edgeData, stressCode: e.target.value })
                           }>
@@ -1231,8 +1192,8 @@ const TestPage = () => {
           setSigmaCursor={setSigmaCursor}
           nodeType={nodeType}
           setNodeType={(type) => setNodeType(type)}
-          size={size}
-          setSize={(size) => setSize(size)}
+          nodeSize={nodeSize}
+          setNodeSize={(size) => setNodeSize(size)}
         />
 
        <Category currentGraph={graph} updateGraph={setGraph} />

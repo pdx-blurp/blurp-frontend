@@ -6,14 +6,14 @@ export const CAMERA_MAX = 3.0;
    https://github.com/vitejs/vite/issues/1973
    https://vitejs.dev/guide/env-and-mode.html
 */
-export const BACKEND_URL = import.meta.env.VITE_BACKEND_PROD;
-export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_PROD;
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_DEV;
+export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_DEV;
 
 export enum COLORS {
   // node colors
-  BROWN = '#B3B3E6', //people
-  GREY = '#7393B3', //place
-  OLIVE = '#FEDD00F', //idea
+  PEOPLE = '#B3B3E6', //people
+  PLACE = '#7393B3', //place
+  IDEA = '#FEDD00F', //idea
   // stress level colors
   RED = '#C41E3A',
   ORANGE = '#FF6700',
