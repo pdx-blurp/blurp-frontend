@@ -25,6 +25,7 @@ const SidebarForm = forwardRef((props, ref) => {
     name: '',
     years: '',
     notes: '',
+    size: 0,
     type: NODE_TYPE.PERSON,
     id: '',
   });
@@ -47,8 +48,11 @@ const SidebarForm = forwardRef((props, ref) => {
   */
   const handleChange = (e) => {
     const target = e.target;
-    const value = target.value;
+    let value = target.value;
     const e_name = target.name.split('.');
+    if (e_name[1] === 'size') {
+        value *= 10;
+    }
     if (target.type == 'radio') {
       setEdge({
         ...edge,
@@ -83,7 +87,7 @@ const SidebarForm = forwardRef((props, ref) => {
         getSize(edge.familiarity) * 2,
       );
     } else {
-      props.changeNodeData(node.name, node.years, node.notes, node.id);
+      props.changeNodeData(node.name, node.size, node.years, node.notes, node.id);
     }
     e.preventDefault();
   };
@@ -93,6 +97,7 @@ const SidebarForm = forwardRef((props, ref) => {
       name: '',
       years: '',
       notes: '',
+      size: 0,
       type: NODE_TYPE.PERSON,
       id: '',
     });
@@ -126,6 +131,7 @@ const SidebarForm = forwardRef((props, ref) => {
         years: selected_node.years,
         notes: selected_node.notes,
         type: selected_node.type,
+        size: selected_node.size,
         id: selected_node.id,
       });
       if (selected_node.type != '') {
@@ -175,6 +181,24 @@ const SidebarForm = forwardRef((props, ref) => {
               onChange={handleChange}
               className="textbox-sidebar"
             />
+            <label className="m-2 self-center font-bold">Size</label>
+            <Slider
+                name="node.size"
+                value={node.size}
+                onChange={(e) => {
+                    handleChange(e);
+                }}
+                min={1}
+                max={10}
+                marks
+                aria-label="small"
+                size="small"
+                valueLabelDisplay="auto"
+                className="my-1 mx-4 self-end"
+                sx={{
+                  width: '13rem',
+                }}
+            />
             <textarea
               type="text"
               name="node.notes"
@@ -202,6 +226,22 @@ const SidebarForm = forwardRef((props, ref) => {
               value={node.name}
               onChange={handleChange}
               className="textbox-sidebar"
+            />
+              <label className="m-2 self-center font-bold">Size</label>
+              <Slider
+                value={node.size}
+                name="node.size"
+                onChange={(e) => props.setSize(e.target.value)}
+                min={1}
+                max={10}
+                marks
+                aria-label="small"
+                size="small"
+                valueLabelDisplay="auto"
+                className="my-1 mx-4 self-end"
+                sx={{
+                  width: '13rem',
+                }}
             />
             <textarea
               type="text"
@@ -238,6 +278,22 @@ const SidebarForm = forwardRef((props, ref) => {
               value={node.years}
               onChange={handleChange}
               className="textbox-sidebar"
+            />
+              <label className="m-2 self-center font-bold">Size</label>
+              <Slider
+                value={node.size}
+                name="node.size"
+                onChange={(e) => props.setSize(e.target.value)}
+                min={1}
+                max={10}
+                marks
+                aria-label="small"
+                size="small"
+                valueLabelDisplay="auto"
+                className="my-1 mx-4 self-end"
+                sx={{
+                  width: '13rem',
+                }}
             />
             <textarea
               type="text"

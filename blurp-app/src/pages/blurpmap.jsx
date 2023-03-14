@@ -356,9 +356,10 @@ const TestPage = () => {
     }
   };
 
-  function changeNodeData(name, years, notes, id) {
+  function changeNodeData(name, size, years, notes, id) {
     try {
       graph.setNodeAttribute(id, 'label', name);
+      graph.setNodeAttribute(id, 'size', size);
       graph.setNodeAttribute(id, 'years', years);
       graph.setNodeAttribute(id, 'notes', notes);
       setNodes((prevNodes) =>
