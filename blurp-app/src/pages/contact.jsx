@@ -21,7 +21,7 @@ const ContactPage = () => {
             <h2 class="mt-4 mb-8 text-3xl font-bold text-white">We'd ♡ to help!</h2>
             <p className="sugar-text1 text-white">
               If you have any questions,just fill in the contact form, and we will answer you
-              shortly.Or feel free to contact our phone number or email.
+              shortly. Or feel free to contact our phone number or email.
             </p>
             <div class="... my-10 flex flex-row">
               <div class="... w-80 flex-auto">
