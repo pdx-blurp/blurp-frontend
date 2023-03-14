@@ -26,6 +26,7 @@ function MapToolbar(props) {
   const [moveClass, setMoveClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [selectClass, setSelectClass] = useState(SELECTED_ICON_CLASSNAME);
   const [eraserClass, setEraserClass] = useState(UNSELECTED_ICON_CLASSNAME);
+  const [categoryClass, setCategoryClass] = useState(UNSELECTED_ICON_CLASSNAME);
   const [anchorEl, setAnchorEl] = useState();
 
   // Unselects the tool that was currently selected (visually).
@@ -37,7 +38,7 @@ function MapToolbar(props) {
     setMoveClass(UNSELECTED_ICON_CLASSNAME);
     setSelectClass(UNSELECTED_ICON_CLASSNAME);
     setEraserClass(UNSELECTED_ICON_CLASSNAME);
-    //setCategoryClass(UNSELECTED_ICON_CLASSNAME);
+    setCategoryClass(UNSELECTED_ICON_CLASSNAME);
   }
   function handleNodeSelection(event, type) {
     props.setNodeSize(1);
@@ -254,7 +255,7 @@ function MapToolbar(props) {
           <Tooltip>
             <button
               type="button"
-              className="text-gray-500 hover:text-gray-800 sm:ml-1 lg:hidden"
+              className="text-gray-500 hover:text-gray-800 sm:ml-1"
               onClick={() => props.setMobileFiltersOpen(true)}>
               <span className="sr-only">Filters</span>
               <FunnelIcon className="h-5 w-5" aria-hidden="true" />

@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
 
 const filters = [
   {
@@ -21,7 +21,9 @@ function Category(props) {
   const [checkedState, setCheckedState] = useState(
     new Array(filters[0].options.length).fill(false)
   );
+  //const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [graph, setGraph] = useState(props.currentGraph);
+  //let refDiv = useRef(null);
 
   const handleChange = (position) => {
     const updatedCheckedState = checkedState.map((item, index) => {
@@ -99,7 +101,7 @@ function Category(props) {
     <div>
       {/* Mobile filter dialog */}
       <Transition.Root show={props.mobileFiltersOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={props.setMobileFiltersOpen}>
+        <Dialog as="div" className="relative z-10" onClose={props.setMobileFiltersOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -166,8 +168,6 @@ function Category(props) {
                                     onChange={() => {
                                       handleChange(optionIdx);
                                     }}
-                                    //defaultChecked={option.checked}
-                                    // onClick={props.catFilter}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                   />
                                   <label
@@ -177,11 +177,7 @@ function Category(props) {
                                   </label>
                                 </div>
                               ))}
-
-                              {
-                                //sets the filters.options checked to true when checked or false when uncheked
-                                filterGraph()
-                              }
+                              {filterGraph()}
                             </div>
                           </Disclosure.Panel>
                         </>
@@ -194,12 +190,6 @@ function Category(props) {
           </div>
         </Dialog>
       </Transition.Root>
-
-      <main className="max-w-1xl mx-auto px-1 sm:px-1 lg:px-1">
-        <div className="border-gray-5 flex items-baseline justify-between border-b pt-1 pb-1">
-          <div className="flex items-center"></div>
-        </div>
-      </main>
     </div>
   );
 }

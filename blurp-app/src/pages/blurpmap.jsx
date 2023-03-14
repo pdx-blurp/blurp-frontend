@@ -1198,7 +1198,6 @@ const TestPage = () => {
 
         <Category
           currentGraph={graph}
-          updateGraph={setGraph}
           mobileFiltersOpen={mobileFiltersOpen}
           setMobileFiltersOpen={(value) => setMobileFiltersOpen(value)}
         />
