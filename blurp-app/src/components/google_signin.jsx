@@ -1,10 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import x_button from '../assets/x_button.svg';
 import { useCookies } from 'react-cookie';
-import { FRONTEND_URL, BACKEND_URL } from '../constants/constants';
+import { BACKEND_URL } from '../constants/constants';
+import { useGoogleLogin, googleLogout } from '@react-oauth/google';
+import TempMessage from './temp_msg_display';
 
-// Redirect after logging in
-const redirectAfterLogin = FRONTEND_URL;
+// This function gets the current value of a cookie
+function getCookie(cookieLabel) {
+  let myCookies = document.cookie.replace(/ /g, '').split(';');
+  for(let i = 0; i < myCookies.length; i++) {
+    let thisCookie = myCookies[i].split('=');
+    if(thisCookie[0] == cookieLabel) {
+      return thisCookie[1];
+    }
+  }
+  return null;
+}
 
 function GoogleLoginButton(props) {
   const [cookies, setCookie, removeCookie] = useCookies();
@@ -12,13 +23,9 @@ function GoogleLoginButton(props) {
   const [popoutVisible, setPopoutVisible] = useState(false);
   const expanded_div_ref = useRef(null);
   const profile_pic_ref = useRef(null);
-  let profilePicUrl = null;
+  const msgRef = useRef(null);
+  const [showFailMessage, setShowFailMessage] = useState(false);
 
-  // If there's a connect.sid cookie and the user is logged in,
-  // then load the page as though the user is logged in.
-  if (cookies['loggedIntoGoogle'] == 'true') {
-    profilePicUrl = cookies['profilePicUrl'];
-  }
 
   // Collapse popout if user clicks outside
   useEffect(() => {
@@ -41,12 +48,12 @@ function GoogleLoginButton(props) {
   // If the popout visibility changes, update what's rendered
   useEffect(() => {
     // If the user is logged in, render logged-in page
-    if (cookies['loggedIntoGoogle'] == 'true') {
+    if (cookies.loggedIn == 'true') {
       setRenderedContent(userProfile());
     } else {
       setRenderedContent(signInButton());
     }
-  }, [popoutVisible]);
+  }, [popoutVisible, cookies.loggedIn]);
 
   // When the profile is clicked, switch the popout.
   // If expanded, collapse, and vice versa.
@@ -66,25 +73,53 @@ function GoogleLoginButton(props) {
 
   // When the user clicks logout
   async function logout() {
-    fetch(BACKEND_URL + '/login/google/logout', { credentials: 'include' })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res == 'success') {
-          console.log('Logout success.');
-          setRenderedContent(signInButton());
-        }
-      })
-      .catch((err) => {
-        console.log('Logout failed.');
+    let sessionID = getCookie('sessionID');
+    // Only send request if user session didn't exipre yet
+    if(sessionID) {
+      fetch(BACKEND_URL + `/login/google/logout?sessionID=${cookies.sessionID}`, {
+        credentials: 'include',
+      }).then(res => res.text()).then((res) => {
+        // Remove all cookies
+        removeCookie('loggedIn');
+        removeCookie('userName');
+        removeCookie('profileUrl');
+        removeCookie('sessionID');
+        msgRef.current.showMessage('Logout successful');
+      }).catch((err) => {
+        msgRef.current.showMessage('Failed to log out');
       });
+    }
+    else {
+      msgRef.current.showMessage('Already logged out');
+    }
+    setRenderedContent(signInButton());
   }
 
-  function signIn() {
-    // Set cookie to where to redirect to
-    document.cookie = 'redirectAfterLogin=' + redirectAfterLogin;
-    // Redirect to sign in
-    window.location.href = BACKEND_URL + '/login/google';
+  async function onLoginSuccess(codeResponse) {
+    let accessToken = codeResponse.access_token;
+    // Send the access token to the back end
+    await fetch(`${BACKEND_URL}/login/google?accessToken=${accessToken}`, {
+      credentials: 'include'
+    }).then(res => res.json()).then(res => {
+      let success = res.success;
+      // If successfully authenticated user profile in backend
+      if(success) {
+        setCookie('loggedIn', 'true', {maxAge: res.maxAge});
+        setCookie('userName', res.userName, {maxAge:res.maxAge});
+        setCookie('profileUrl', res.profileUrl, {maxAge: res.maxAge});
+        setCookie('sessionID', res.sessionID, {maxAge: res.maxAge});
+        msgRef.current.showMessage('Login successful');
+      } else {
+        msgRef.current.showMessage('Failed to log in');
+      }
+    });
+    setPopoutVisible(false);
   }
+
+  const signIn = useGoogleLogin({
+    onSuccess: codeResponse => onLoginSuccess(codeResponse),
+    onError: error => {msgRef.current.showMessage('Failed to log in');}
+  });
 
   function signInButton() {
     return (
@@ -105,7 +140,7 @@ function GoogleLoginButton(props) {
         <li className="cursor-pointer">
           <img
             className="h-9 w-9 rounded-full"
-            src={profilePicUrl}
+            src={cookies.profileUrl}
             referrerPolicy="no-referrer"
             onClick={handle_profile_click}
             ref={profile_pic_ref}
@@ -131,7 +166,14 @@ function GoogleLoginButton(props) {
     );
   }
 
-  return <>{renderedContent}</>;
+  return (
+    <>
+      {renderedContent}
+      <div className="absolute inset-y-1/2 inset-x-1/2">
+	      <TempMessage ref={msgRef}/>
+      </div>
+    </>
+  );
 }
 
 export default GoogleLoginButton;

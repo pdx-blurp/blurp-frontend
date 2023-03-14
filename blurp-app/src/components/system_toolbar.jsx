@@ -62,11 +62,16 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     props.changeModal(true, props.modal.view);
   }
 
-  function handleModalSaveToggle() {
-    if (!props.profile.profileSet) {
-      props.changeModal(true, MODAL_VIEW.SAVING);
-    } else {
+  function handleModalSave() {
+    if (props.mapTitle == '') {
+      props.msgs.current.showMessage('Need to provide a title!');
+    } else if (props.profile.sessionID == '') {
+      props.msgs.current.showMessage('Need to be logged in!');
+    } else if (props.profile.mapID != '') {
       props.msgs.current.showMessage('Map already saved in DB');
+    } else {
+      props.SaveToDB(props.mapTitle);
+      props.msgs.current.showMessage('Saved to account!');
     }
   }
 
@@ -74,10 +79,10 @@ const System_Toolbar_State = forwardRef((props, ref) => {
     <>
       <div ref={ellipses_button_ref} className={system_toolbar_className}>
         <button onClick={handleModalToggle} className="btn-test">
-          Load another map
+          My Maps
         </button>
-        <button onClick={handleModalSaveToggle} className="btn-test">
-          Save to Account
+        <button onClick={handleModalSave} className="btn-test">
+          Save Map
         </button>
       </div>
       <div className="absolute h-[100%] w-[40px] border-r-[2px] border-gray-400 bg-gray-300">
@@ -135,8 +140,10 @@ const System_Toolbar = forwardRef((props, ref) => {
   return (
     <>
       <System_Toolbar_State
-        ref={ref}
+        SaveToDB={props.SaveToDB}
+        LoadFromDB={props.LoadFromDB}
         msgs={props.msgs}
+        mapTitle={props.mapTitle}
         modal={props.modal}
         profile={props.profile}
         changeModal={props.changeModal}
