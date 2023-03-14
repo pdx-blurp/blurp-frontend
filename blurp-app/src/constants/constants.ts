@@ -55,6 +55,7 @@ export enum MAP_TOOLS {
   move = 'move',
   select = 'select',
   eraser = 'eraser',
+  category = 'category'
 }
 
 export enum SIGMA_CURSOR {
@@ -63,6 +64,7 @@ export enum SIGMA_CURSOR {
   MOVE = 'cursor-move',
   EDGE = 'cursor-edge',
   ERASER = 'cursor-eraser',
+  CATEGORY = 'cursor-category'
 }
 
 /* 
