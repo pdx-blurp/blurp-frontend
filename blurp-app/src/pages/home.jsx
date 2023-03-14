@@ -41,28 +41,30 @@ const Home = () => {
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">what is blurp?</h1>
             <p className="text-2xl text-neutral-300">
-              Blurp is a creative, visualization tool for mapping relationships in one's life. Relationships 
-              include anything from work relationships with your tyrant boss to relationships you have with 
-              an idea about the existence of rubber ducks... anything goes :)
+              Blurp is a creative visualization tool for mapping relationships in one's life.
+              These relationships include anything from work relationships with your tyrant boss, to relationships
+              you have with an idea about the existence of rubber ducks. With Blurp, anything goes – it’s your map.
             </p>
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">how it can help you</h1>
             <p className="text-2xl text-neutral-300">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur labore facilis
-              assumenda, laborum quae rerum beatae non magni ipsam quasi doloremque omnis facere ab
-              quos officiis ipsum saepe quo molestias. Lorem ipsum, dolor sit amet consectetur
-              adipisicing elit. Fuga natus iusto exercitationem explicabo incidunt molestias
-              accusantium doloremque! Fugiat amet, reiciendis exercitationem sed, perspiciatis
-              veniam recusandae nesciunt quasi hic ea eligendi.
+              Mapping relationships is an important aspect of our lives. We are constantly interacting with the world
+              around us, forming connections and building relationships with everything from family and friends to
+              ideas and interests. However, it can be difficult to keep track of these connections and understand how
+              they all fit together. Blurp lets you safely spill the beans, mapping out these connections to understand
+              the world around you.
             </p>
           </div>
           <div className="grid justify-center my-5">
             <h1 className="text-center section-title">how to make a blurp map</h1>
             <p className="text-2xl text-neutral-300">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, rem eaque culpa
-              reiciendis nostrum suscipit exercitationem magni eum ratione, mollitia itaque
-              voluptatibus vero consequatur consectetur optio officiis harum facilis repellat?
+              We understand that mapping out your relationships can be very personal and complex, which is why we offer
+              flexibility in organizing and visualizing your connections. You can create entities of different types and
+              sizes, as well as add relationships with different properties, allowing you to view a more detailed and
+              interconnected view of your relationships. Additionally, you have the ability to save your maps locally
+              or in the cloud, giving you the flexibility to work from anywhere or keep your information just to yourself.
+              With Blurp, you have the freedom.
             </p>
           </div>
         </div>
