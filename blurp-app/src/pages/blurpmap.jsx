@@ -65,7 +65,7 @@ const TestPage = () => {
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
-
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [clickTrigger, setClickTrigger] = useState(true);
   // Tell the user how to create an edge the first time they select the edge tool
@@ -80,7 +80,6 @@ const TestPage = () => {
   const [isSidebarOn, setIsSidebarOn] = useState(false);
   const [mapTitle, setMapTitle] = useState('');
   const msgRef = useRef();
-
 
   // Temporary db sessionID/mapID for testing
   const [profile, setProfile] = useState({
@@ -1194,14 +1193,17 @@ const TestPage = () => {
           setNodeType={(type) => setNodeType(type)}
           nodeSize={nodeSize}
           setNodeSize={(size) => setNodeSize(size)}
+          setMobileFiltersOpen={(value) => setMobileFiltersOpen(value)}
         />
 
-       <Category currentGraph={graph} updateGraph={setGraph} />
-        
+        <Category
+          currentGraph={graph}
+          updateGraph={setGraph}
+          mobileFiltersOpen={mobileFiltersOpen}
+          setMobileFiltersOpen={(value) => setMobileFiltersOpen(value)}
+        />
       </div>
 
-
-      
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <TempMessage ref={msgRef} />
       </div>

@@ -1,7 +1,7 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { FunnelIcon, MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { MinusIcon, PlusIcon } from '@heroicons/react/20/solid';
 
 const filters = [
   {
@@ -21,7 +21,6 @@ function Category(props) {
   const [checkedState, setCheckedState] = useState(
     new Array(filters[0].options.length).fill(false)
   );
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [graph, setGraph] = useState(props.currentGraph);
 
   const handleChange = (position) => {
@@ -99,8 +98,8 @@ function Category(props) {
   return (
     <div>
       {/* Mobile filter dialog */}
-      <Transition.Root show={mobileFiltersOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setMobileFiltersOpen}>
+      <Transition.Root show={props.mobileFiltersOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-40 lg:hidden" onClose={props.setMobileFiltersOpen}>
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -127,7 +126,7 @@ function Category(props) {
                   <button
                     type="button"
                     className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
-                    onClick={() => setMobileFiltersOpen(false)}>
+                    onClick={() => props.setMobileFiltersOpen(false)}>
                     <span className="sr-only">Close menu</span>
                     <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
@@ -198,15 +197,7 @@ function Category(props) {
 
       <main className="max-w-1xl mx-auto px-1 sm:px-1 lg:px-1">
         <div className="border-gray-5 flex items-baseline justify-between border-b pt-1 pb-1">
-          <div className="flex items-center">
-            <button
-              type="button"
-              className="text-gray-500 hover:text-gray-800 sm:ml-1 lg:hidden"
-              onClick={() => setMobileFiltersOpen(true)}>
-              <span className="sr-only">Filters</span>
-              <FunnelIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
+          <div className="flex items-center"></div>
         </div>
       </main>
     </div>
