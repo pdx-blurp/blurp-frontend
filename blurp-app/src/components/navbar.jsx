@@ -20,6 +20,10 @@ function NavbarProp() {
           <Link to="/contact">
             <li className="btn-navbar">Contact</li>
           </Link>
+          <a href="https://pdx-blurp.github.io/blurp-docs/">
+            <li className="btn-navbar">Docs</li>
+          </a>
+
           {/* <li className="cursor-pointer">
             <img className="w-9 h-9 rounded-full" src={profile_pic} />
           </li> */}
