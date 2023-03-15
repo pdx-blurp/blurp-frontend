@@ -1,9 +1,10 @@
 export class NodeData {
-  constructor(name, years, notes, type, id) {
+  constructor(name, years, notes, type, size, id) {
     this.name = name;
     this.years = years;
     this.notes = notes;
     this.type = type;
+    this.size = size;
     this.id = id;
 
     this.display = this.display.bind(this);
@@ -15,6 +16,7 @@ export class NodeData {
     console.log('name: ' + this.name);
     console.log('years: ' + this.years);
     console.log('notes: ' + this.notes);
+    console.log('size: ' + this.size);
     console.log('type: ' + this.type);
   }
 }

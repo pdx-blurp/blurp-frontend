@@ -1,7 +1,13 @@
 import { useReducer } from 'react';
 import { React, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
-import { NodeData, EdgeData} from '../constants/classes.jsx';
-import { NODE_TYPE, SIDEBAR_VIEW, RELATIONSHIPS, STRESS_CODE, FAMILIARITY } from '../constants/constants.ts';
+import { NodeData, EdgeData } from '../constants/classes.jsx';
+import {
+  NODE_TYPE,
+  SIDEBAR_VIEW,
+  RELATIONSHIPS,
+  STRESS_CODE,
+  FAMILIARITY,
+} from '../constants/constants.ts';
 import Slider from '@mui/material/Slider';
 
 const notes_size = 255;
@@ -25,7 +31,7 @@ const SidebarForm = forwardRef((props, ref) => {
     name: '',
     years: '',
     notes: '',
-    size: 0,
+    size: 1,
     type: NODE_TYPE.PERSON,
     id: '',
   });
@@ -50,9 +56,6 @@ const SidebarForm = forwardRef((props, ref) => {
     const target = e.target;
     let value = target.value;
     const e_name = target.name.split('.');
-    if (e_name[1] === 'size') {
-        value *= 10;
-    }
     if (target.type == 'radio') {
       setEdge({
         ...edge,
@@ -84,10 +87,11 @@ const SidebarForm = forwardRef((props, ref) => {
         edge.node1ID,
         edge.node2ID,
         edge.id,
-        getSize(edge.familiarity) * 2,
+        getSize(edge.familiarity) * 2
       );
     } else {
-      props.changeNodeData(node.name, node.size, node.years, node.notes, node.id);
+      let newSize = Math.log(node.size + 1) * 30;
+      props.changeNodeData(node.name, newSize, node.years, node.notes, node.id);
     }
     e.preventDefault();
   };
@@ -114,13 +118,13 @@ const SidebarForm = forwardRef((props, ref) => {
   };
 
   const getSize = (familiarityLabel) => {
-    for (const[key, element] of Object.entries(FAMILIARITY)) {
+    for (const [key, element] of Object.entries(FAMILIARITY)) {
       if (element.label === familiarityLabel) {
         return element.value;
       }
     }
     return 2;
-  }
+  };
   const setData = () => {
     const selected_node = props.parent_node.selected;
     const selected_edge = props.parent_edge.selected;
@@ -183,21 +187,21 @@ const SidebarForm = forwardRef((props, ref) => {
             />
             <label className="m-2 self-center font-bold">Size</label>
             <Slider
-                name="node.size"
-                value={node.size}
-                onChange={(e) => {
-                    handleChange(e);
-                }}
-                min={1}
-                max={10}
-                marks
-                aria-label="small"
-                size="small"
-                valueLabelDisplay="auto"
-                className="my-1 mx-4 self-end"
-                sx={{
-                  width: '13rem',
-                }}
+              name="node.size"
+              value={node.size}
+              onChange={(e) => {
+                handleChange(e);
+              }}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '13rem',
+              }}
             />
             <textarea
               type="text"
@@ -227,21 +231,21 @@ const SidebarForm = forwardRef((props, ref) => {
               onChange={handleChange}
               className="textbox-sidebar"
             />
-              <label className="m-2 self-center font-bold">Size</label>
-              <Slider
-                value={node.size}
-                name="node.size"
-                onChange={(e) => props.setSize(e.target.value)}
-                min={1}
-                max={10}
-                marks
-                aria-label="small"
-                size="small"
-                valueLabelDisplay="auto"
-                className="my-1 mx-4 self-end"
-                sx={{
-                  width: '13rem',
-                }}
+            <label className="m-2 self-center font-bold">Size</label>
+            <Slider
+              value={node.size}
+              name="node.size"
+              onChange={(e) => handleChange(e)}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '13rem',
+              }}
             />
             <textarea
               type="text"
@@ -279,21 +283,21 @@ const SidebarForm = forwardRef((props, ref) => {
               onChange={handleChange}
               className="textbox-sidebar"
             />
-              <label className="m-2 self-center font-bold">Size</label>
-              <Slider
-                value={node.size}
-                name="node.size"
-                onChange={(e) => props.setSize(e.target.value)}
-                min={1}
-                max={10}
-                marks
-                aria-label="small"
-                size="small"
-                valueLabelDisplay="auto"
-                className="my-1 mx-4 self-end"
-                sx={{
-                  width: '13rem',
-                }}
+            <label className="m-2 self-center font-bold">Size</label>
+            <Slider
+              value={node.size}
+              name="node.size"
+              onChange={(e) => handleChange(e)}
+              min={1}
+              max={10}
+              marks
+              aria-label="small"
+              size="small"
+              valueLabelDisplay="auto"
+              className="my-1 mx-4 self-end"
+              sx={{
+                width: '13rem',
+              }}
             />
             <textarea
               type="text"
