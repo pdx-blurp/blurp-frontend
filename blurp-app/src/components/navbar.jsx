@@ -20,7 +20,7 @@ function NavbarProp() {
           <Link to="/contact">
             <li className="btn-navbar">Contact</li>
           </Link>
-          <a href="https://pdx-blurp.github.io/blurp-docs/">
+          <a href="https://pdx-blurp.github.io/blurp-docs/" target="_blank">
             <li className="btn-navbar">Docs</li>
           </a>
 
