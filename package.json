@@ -9,6 +9,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@headlessui/react": "^0.0.0-dev.0ce63d8",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.7",
     "@splinetool/react-spline": "^2.2.5",

@@ -36,6 +36,7 @@ import DataSidebar from '../components/data_sidebar.jsx';
 import MapToolbar from '../components/map_toolbar.jsx';
 import System_Toolbar from '../components/system_toolbar.jsx';
 import ConfirmDeleteForm from '../components/confirm_delete_form';
+import Category from '../components/category';
 import TempMessage from '../components/temp_msg_display';
 import LoadMapModal from '../components/select_map_modal';
 import { FAMILIARITY } from '../constants/constants';
@@ -64,6 +65,8 @@ const TestPage = () => {
   const [edgeData, setEdgeData] = useState({ familiarity: 0, stressCode: STRESS_CODE.MINIMAL });
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [sigma, setSigma] = useState(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
   const [clickTrigger, setClickTrigger] = useState(true);
   // Tell the user how to create an edge the first time they select the edge tool
   const [showEdgeMessage, setShowEdgeMessage] = useState(true);
@@ -1090,6 +1093,17 @@ const TestPage = () => {
                     </div>
                   </div>
                 )}
+                {/*modalTitle === 'Category' && (
+                  <div className="absolute inset-y-0 top-0 right-0">
+                    <Category
+                      filter={filter}
+                      currentGraph={graph}
+                      updateGraph={setGraph}
+                      mobFilter={mobileFiltersOpen}
+                      setMobFilter={setMobileFiltersOpen}
+                    />
+                  </div>
+                )*/}
                 {/*footer*/}
                 <div className="flex items-center justify-end rounded-b border-t border-solid border-slate-200 p-6">
                   <button
@@ -1181,11 +1195,22 @@ const TestPage = () => {
           setNodeType={(type) => setNodeType(type)}
           nodeSize={nodeSize}
           setNodeSize={(size) => setNodeSize(size)}
+          setMobileFiltersOpen={(value) => setMobileFiltersOpen(value)}
+        />
+
+        <Category
+          currentGraph={graph}
+          mobileFiltersOpen={mobileFiltersOpen}
+          setMobileFiltersOpen={(value) => setMobileFiltersOpen(value)}
         />
       </div>
+
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <TempMessage ref={msgRef} />
       </div>
+
+      <div className="absolute inset-y-0 top-0 right-0"></div>
+
       <div className="absolute inset-y-1/2 inset-x-1/2">
         <ConfirmDeleteForm />
       </div>
