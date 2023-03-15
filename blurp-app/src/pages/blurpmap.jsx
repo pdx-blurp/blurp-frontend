@@ -382,6 +382,7 @@ const TestPage = () => {
               nodeName: name,
               age: years,
               description: notes,
+              size: size,
             },
           })
           .catch((error) => {
